@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.CardView">
+   <children>
+      <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#1f93ff00" height="140.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="5.0" width="100.0" />
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="100.0">
+         <children>
+            <Text fx:id="valueView" strokeType="OUTSIDE" strokeWidth="0.0" text="13" textAlignment="CENTER" wrappingWidth="100.0">
+               <font>
+                  <Font name="FreeSans Bold" size="40.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Text>
+            <StackPane prefHeight="150.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <SVGPath content="M 36.513109,0 C 44.896653,13.03748 53.687271,25.982514 73.112059,36.513147 59.233357,45.152958 46.484482,56.14802 36.59895,73.112089 27.493633,58.459616 16.341033,45.448933 0,36.598942 15.629783,27.123326 27.800822,14.923692 36.513109,0 ZM 36.513109,0 C 44.896653,13.03748 53.687271,25.982514 73.112059,36.513147 59.233357,45.152958 46.484482,56.14802 36.59895,73.112089 27.493633,58.459616 16.341033,45.448933 0,36.598942 15.629783,27.123326 27.800822,14.923692 36.513109,0 Z" fill="#ffc100" StackPane.alignment="CENTER">
+                     <StackPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </StackPane.margin>
+                  </SVGPath>
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </children>
+</StackPane>

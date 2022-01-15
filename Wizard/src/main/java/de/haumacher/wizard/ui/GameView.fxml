@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox fx:id="main" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.GameView">
+   <children>
+      <HBox prefHeight="150.0" VBox.vgrow="ALWAYS">
+         <children>
+            <AnchorPane fx:id="actionPane" HBox.hgrow="ALWAYS" />
+            <VBox>
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Spielstand">
+                     <VBox.margin>
+                        <Insets left="5.0" top="5.0" />
+                     </VBox.margin>
+                  </Text>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Text fx:id="roundDisplay" strokeType="OUTSIDE" strokeWidth="0.0" text="Runde 2 von 10" />
+                        <VBox fx:id="statusPane" spacing="5.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets left="5.0" top="5.0" />
+                           </padding>
+                           <VBox.margin>
+                              <Insets left="5.0" />
+                           </VBox.margin>
+                        </VBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" top="5.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox prefHeight="150.0">
+         <children>
+            <VBox prefWidth="400.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Deine Karten" />
+                  <TilePane fx:id="cardsPane" hgap="5.0" vgap="5.0" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets left="5.0" top="5.0" />
+                     </padding>
+                  </TilePane>
+               </children>
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </VBox>
+            <VBox prefWidth="100.0" HBox.hgrow="NEVER">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Trumpf" />
+                  <TilePane fx:id="trumpPane" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets left="5.0" top="5.0" />
+                     </padding>
+                  </TilePane>
+               </children>
+               <padding>
+                  <Insets right="5.0" top="5.0" />
+               </padding>
+            </VBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+      </HBox>
+   </children>
+   <padding>
+      <Insets right="10.0" />
+   </padding>
+</VBox>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Text?>
+
+<HBox fx:id="main" alignment="CENTER_LEFT" spacing="5.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.PlayerStatus">
+   <children>
+      <Rectangle fx:id="activityView" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="20.0" stroke="BLACK" strokeType="INSIDE" width="20.0" HBox.hgrow="NEVER" />
+      <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+         <children>
+            <Text fx:id="nameField" strokeType="OUTSIDE" strokeWidth="0.0" text="Anne (20)" />
+         </children>
+      </VBox>
+      <Text fx:id="pointsField" strokeType="OUTSIDE" strokeWidth="0.0" text="(0/2)" HBox.hgrow="NEVER" />
+   </children>
+</HBox>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.CardView">
+   <children>
+      <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#1f93ff00" height="140.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="5.0" width="100.0" />
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="100.0">
+         <children>
+            <Text fx:id="valueView" strokeType="OUTSIDE" strokeWidth="0.0" text="W" textAlignment="CENTER" wrappingWidth="100.0">
+               <font>
+                  <Font name="FreeSans Bold" size="40.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Text>
+            <StackPane prefHeight="150.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <SVGPath content="M 65.594457,0 45.353122,34.143118 39.543119,4.2332977 15.328517,40.974539 15.539414,39.463484 16.282092,34.15253 5.6670993,32.664832 4.9127434,37.975862 0,73.013935 28.775925,57.120757 33.468435,54.525015 28.2816,45.139956 23.781203,47.627982 34.028372,32.079156 40.208542,63.858483 74.810873,5.4632316 Z" StackPane.alignment="CENTER">
+                     <StackPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </StackPane.margin>
+                  </SVGPath>
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </children>
+</StackPane>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<StackPane fx:id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.CardView">
+   <children>
+      <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#1f93ff00" height="140.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="5.0" width="100.0" />
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="100.0">
+         <children>
+            <Text fx:id="valueView" strokeType="OUTSIDE" strokeWidth="0.0" text="13" textAlignment="CENTER" wrappingWidth="100.0">
+               <font>
+                  <Font name="FreeSans Bold" size="40.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Text>
+            <StackPane prefHeight="150.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <SVGPath content="M 34.804131,2.1224423e-8 A 12.509923,12.509923 0 0 0 22.295331,12.51069 12.509923,12.509923 0 0 0 29.206689,23.682898 v 7.92892 H 23.307224 A 12.509923,12.509923 0 0 0 12.508811,25.387616 12.509923,12.509923 0 0 0 2.3484517e-8,37.896416 12.509923,12.509923 0 0 0 12.508811,50.407106 12.509923,12.509923 0 0 0 22.863583,44.915377 h 6.343106 V 66.978483 H 17.987275 v 6.041083 H 50.954544 V 66.978483 H 40.943369 V 44.915377 h 6.303459 a 12.509923,12.509923 0 0 0 10.341543,5.491729 12.509923,12.509923 0 0 0 12.51069,-12.51069 12.509923,12.509923 0 0 0 -12.51069,-12.5088 12.509923,12.509923 0 0 0 -10.802154,6.224202 H 40.943369 V 23.394066 A 12.509923,12.509923 0 0 0 47.314784,12.51069 12.509923,12.509923 0 0 0 34.804131,2.1224423e-8 Z" fill="#3e04eb" StackPane.alignment="CENTER">
+                     <StackPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </StackPane.margin>
+                  </SVGPath>
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </children>
+</StackPane>

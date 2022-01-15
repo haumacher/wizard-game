@@ -1,0 +1,7 @@
+package de.haumacher.wizard.data;
+
+message ConnectData {
+	string nickName;
+	string serverAddr;
+}
+

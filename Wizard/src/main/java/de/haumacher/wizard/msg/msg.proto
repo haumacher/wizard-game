@@ -1,0 +1,259 @@
+package de.haumacher.wizard.msg;
+
+option NoReflection;
+option NoListener;
+option NoBinary;
+option NoTypeKind;
+
+/**
+ * The color of a card.
+ */
+enum Color {
+	yellow;
+	red;
+	green;
+	blue;
+}
+
+/**
+ * Possible card values.
+ */
+enum Value {
+	N;
+	C1;
+	C2;
+	C3;
+	C4;
+	C5;
+	C6;
+	C7;
+	C8;
+	C9;
+	C10;
+	C11;
+	C12;
+	C13;
+	Z;
+}
+
+/**
+ * A card of the Wizard game.
+ */
+message Card {
+    /** The card color, <code>null</code> for wizards and fools. */
+	@Nullable
+	Color color;
+	
+    /** The value of the card. */
+	Value value;
+}
+
+message Player {
+	string id;
+	string name;
+}
+
+abstract message Msg {}
+abstract message Cmd {}
+
+/** 
+ * First message that must be sent after connecting to a game server.
+ *
+ * <p>
+ * On success, a {@link LoggedIn} message is sent back.
+ * </p> 
+ */
+message Login extends Cmd {
+	/** The nick name of the player. */
+	string name;
+}
+
+/** Response message upon successful {@link Login}. */
+message LoggedIn extends Msg {
+	string playerId;
+}
+
+/** 
+ * Command that requests creating a new game on the server.
+ * <p>
+ * On success, a {@link GameCreated} response message is sent to all clients not currently participating in a game.
+ * </p> 
+ */
+message CreateGame extends Cmd {
+
+}
+
+message GameCreated extends Msg {
+	/** Id of the player that created the game. This player is implicitly the first player in the game without explicitly joining the game. */
+	string ownerId;
+	
+	/** The newly created game. */
+	Game game;
+}
+
+message GameDeleted extends Msg {
+	string gameId;
+}
+
+message StartGame extends Cmd {
+	string gameId;
+}
+
+/** Message sent in response to {@link StartGame} to announce the final game configuration. */
+message GameStarted extends Msg {
+	/** The final settings of the game that is started */
+	Game game;
+}
+
+message Join extends Cmd {
+	string gameId;
+}
+
+message ListGames extends Cmd {
+}
+
+abstract message Result extends Msg {
+
+}
+
+message Error extends Result {
+	string `message`;
+}
+
+message ListGamesResult extends Result {
+	repeated Game games;
+}
+
+message Game {
+	string gameId;
+	repeated Player players;
+}
+
+message JoinAnnounce extends Msg {
+	string gameId;
+	Player player;
+}
+
+message LeaveAnnounce extends Msg {
+	string gameId;
+	string playerId;
+}
+
+message StartRound extends Msg {
+	int round;
+	int maxRound;
+	repeated Player players;
+	repeated Card cards;
+	Card trumpCard;
+}
+
+message FinishTurn extends Msg {
+	repeated Card trick;
+	Player winner;
+}
+
+/** Command in response to {@link FinishTurn} that must be received from all players, before the next turn starts */
+message ConfirmTrick extends GameCmd {
+}
+
+/** Command in response to {@link FinishRound} that must be received from all players, before the next round starts */
+message ConfirmRound extends GameCmd {
+}
+
+message FinishRound extends Msg {
+	map<string, int> points;
+}
+
+message FinishGame extends Msg {
+	repeated PlayerScore scores;
+}
+
+message PlayerScore {
+	Player player;
+	int score;
+}
+
+message LeaveGame extends Cmd {
+	string gameId;
+}
+
+abstract message GameCmd extends Cmd {
+
+}
+
+message Announce extends Msg {
+	string playerId;
+	GameCmd cmd;
+}
+
+message RequestTrumpSelection extends Msg {
+	string playerId;
+}
+
+message SelectTrump extends GameCmd {
+	Color trumpColor;
+}
+
+message StartBids extends Msg {
+}
+
+message RequestBid extends Msg {
+	/** The number of tricks expected by other players so far. */
+	int expected;
+	
+	/** The round number and maximum number of tricks possible in that round. */
+	int round;
+}
+
+message Bid extends GameCmd {
+	/** 
+	 * The sum of tricks expected by all players so far.
+	 *
+	 * <p>
+	 * The value is only relevant when the message is announced to all players. It is not required to set this value when sending the command to the server.
+	 * </p> 
+	 */
+	int expected;
+
+	/** The bid of the current player */
+	int cnt;
+}
+
+/**
+ * Message sent to all players that announces the player that is about to put a card on the table.
+ */
+message RequestPut extends Msg {
+	/** The ID of the player that is expected to send a {@link Put} message. All other playes are only informed about the player that is in command. */
+	string playerId;
+}
+
+/**
+ * Message announcing that all bids are placed.
+ */
+message StartLead extends Msg {
+	map<string, PlayerInfo> state;
+}
+
+message PlayerInfo {
+	int bid;
+	int tricks;
+	int score;
+}
+
+message Put extends GameCmd {
+	Card card;
+}
+
+message RoundState {
+	int bidCnt;
+	int hitCnt;
+	repeated Card cards;
+}
+
+message PlayerState {
+	Player player;
+	int score;
+	RoundState roundState;
+}
+
+
