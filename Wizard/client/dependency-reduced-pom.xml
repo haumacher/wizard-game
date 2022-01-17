@@ -7,6 +7,8 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>wizard</artifactId>
+  <name>Zauberer</name>
+  <description>Multi player online variant of the famous card game "Wizard" by Ken Fisher.</description>
   <build>
     <plugins>
       <plugin>
@@ -24,9 +26,52 @@
               <shadedArtifactAttached>false</shadedArtifactAttached>
               <transformers>
                 <transformer>
-                  <mainClass>de.haumacher.wizard.WizardLauncher</mainClass>
+                  <mainClass>${mainClassName}</mainClass>
                 </transformer>
               </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+        <artifactId>launch4j-maven-plugin</artifactId>
+        <version>2.1.2</version>
+        <executions>
+          <execution>
+            <id>launch4j</id>
+            <phase>package</phase>
+            <goals>
+              <goal>launch4j</goal>
+            </goals>
+            <configuration>
+              <headerType>gui</headerType>
+              <jar>target/wizard-${project.version}.jar</jar>
+              <outfile>target/${project.name}.exe</outfile>
+              <downloadUrl>http://java.com/download</downloadUrl>
+              <classPath>
+                <mainClass>${mainClassName}</mainClass>
+              </classPath>
+              <jre>
+                <path />
+                <bundledJre64Bit>false</bundledJre64Bit>
+                <bundledJreAsFallback>false</bundledJreAsFallback>
+                <minVersion>11</minVersion>
+                <maxVersion />
+                <jdkPreference>preferJre</jdkPreference>
+                <runtimeBits>64/32</runtimeBits>
+              </jre>
+              <versionInfo>
+                <fileVersion>1.0.0.0</fileVersion>
+                <txtFileVersion>${project.version}</txtFileVersion>
+                <fileDescription>${project.description}</fileDescription>
+                <copyright>(C) Bernhard Haumacher</copyright>
+                <productVersion>1.0.0.0</productVersion>
+                <txtProductVersion>${project.version}</txtProductVersion>
+                <productName>${project.name}</productName>
+                <internalName>${project.name}</internalName>
+                <originalFilename>${project.name}.exe</originalFilename>
+              </versionInfo>
             </configuration>
           </execution>
         </executions>
@@ -43,5 +88,6 @@
   </dependencies>
   <properties>
     <javafx.version>17</javafx.version>
+    <mainClassName>de.haumacher.wizard.WizardLauncher</mainClassName>
   </properties>
 </project>

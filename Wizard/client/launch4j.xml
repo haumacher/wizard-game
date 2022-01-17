@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>/home/bhu/git/wizard-game/Wizard/client/target/wizard-1.0.0-SNAPSHOT.jar</jar>
-  <outfile>/home/bhu/Schreibtisch/wizard.exe</outfile>
+  <jar>client/target/wizard-1.0.0-SNAPSHOT.jar</jar>
+  <outfile>target/Wizard.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
