@@ -14,7 +14,7 @@
 		<module>server</module>
 		<module>common</module>
 	</modules>
-
+	
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 	</properties>
@@ -28,6 +28,13 @@
 		</dependency>
 	</dependencies>
 
+	<scm>
+		<tag>HEAD</tag>
+		<url>https://github.com/haumacher/wizard-game</url>
+		<connection>scm:git:https://github.com/haumacher/wizard-game.git</connection>
+		<developerConnection>scm:git:https://github.com/haumacher/wizard-game.git</developerConnection>
+	</scm>
+	
 	<build>
 		<resources>
 			<resource>
