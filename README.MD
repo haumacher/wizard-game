@@ -26,7 +26,7 @@ in this directory. If the build succeeds, it produces a runnable JAR for the ser
 ## Usage
 
 Start the server on some machine and the clients on at least three machines for the players. From each client connect
-to the game server. One of the clients is then expected to start a game. The other clients join the started game. After
+to the game server. One of the clients is then expected to create a game. The other clients join the created game. After
 all players have joined, the game can be started. Follow the instructions in the UI.
  
 ![Screenshot](doc/screenshot.png "It's your turn!")
