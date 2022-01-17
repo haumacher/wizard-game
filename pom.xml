@@ -14,7 +14,7 @@
 		<module>server</module>
 		<module>common</module>
 	</modules>
-	
+
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 	</properties>
@@ -34,7 +34,7 @@
 		<connection>scm:git:https://github.com/haumacher/wizard-game.git</connection>
 		<developerConnection>scm:git:https://github.com/haumacher/wizard-game.git</developerConnection>
 	</scm>
-	
+
 	<build>
 		<resources>
 			<resource>
@@ -56,35 +56,44 @@
 			</plugin>
 
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<configuration>
+					<tagNameFormat>v@{project.version}</tagNameFormat>
+				</configuration>
+			</plugin>
+
+			<plugin>
 				<groupId>com.ragedunicorn.tools.maven</groupId>
 				<artifactId>github-release-maven-plugin</artifactId>
 				<version>1.0.3</version>
-				
+
 				<executions>
 					<execution>
 						<id>create-github-release</id>
-						
+
 						<goals>
 							<goal>github-release</goal>
 						</goals>
-						
+
 						<inherited>false</inherited>
 					</execution>
 				</executions>
-				
+
 				<inherited>false</inherited>
-				
+
 				<configuration>
 					<name>Wizard ${project.version}</name>
-					
+
 					<tagName>v${project.version}</tagName>
 					<draft>true</draft>
-	
+
 					<server>github-haumacher</server>
 					<repository>wizard-game</repository>
 					<owner>haumacher</owner>
 					<targetCommitish>master</targetCommitish>
-	
+
 					<releaseNotes>release-notes.md</releaseNotes>
 					<assets>
 						<asset>${basedir}/client/target/wizard-client-${project.version}.jar/</asset>
