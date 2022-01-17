@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Starts a round by assigning cards to players.
+ */
 public class StartRound extends Msg {
 
 	/**
@@ -46,6 +49,9 @@ public class StartRound extends Msg {
 		super();
 	}
 
+	/**
+	 * The number of the round. 1 is the first round.
+	 */
 	public final int getRound() {
 		return _round;
 	}
@@ -63,6 +69,9 @@ public class StartRound extends Msg {
 	}
 
 
+	/**
+	 * The number of rounds being played in this game (depends on the number of players).
+	 */
 	public final int getMaxRound() {
 		return _maxRound;
 	}
@@ -80,6 +89,9 @@ public class StartRound extends Msg {
 	}
 
 
+	/**
+	 * The players and their order in this round.
+	 */
 	public final java.util.List<Player> getPlayers() {
 		return _players;
 	}
@@ -119,6 +131,9 @@ public class StartRound extends Msg {
 		_players.remove(value);
 	}
 
+	/**
+	 * The cards given to the player that receives this message.
+	 */
 	public final java.util.List<Card> getCards() {
 		return _cards;
 	}
@@ -158,6 +173,9 @@ public class StartRound extends Msg {
 		_cards.remove(value);
 	}
 
+	/**
+	 * The given trump card. In the last round, there is no trump card.
+	 */
 	public final Card getTrumpCard() {
 		return _trumpCard;
 	}

@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Information about a game.
+ */
 public class Game extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/**
@@ -31,6 +34,9 @@ public class Game extends de.haumacher.msgbuf.data.AbstractDataObject {
 		super();
 	}
 
+	/**
+	 * A unique identifier of the game used to reference this game in messages.
+	 */
 	public final String getGameId() {
 		return _gameId;
 	}
@@ -48,6 +54,9 @@ public class Game extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
+	/**
+	 * The players that have joined this game.
+	 */
 	public final java.util.List<Player> getPlayers() {
 		return _players;
 	}

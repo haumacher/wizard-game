@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Message to forward a {@link GameCmd} sent by one player of a game to all other players.
+ */
 public class Announce extends Msg {
 
 	/**
@@ -31,6 +34,9 @@ public class Announce extends Msg {
 		super();
 	}
 
+	/**
+	 * The ID of the player that sent the command.
+	 */
 	public final String getPlayerId() {
 		return _playerId;
 	}
@@ -48,6 +54,9 @@ public class Announce extends Msg {
 	}
 
 
+	/**
+	 * The command sent by the player with the ID given in {@link #getPlayerId()}.
+	 */
 	public final GameCmd getCmd() {
 		return _cmd;
 	}

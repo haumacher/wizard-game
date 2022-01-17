@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Message sent after the last round of a game.
+ */
 public class FinishGame extends Msg {
 
 	/**
@@ -26,6 +29,9 @@ public class FinishGame extends Msg {
 		super();
 	}
 
+	/**
+	 * The total score for each player. The list is ordered by the points the players have won.
+	 */
 	public final java.util.List<PlayerScore> getScores() {
 		return _scores;
 	}

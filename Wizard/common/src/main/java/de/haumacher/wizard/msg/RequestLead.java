@@ -3,17 +3,17 @@ package de.haumacher.wizard.msg;
 /**
  * Message sent to all players that announces the player that is about to put a card on the table.
  */
-public class RequestPut extends Msg {
+public class RequestLead extends Msg {
 
 	/**
-	 * Creates a {@link RequestPut} instance.
+	 * Creates a {@link RequestLead} instance.
 	 */
-	public static RequestPut create() {
-		return new RequestPut();
+	public static RequestLead create() {
+		return new RequestLead();
 	}
 
-	/** Identifier for the {@link RequestPut} type in JSON format. */
-	public static final String REQUEST_PUT__TYPE = "RequestPut";
+	/** Identifier for the {@link RequestLead} type in JSON format. */
+	public static final String REQUEST_LEAD__TYPE = "RequestLead";
 
 	/** @see #getPlayerId() */
 	private static final String PLAYER_ID = "playerId";
@@ -21,16 +21,16 @@ public class RequestPut extends Msg {
 	private String _playerId = "";
 
 	/**
-	 * Creates a {@link RequestPut} instance.
+	 * Creates a {@link RequestLead} instance.
 	 *
 	 * @see #create()
 	 */
-	protected RequestPut() {
+	protected RequestLead() {
 		super();
 	}
 
 	/**
-	 * The ID of the player that is expected to send a {@link Put} message. All other playes are only informed about the player that is in command.
+	 * The ID of the player that is expected to send a {@link Lead} message. All other playes are only informed about the player that is in command.
 	 */
 	public final String getPlayerId() {
 		return _playerId;
@@ -39,7 +39,7 @@ public class RequestPut extends Msg {
 	/**
 	 * @see #getPlayerId()
 	 */
-	public RequestPut setPlayerId(String value) {
+	public RequestLead setPlayerId(String value) {
 		internalSetPlayerId(value);
 		return this;
 	}
@@ -51,12 +51,12 @@ public class RequestPut extends Msg {
 
 	@Override
 	public String jsonType() {
-		return REQUEST_PUT__TYPE;
+		return REQUEST_LEAD__TYPE;
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static RequestPut readRequestPut(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		RequestPut result = new RequestPut();
+	public static RequestLead readRequestLead(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		RequestLead result = new RequestLead();
 		in.beginObject();
 		result.readFields(in);
 		in.endObject();

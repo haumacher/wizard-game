@@ -29,6 +29,9 @@ public class StartLead extends Msg {
 		super();
 	}
 
+	/**
+	 * Score information of all players by their IDs.
+	 */
 	public final java.util.Map<String, PlayerInfo> getState() {
 		return _state;
 	}

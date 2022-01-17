@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Internal information kept for each player of a game on the server.
+ */
 public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/**
@@ -36,6 +39,9 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		super();
 	}
 
+	/**
+	 * Player data.
+	 */
 	public final Player getPlayer() {
 		return _player;
 	}
@@ -60,6 +66,9 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		return _player != null;
 	}
 
+	/**
+	 * Points won so far.
+	 */
 	public final int getPoints() {
 		return _points;
 	}
@@ -77,6 +86,9 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
+	/**
+	 * Information about the current round.
+	 */
 	public final RoundState getRoundState() {
 		return _roundState;
 	}

@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * The state of a player as part of {@link PlayerState}.
+ */
 public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/**
@@ -36,6 +39,9 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		super();
 	}
 
+	/**
+	 * The player's bid.
+	 */
 	public final int getBidCnt() {
 		return _bidCnt;
 	}
@@ -53,6 +59,9 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
+	/**
+	 * The number of tricks won.
+	 */
 	public final int getWinCnt() {
 		return _winCnt;
 	}
@@ -70,6 +79,9 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
+	/**
+	 * The cards that the player has currently in his hand.
+	 */
 	public final java.util.List<Card> getCards() {
 		return _cards;
 	}

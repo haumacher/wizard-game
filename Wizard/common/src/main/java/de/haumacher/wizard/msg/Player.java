@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * A player of a {@link Game}.
+ */
 public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/**
@@ -31,6 +34,9 @@ public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 		super();
 	}
 
+	/**
+	 * A technical ID of the player used to reference this player in messages.
+	 */
 	public final String getId() {
 		return _id;
 	}
@@ -48,6 +54,9 @@ public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
+	/**
+	 * A nick name for the player to display to other users.
+	 */
 	public final String getName() {
 		return _name;
 	}

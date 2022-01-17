@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Message sent at the end of each turn announcing the winner.
+ */
 public class FinishTurn extends Msg {
 
 	/**
@@ -31,6 +34,9 @@ public class FinishTurn extends Msg {
 		super();
 	}
 
+	/**
+	 * The cards that have been played in this turn.
+	 */
 	public final java.util.List<Card> getTrick() {
 		return _trick;
 	}
@@ -70,6 +76,9 @@ public class FinishTurn extends Msg {
 		_trick.remove(value);
 	}
 
+	/**
+	 * The winner of this turn.
+	 */
 	public final Player getWinner() {
 		return _winner;
 	}

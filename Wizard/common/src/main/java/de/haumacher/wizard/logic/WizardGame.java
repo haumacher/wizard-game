@@ -32,9 +32,9 @@ import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
 import de.haumacher.wizard.msg.PlayerScore;
 import de.haumacher.wizard.msg.PlayerState;
-import de.haumacher.wizard.msg.Put;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.RequestBid;
-import de.haumacher.wizard.msg.RequestPut;
+import de.haumacher.wizard.msg.RequestLead;
 import de.haumacher.wizard.msg.RequestTrumpSelection;
 import de.haumacher.wizard.msg.RoundState;
 import de.haumacher.wizard.msg.SelectTrump;
@@ -52,6 +52,8 @@ import de.haumacher.wizard.msg.Value;
 public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException> {
 	
 	static final List<Card> CARDS;
+
+	public static final int PROTOCOL_VERSION = 1;
 	
 	static {
 		List<Card> cards = new ArrayList<>();
@@ -305,7 +307,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			for (PlayerState state : _players) {
 				startLead.getState().put(state.getPlayer().getId(), 
 					PlayerInfo.create()
-						.setScore(state.getPoints())
+						.setPoints(state.getPoints())
 						.setBid(state.getRoundState().getBidCnt())
 						.setTricks(state.getRoundState().getWinCnt()));
 			}
@@ -317,7 +319,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	@Override
-	public Void visit(Put self, GameClient arg)  {
+	public Void visit(Lead self, GameClient arg)  {
 		if (_bidCount < _players.size()) {
 			arg.sendError("Es sind noch nicht alle Gebote angegeben.");
 			return null;
@@ -491,7 +493,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void requestPut(int nextPlayer) {
-		broadCast(RequestPut.create().setPlayerId(getPlayerId(nextPlayer)));
+		broadCast(RequestLead.create().setPlayerId(getPlayerId(nextPlayer)));
 	}
 
 	private boolean hits(Card best, Card current) {

@@ -1,16 +1,19 @@
 package de.haumacher.wizard.msg;
 
-public class Join extends Cmd {
+/**
+ * Requests joining a game.
+ */
+public class JoinGame extends Cmd {
 
 	/**
-	 * Creates a {@link Join} instance.
+	 * Creates a {@link JoinGame} instance.
 	 */
-	public static Join create() {
-		return new Join();
+	public static JoinGame create() {
+		return new JoinGame();
 	}
 
-	/** Identifier for the {@link Join} type in JSON format. */
-	public static final String JOIN__TYPE = "Join";
+	/** Identifier for the {@link JoinGame} type in JSON format. */
+	public static final String JOIN_GAME__TYPE = "JoinGame";
 
 	/** @see #getGameId() */
 	private static final String GAME_ID = "gameId";
@@ -18,14 +21,17 @@ public class Join extends Cmd {
 	private String _gameId = "";
 
 	/**
-	 * Creates a {@link Join} instance.
+	 * Creates a {@link JoinGame} instance.
 	 *
 	 * @see #create()
 	 */
-	protected Join() {
+	protected JoinGame() {
 		super();
 	}
 
+	/**
+	 * The ID of the game the sender wants to join.
+	 */
 	public final String getGameId() {
 		return _gameId;
 	}
@@ -33,7 +39,7 @@ public class Join extends Cmd {
 	/**
 	 * @see #getGameId()
 	 */
-	public Join setGameId(String value) {
+	public JoinGame setGameId(String value) {
 		internalSetGameId(value);
 		return this;
 	}
@@ -45,12 +51,12 @@ public class Join extends Cmd {
 
 	@Override
 	public String jsonType() {
-		return JOIN__TYPE;
+		return JOIN_GAME__TYPE;
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static Join readJoin(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Join result = new Join();
+	public static JoinGame readJoinGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		JoinGame result = new JoinGame();
 		in.beginObject();
 		result.readFields(in);
 		in.endObject();

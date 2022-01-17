@@ -6,6 +6,7 @@ package de.haumacher.wizard;
 import java.io.IOError;
 import java.io.IOException;
 
+import de.haumacher.wizard.logic.WizardGame;
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.ConfirmRound;
@@ -20,7 +21,7 @@ import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameCreated;
 import de.haumacher.wizard.msg.GameDeleted;
 import de.haumacher.wizard.msg.GameStarted;
-import de.haumacher.wizard.msg.Join;
+import de.haumacher.wizard.msg.JoinGame;
 import de.haumacher.wizard.msg.JoinAnnounce;
 import de.haumacher.wizard.msg.LeaveAnnounce;
 import de.haumacher.wizard.msg.LeaveGame;
@@ -29,9 +30,9 @@ import de.haumacher.wizard.msg.ListGamesResult;
 import de.haumacher.wizard.msg.LoggedIn;
 import de.haumacher.wizard.msg.Login;
 import de.haumacher.wizard.msg.Msg;
-import de.haumacher.wizard.msg.Put;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.RequestBid;
-import de.haumacher.wizard.msg.RequestPut;
+import de.haumacher.wizard.msg.RequestLead;
 import de.haumacher.wizard.msg.RequestTrumpSelection;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartBids;
@@ -116,7 +117,7 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 					}
 				};
 				_handler.start(data.getServerAddr(), 8090);
-				_handler.sendCommand(Login.create().setName(data.getNickName()));
+				_handler.sendCommand(Login.create().setName(data.getNickName()).setVersion(WizardGame.PROTOCOL_VERSION));
 				_handler.sendCommand(ListGames.create());
 			} catch (IOException ex) {
 				_handler = null;
@@ -175,7 +176,7 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 		_gameSelector = showView(GameSelector.class, "GameSelector.fxml");
 		_gameSelector.init(self, game -> {
 			_game = game;
-			_handler.sendCommand(Join.create().setGameId(game.getGameId()));
+			_handler.sendCommand(JoinGame.create().setGameId(game.getGameId()));
 		});
 		return null;
 	}
@@ -284,13 +285,13 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 	}
 
 	@Override
-	public Void visit(RequestPut self, Void arg) throws IOException {
+	public Void visit(RequestLead self, Void arg) throws IOException {
 		_gameView.requestLead(self.getPlayerId());
 		return null;
 	}
 
 	@Override
-	public Void visit(Put self, String playerId) throws IOException {
+	public Void visit(Lead self, String playerId) throws IOException {
 		_gameView.announceLead(playerId, self.getCard());
 		return null;
 	}

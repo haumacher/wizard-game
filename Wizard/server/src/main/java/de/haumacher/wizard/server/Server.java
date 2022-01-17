@@ -33,7 +33,7 @@ import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameCreated;
 import de.haumacher.wizard.msg.GameDeleted;
 import de.haumacher.wizard.msg.GameStarted;
-import de.haumacher.wizard.msg.Join;
+import de.haumacher.wizard.msg.JoinGame;
 import de.haumacher.wizard.msg.LeaveGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.ListGamesResult;
@@ -41,7 +41,7 @@ import de.haumacher.wizard.msg.LoggedIn;
 import de.haumacher.wizard.msg.Login;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.Player;
-import de.haumacher.wizard.msg.Put;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
 
@@ -89,7 +89,8 @@ public class Server {
 		
 		private WizardGame _game;
 		
-		private Player _data = Player.create().setId(UUID.randomUUID().toString());
+		private Player _data = Player.create().setId(UUID.randomUUID().toString()).setName("Anonymous");
+		private boolean _loggedIn = false;
 
 		public Client(ReaderAdapter in, WriterAdapter out) {
 			_in = new JsonReader(in);
@@ -107,9 +108,11 @@ public class Server {
 						if (_in.peek() == JsonToken.END_ARRAY) {
 							break;
 						}
+						
 						Cmd cmd = Cmd.readCmd(_in);
-						System.out.println(_data.getName() + " -> " + cmd);
 						cmd.visit(this, null);
+						
+						System.out.println(_data.getName() + " -> " + cmd);
 					} catch (RuntimeException ex) {
 						ex.printStackTrace();
 						
@@ -142,41 +145,42 @@ public class Server {
 		}
 
 		@Override
-		public Void visit(SelectTrump self, Void arg) throws IOException {
-			return forwardToGame(self);
+		public Player getData() {
+			return _data;
 		}
 
 		@Override
-		public Void visit(Bid self, Void arg) throws IOException {
-			return forwardToGame(self);
-		}
-
-		@Override
-		public Void visit(Put self, Void arg) throws IOException {
-			return forwardToGame(self);
+		public String getId() {
+			return _data.getId();
 		}
 		
 		@Override
-		public Void visit(ConfirmTrick self, Void arg) throws IOException {
-			return forwardToGame(self);
+		public void sendError(String message) {
+			sendMessage(Error.create().setMessage(message));
 		}
 		
 		@Override
-		public Void visit(ConfirmRound self, Void arg) throws IOException {
-			return forwardToGame(self);
-		}
-
-		private Void forwardToGame(GameCmd self) throws IOException {
-			if (_game == null) {
-				sendError("Du bist keinem Spiel beigetreten.");
-				return null;
+		public synchronized void sendMessage(Msg msg) {
+			try {
+				System.out.println(_data.getName() + " <- " + msg);
+				msg.writeTo(_out);
+				_out.flush();
+			} catch (IOException ex) {
+				System.err.println("Cannot send to " + _data + ": " + msg + " (" + ex.getMessage() + ")");
 			}
-
-			return self.visit(_game, this);
 		}
-
+		
 		@Override
 		public Void visit(Login self, Void arg) throws IOException {
+			if (self.getVersion() != WizardGame.PROTOCOL_VERSION) {
+				if (self.getVersion() > WizardGame.PROTOCOL_VERSION) {
+					sendError("Die Version von deinem Programm ist zu neu. Sie ist nicht mit diesem Server kompatibel.");
+				} else {
+					sendError("Die Version von deinem Programm ist zu alt. Sie ist nicht mit diesem Server kompatibel.");
+				}
+				return null;
+			}
+			_loggedIn = true;
 			_data.setName(self.getName());
 			sendMessage(LoggedIn.create().setPlayerId(getId()));
 			return null;
@@ -198,11 +202,6 @@ public class Server {
 		}
 
 		@Override
-		public void sendError(String message) {
-			sendMessage(Error.create().setMessage(message));
-		}
-		
-		@Override
 		public Void visit(StartGame self, Void arg) throws IOException {
 			if (_game == null) {
 				sendError("Du bist keinem Spiel beigetreten.");
@@ -222,7 +221,7 @@ public class Server {
 		}
 
 		@Override
-		public Void visit(Join self, Void arg) throws IOException {
+		public Void visit(JoinGame self, Void arg) throws IOException {
 			if (_game != null) {
 				sendError("Du bist schon einem Spiel beigetreten.");
 				return null;
@@ -257,25 +256,42 @@ public class Server {
 		}
 
 		@Override
-		public Player getData() {
-			return _data;
+		public Void visit(SelectTrump self, Void arg) throws IOException {
+			return forwardToGame(self);
 		}
 
 		@Override
-		public synchronized void sendMessage(Msg msg) {
-			try {
-				System.out.println(_data.getName() + " <- " + msg);
-				msg.writeTo(_out);
-				_out.flush();
-			} catch (IOException ex) {
-				System.err.println("Cannot send to " + _data + ": " + msg + " (" + ex.getMessage() + ")");
-			}
+		public Void visit(Bid self, Void arg) throws IOException {
+			return forwardToGame(self);
 		}
 
 		@Override
-		public String getId() {
-			return _data.getId();
+		public Void visit(Lead self, Void arg) throws IOException {
+			return forwardToGame(self);
 		}
 		
+		@Override
+		public Void visit(ConfirmTrick self, Void arg) throws IOException {
+			return forwardToGame(self);
+		}
+		
+		@Override
+		public Void visit(ConfirmRound self, Void arg) throws IOException {
+			return forwardToGame(self);
+		}
+
+		private Void forwardToGame(GameCmd self) throws IOException {
+			if (!_loggedIn) {
+				sendError("Du bist nicht angemeldet.");
+				return null;
+			}
+			if (_game == null) {
+				sendError("Du bist keinem Spiel beigetreten.");
+				return null;
+			}
+
+			return self.visit(_game, this);
+		}
+
 	}
 }

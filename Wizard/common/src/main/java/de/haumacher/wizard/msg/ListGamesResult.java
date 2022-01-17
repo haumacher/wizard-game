@@ -1,6 +1,9 @@
 package de.haumacher.wizard.msg;
 
-public class ListGamesResult extends Result {
+/**
+ * Provides a listing of games waiting for players.
+ */
+public class ListGamesResult extends ResultMsg {
 
 	/**
 	 * Creates a {@link ListGamesResult} instance.
@@ -26,6 +29,9 @@ public class ListGamesResult extends Result {
 		super();
 	}
 
+	/**
+	 * List of all games on the server currently accepting new players.
+	 */
 	public final java.util.List<Game> getGames() {
 		return _games;
 	}
@@ -106,7 +112,7 @@ public class ListGamesResult extends Result {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Result.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(ResultMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

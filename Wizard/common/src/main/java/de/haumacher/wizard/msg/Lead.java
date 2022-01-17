@@ -1,16 +1,19 @@
 package de.haumacher.wizard.msg;
 
-public class Put extends GameCmd {
+/**
+ * Puts a card on the table.
+ */
+public class Lead extends GameCmd {
 
 	/**
-	 * Creates a {@link Put} instance.
+	 * Creates a {@link Lead} instance.
 	 */
-	public static Put create() {
-		return new Put();
+	public static Lead create() {
+		return new Lead();
 	}
 
-	/** Identifier for the {@link Put} type in JSON format. */
-	public static final String PUT__TYPE = "Put";
+	/** Identifier for the {@link Lead} type in JSON format. */
+	public static final String LEAD__TYPE = "Lead";
 
 	/** @see #getCard() */
 	private static final String CARD = "card";
@@ -18,14 +21,17 @@ public class Put extends GameCmd {
 	private Card _card = null;
 
 	/**
-	 * Creates a {@link Put} instance.
+	 * Creates a {@link Lead} instance.
 	 *
 	 * @see #create()
 	 */
-	protected Put() {
+	protected Lead() {
 		super();
 	}
 
+	/**
+	 * The card that is led.
+	 */
 	public final Card getCard() {
 		return _card;
 	}
@@ -33,7 +39,7 @@ public class Put extends GameCmd {
 	/**
 	 * @see #getCard()
 	 */
-	public Put setCard(Card value) {
+	public Lead setCard(Card value) {
 		internalSetCard(value);
 		return this;
 	}
@@ -52,12 +58,12 @@ public class Put extends GameCmd {
 
 	@Override
 	public String jsonType() {
-		return PUT__TYPE;
+		return LEAD__TYPE;
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static Put readPut(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Put result = new Put();
+	public static Lead readLead(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		Lead result = new Lead();
 		in.beginObject();
 		result.readFields(in);
 		in.endObject();

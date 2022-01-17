@@ -22,7 +22,12 @@ public class Login extends Cmd {
 	/** @see #getName() */
 	private static final String NAME = "name";
 
+	/** @see #getVersion() */
+	private static final String VERSION = "version";
+
 	private String _name = "";
+
+	private int _version = 0;
 
 	/**
 	 * Creates a {@link Login} instance.
@@ -53,6 +58,26 @@ public class Login extends Cmd {
 	}
 
 
+	/**
+	 * The protocol version of the connecting client. This can be used to detect version mismatch of client and server.
+	 */
+	public final int getVersion() {
+		return _version;
+	}
+
+	/**
+	 * @see #getVersion()
+	 */
+	public Login setVersion(int value) {
+		internalSetVersion(value);
+		return this;
+	}
+	/** Internal setter for {@link #getVersion()} without chain call utility. */
+	protected final void internalSetVersion(int value) {
+		_version = value;
+	}
+
+
 	@Override
 	public String jsonType() {
 		return LOGIN__TYPE;
@@ -72,12 +97,15 @@ public class Login extends Cmd {
 		super.writeFields(out);
 		out.name(NAME);
 		out.value(getName());
+		out.name(VERSION);
+		out.value(getVersion());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
 			case NAME: setName(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case VERSION: setVersion(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

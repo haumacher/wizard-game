@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Message that starts the bid phase.
+ */
 public class StartBids extends Msg {
 
 	/**

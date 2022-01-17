@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Informs idle players that a game that was waiting for players has been deleted.
+ */
 public class GameDeleted extends Msg {
 
 	/**
@@ -26,6 +29,9 @@ public class GameDeleted extends Msg {
 		super();
 	}
 
+	/**
+	 * The ID of the game that has been deleted.
+	 */
 	public final String getGameId() {
 		return _gameId;
 	}

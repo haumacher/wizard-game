@@ -18,7 +18,7 @@ import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
-import de.haumacher.wizard.msg.Put;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.StartRound;
 import de.haumacher.wizard.msg.Value;
 import javafx.fxml.FXML;
@@ -135,7 +135,7 @@ public class GameView extends Controller {
 			PlayerInfo info = entry.getValue();
 			
 			playerStatus.setBid(info.getBid());
-			playerStatus.setScore(info.getScore());
+			playerStatus.setScore(info.getPoints());
 		}
 		
 		_currentTrick = load(CurrentTrick.class, "CurrentTrick.fxml");
@@ -159,7 +159,7 @@ public class GameView extends Controller {
 
 	private void leadCard(Node n) {
 		_cardBeingPut = (CardView) n.getUserData();
-		_handler.sendCommand(Put.create().setCard(_cardBeingPut.getCard()));
+		_handler.sendCommand(Lead.create().setCard(_cardBeingPut.getCard()));
 	}
 
 	public void announceLead(String playerId, Card card) {

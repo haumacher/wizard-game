@@ -1,6 +1,9 @@
 package de.haumacher.wizard.msg;
 
-public class Error extends Result {
+/**
+ * Informs the client that the last {@link Cmd} failed.
+ */
+public class Error extends ResultMsg {
 
 	/**
 	 * Creates a {@link Error} instance.
@@ -26,6 +29,9 @@ public class Error extends Result {
 		super();
 	}
 
+	/**
+	 * Description of the error that has been detected.
+	 */
 	public final String getMessage() {
 		return _message;
 	}
@@ -73,7 +79,7 @@ public class Error extends Result {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Result.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(ResultMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

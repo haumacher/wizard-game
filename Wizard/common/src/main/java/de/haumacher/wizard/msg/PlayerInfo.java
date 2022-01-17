@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Score information for a single player, see {@link StartLead}.
+ */
 public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/**
@@ -18,14 +21,14 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/** @see #getTricks() */
 	private static final String TRICKS = "tricks";
 
-	/** @see #getScore() */
-	private static final String SCORE = "score";
+	/** @see #getPoints() */
+	private static final String POINTS = "points";
 
 	private int _bid = 0;
 
 	private int _tricks = 0;
 
-	private int _score = 0;
+	private int _points = 0;
 
 	/**
 	 * Creates a {@link PlayerInfo} instance.
@@ -36,6 +39,9 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		super();
 	}
 
+	/**
+	 * The player's bid.
+	 */
 	public final int getBid() {
 		return _bid;
 	}
@@ -53,6 +59,9 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
+	/**
+	 * The number of won tricks.
+	 */
 	public final int getTricks() {
 		return _tricks;
 	}
@@ -70,20 +79,23 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
-	public final int getScore() {
-		return _score;
+	/**
+	 * The current points of the player.
+	 */
+	public final int getPoints() {
+		return _points;
 	}
 
 	/**
-	 * @see #getScore()
+	 * @see #getPoints()
 	 */
-	public PlayerInfo setScore(int value) {
-		internalSetScore(value);
+	public PlayerInfo setPoints(int value) {
+		internalSetPoints(value);
 		return this;
 	}
-	/** Internal setter for {@link #getScore()} without chain call utility. */
-	protected final void internalSetScore(int value) {
-		_score = value;
+	/** Internal setter for {@link #getPoints()} without chain call utility. */
+	protected final void internalSetPoints(int value) {
+		_points = value;
 	}
 
 
@@ -113,8 +125,8 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		out.value(getBid());
 		out.name(TRICKS);
 		out.value(getTricks());
-		out.name(SCORE);
-		out.value(getScore());
+		out.name(POINTS);
+		out.value(getPoints());
 	}
 
 	@Override
@@ -122,7 +134,7 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		switch (field) {
 			case BID: setBid(in.nextInt()); break;
 			case TRICKS: setTricks(in.nextInt()); break;
-			case SCORE: setScore(in.nextInt()); break;
+			case POINTS: setPoints(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

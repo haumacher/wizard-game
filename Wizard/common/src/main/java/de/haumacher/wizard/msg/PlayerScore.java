@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Score info for a player.
+ */
 public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/**
@@ -31,6 +34,9 @@ public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 		super();
 	}
 
+	/**
+	 * The player.
+	 */
 	public final Player getPlayer() {
 		return _player;
 	}
@@ -55,6 +61,9 @@ public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 		return _player != null;
 	}
 
+	/**
+	 * The player's points.
+	 */
 	public final int getPoints() {
 		return _points;
 	}

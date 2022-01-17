@@ -1,9 +1,28 @@
 package de.haumacher.wizard.msg;
 
+option NoBinary;
 option NoReflection;
 option NoListener;
 option NoBinary;
 option NoTypeKind;
+
+/** Information about a game. */
+message Game {
+	/** A unique identifier of the game used to reference this game in messages. */ 
+	string gameId;
+	
+	/** The players that have joined this game. */
+	repeated Player players;
+}
+
+/** A player of a {@link Game}. */
+message Player {
+	/** A technical ID of the player used to reference this player in messages. */
+	string id;
+	
+	/** A nick name for the player to display to other users. */
+	string name;
+}
 
 /**
  * The suit of a card.
@@ -19,7 +38,9 @@ enum Suit {
  * Possible card values.
  */
 enum Value {
+	/** A jester. */
 	N;
+	
 	C1;
 	C2;
 	C3;
@@ -33,6 +54,8 @@ enum Value {
 	C11;
 	C12;
 	C13;
+
+	/** A wizard. */
 	Z;
 }
 
@@ -48,13 +71,22 @@ message Card {
 	Value value;
 }
 
-message Player {
-	string id;
-	string name;
+/** A message that is sent from a client to the game server to trigger some action. */
+abstract message Cmd {}
+
+/** A message sent from the game server to active clients. */ 
+abstract message Msg {}
+
+/** A message that is sent in direct result to a {@link Cmd}. */
+abstract message ResultMsg extends Msg {
+
 }
 
-abstract message Msg {}
-abstract message Cmd {}
+/** Informs the client that the last {@link Cmd} failed. */
+message Error extends ResultMsg {
+	/** Description of the error that has been detected. */
+	string `message`;
+}
 
 /** 
  * First message that must be sent after connecting to a game server.
@@ -66,11 +98,31 @@ abstract message Cmd {}
 message Login extends Cmd {
 	/** The nick name of the player. */
 	string name;
+	
+	/** The protocol version of the connecting client. This can be used to detect version mismatch of client and server. */
+	int version;
 }
 
 /** Response message upon successful {@link Login}. */
-message LoggedIn extends Msg {
+message LoggedIn extends ResultMsg {
+	/** The ID of the player that logged in to the server. */
 	string playerId;
+}
+
+/** Requests a listing of games waiting for player. */
+message ListGames extends Cmd {
+}
+
+/** Provides a listing of games waiting for players. */
+message ListGamesResult extends ResultMsg {
+	/** List of all games on the server currently accepting new players. */
+	repeated Game games;
+}
+
+/** Requests joining a game. */
+message JoinGame extends Cmd {
+	/** The ID of the game the sender wants to join. */
+	string gameId;
 }
 
 /** 
@@ -83,6 +135,7 @@ message CreateGame extends Cmd {
 
 }
 
+/** Informs idle players that a new game was created. */
 message GameCreated extends Msg {
 	/** Id of the player that created the game. This player is implicitly the first player in the game without explicitly joining the game. */
 	string ownerId;
@@ -91,11 +144,15 @@ message GameCreated extends Msg {
 	Game game;
 }
 
+/** Informs idle players that a game that was waiting for players has been deleted. */
 message GameDeleted extends Msg {
+	/** The ID of the game that has been deleted. */
 	string gameId;
 }
 
+/** Informs members of a game and idle players that a game has started and is not accepting players anymore. */
 message StartGame extends Cmd {
+	/** The ID of the game that has started. */
 	string gameId;
 }
 
@@ -105,98 +162,65 @@ message GameStarted extends Msg {
 	Game game;
 }
 
-message Join extends Cmd {
-	string gameId;
-}
-
-message ListGames extends Cmd {
-}
-
-abstract message Result extends Msg {
-
-}
-
-message Error extends Result {
-	string `message`;
-}
-
-message ListGamesResult extends Result {
-	repeated Game games;
-}
-
-message Game {
-	string gameId;
-	repeated Player players;
-}
-
+/** Announces that a player has joined a game. */
 message JoinAnnounce extends Msg {
-	string gameId;
+	/** The player that joined the game. */	
 	Player player;
+	
+	/** The ID of the game the player joined. */
+	string gameId;
 }
 
+/** Announces that a player has left a game. */
 message LeaveAnnounce extends Msg {
-	string gameId;
+	/** The ID of the player that left a game. */
 	string playerId;
-}
-
-message StartRound extends Msg {
-	int round;
-	int maxRound;
-	repeated Player players;
-	repeated Card cards;
-	Card trumpCard;
-}
-
-message FinishTurn extends Msg {
-	repeated Card trick;
-	Player winner;
-}
-
-/** Command in response to {@link FinishTurn} that must be received from all players, before the next turn starts */
-message ConfirmTrick extends GameCmd {
-}
-
-/** Command in response to {@link FinishRound} that must be received from all players, before the next round starts */
-message ConfirmRound extends GameCmd {
-}
-
-message FinishRound extends Msg {
-	map<string, int> points;
-}
-
-message FinishGame extends Msg {
-	repeated PlayerScore scores;
-}
-
-message PlayerScore {
-	Player player;
-	int points;
-}
-
-message LeaveGame extends Cmd {
+	
+	/** The ID of the game the player left. */
 	string gameId;
 }
 
+/** A {@link Cmd} targeting a running game. */
 abstract message GameCmd extends Cmd {
 
 }
 
-message Announce extends Msg {
-	string playerId;
-	GameCmd cmd;
+/** Starts a round by assigning cards to players. */
+message StartRound extends Msg {
+	/** The number of the round. 1 is the first round. */
+	int round;
+	
+	/** The number of rounds being played in this game (depends on the number of players). */
+	int maxRound;
+	
+	/** The players and their order in this round. */
+	repeated Player players;
+	
+	/** The cards given to the player that receives this message. */
+	repeated Card cards;
+	
+	/** The given trump card. In the last round, there is no trump card. */
+	@Nullable
+	Card trumpCard;
 }
 
+/** Requests a player to select the trump suit in case the trump card was a wizard. */
 message RequestTrumpSelection extends Msg {
+	/** The ID of the player that is expected to select the trump suit. */
 	string playerId;
 }
 
+/** {@link GameCmd} to select the trump suit in response to {@link RequestTrumpSelection}. */
 message SelectTrump extends GameCmd {
+	/** The trump suit selected. */
 	Suit trumpSuit;
 }
 
+/** Message that starts the bid phase. */
 message StartBids extends Msg {
 }
 
+/** Requests a bid. */
 message RequestBid extends Msg {
 	/** The number of tricks expected by other players so far. */
 	int expected;
@@ -205,7 +229,11 @@ message RequestBid extends Msg {
 	int round;
 }
 
+/** Message announcing a player's bid. */
 message Bid extends GameCmd {
+	/** The bid of the current player */
+	int cnt;
+	
 	/** 
 	 * The sum of tricks expected by all players so far.
 	 *
@@ -214,46 +242,115 @@ message Bid extends GameCmd {
 	 * </p> 
 	 */
 	int expected;
-
-	/** The bid of the current player */
-	int cnt;
-}
-
-/**
- * Message sent to all players that announces the player that is about to put a card on the table.
- */
-message RequestPut extends Msg {
-	/** The ID of the player that is expected to send a {@link Put} message. All other playes are only informed about the player that is in command. */
-	string playerId;
 }
 
 /**
  * Message announcing that all bids are placed.
  */
 message StartLead extends Msg {
+	/** Score information of all players by their IDs. */
 	map<string, PlayerInfo> state;
 }
 
+/** Score information for a single player, see {@link StartLead}. */
 message PlayerInfo {
+	/** The player's bid. */
 	int bid;
+	
+	/** The number of won tricks. */
 	int tricks;
-	int score;
+	
+	/** The current points of the player. */
+	int points;
 }
 
-message Put extends GameCmd {
+/**
+ * Message sent to all players that announces the player that is about to put a card on the table.
+ */
+message RequestLead extends Msg {
+	/** The ID of the player that is expected to send a {@link Lead} message. All other playes are only informed about the player that is in command. */
+	string playerId;
+}
+
+/** Puts a card on the table. */
+message Lead extends GameCmd {
+	/** The card that is led. */
 	Card card;
 }
 
-message RoundState {
-	int bidCnt;
-	int winCnt;
-	repeated Card cards;
+/** Message sent at the end of each turn announcing the winner. */
+message FinishTurn extends Msg {
+	/** The cards that have been played in this turn. */
+	repeated Card trick;
+	
+	/** The winner of this turn. */
+	Player winner;
 }
 
-message PlayerState {
+/** Command in response to {@link FinishTurn} that must be received from all players, before the next turn starts */
+message ConfirmTrick extends GameCmd {
+}
+
+/** Message sent after each round that announces the points received in this round. */
+message FinishRound extends Msg {
+	/** For each player ID the number of points this player wins. The number may be negative. */
+	map<string, int> points;
+}
+
+/** Command in response to {@link FinishRound} that must be received from all players, before the next round starts */
+message ConfirmRound extends GameCmd {
+}
+
+/** Message sent after the last round of a game. */
+message FinishGame extends Msg {
+	/** The total score for each player. The list is ordered by the points the players have won. */
+	repeated PlayerScore scores;
+}
+
+/** Score info for a player. */
+message PlayerScore {
+	/** The player. */
 	Player player;
+	
+	/** The player's points. */
 	int points;
+}
+
+/** Command to request leaving a game. */
+message LeaveGame extends Cmd {
+	/** The ID of the game to leave. */
+	string gameId;
+}
+
+/** Message to forward a {@link GameCmd} sent by one player of a game to all other players. */
+message Announce extends Msg {
+	/** The ID of the player that sent the command. */
+	string playerId;
+	
+	/** The command sent by the player with the ID given in {@link #playerId}. */
+	GameCmd cmd;
+}
+
+/** Internal information kept for each player of a game on the server. */
+message PlayerState {
+	/** Player data. */
+	Player player;
+	
+	/** Points won so far. */
+	int points;
+	
+	/** Information about the current round. */
 	RoundState roundState;
 }
 
-
+/** The state of a player as part of {@link PlayerState}. */
+message RoundState {
+	/** The player's bid. */
+	int bidCnt;
+	
+	/** The number of tricks won. */
+	int winCnt;
+	
+	/** The cards that the player has currently in his hand. */
+	repeated Card cards;
+}

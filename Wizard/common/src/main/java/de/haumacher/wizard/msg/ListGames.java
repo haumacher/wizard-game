@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Requests a listing of games waiting for player.
+ */
 public class ListGames extends Cmd {
 
 	/**

@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Requests a bid.
+ */
 public class RequestBid extends Msg {
 
 	/**

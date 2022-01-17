@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Informs idle players that a new game was created.
+ */
 public class GameCreated extends Msg {
 
 	/**

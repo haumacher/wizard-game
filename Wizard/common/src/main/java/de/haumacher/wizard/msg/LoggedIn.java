@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Response message upon successful {@link Login}.
  */
-public class LoggedIn extends Msg {
+public class LoggedIn extends ResultMsg {
 
 	/**
 	 * Creates a {@link LoggedIn} instance.
@@ -29,6 +29,9 @@ public class LoggedIn extends Msg {
 		super();
 	}
 
+	/**
+	 * The ID of the player that logged in to the server.
+	 */
 	public final String getPlayerId() {
 		return _playerId;
 	}
@@ -76,7 +79,7 @@ public class LoggedIn extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(ResultMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

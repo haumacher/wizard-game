@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Announces that a player has joined a game.
+ */
 public class JoinAnnounce extends Msg {
 
 	/**
@@ -12,15 +15,15 @@ public class JoinAnnounce extends Msg {
 	/** Identifier for the {@link JoinAnnounce} type in JSON format. */
 	public static final String JOIN_ANNOUNCE__TYPE = "JoinAnnounce";
 
-	/** @see #getGameId() */
-	private static final String GAME_ID = "gameId";
-
 	/** @see #getPlayer() */
 	private static final String PLAYER = "player";
 
-	private String _gameId = "";
+	/** @see #getGameId() */
+	private static final String GAME_ID = "gameId";
 
 	private Player _player = null;
+
+	private String _gameId = "";
 
 	/**
 	 * Creates a {@link JoinAnnounce} instance.
@@ -31,23 +34,9 @@ public class JoinAnnounce extends Msg {
 		super();
 	}
 
-	public final String getGameId() {
-		return _gameId;
-	}
-
 	/**
-	 * @see #getGameId()
+	 * The player that joined the game.
 	 */
-	public JoinAnnounce setGameId(String value) {
-		internalSetGameId(value);
-		return this;
-	}
-	/** Internal setter for {@link #getGameId()} without chain call utility. */
-	protected final void internalSetGameId(String value) {
-		_gameId = value;
-	}
-
-
 	public final Player getPlayer() {
 		return _player;
 	}
@@ -72,6 +61,26 @@ public class JoinAnnounce extends Msg {
 		return _player != null;
 	}
 
+	/**
+	 * The ID of the game the player joined.
+	 */
+	public final String getGameId() {
+		return _gameId;
+	}
+
+	/**
+	 * @see #getGameId()
+	 */
+	public JoinAnnounce setGameId(String value) {
+		internalSetGameId(value);
+		return this;
+	}
+	/** Internal setter for {@link #getGameId()} without chain call utility. */
+	protected final void internalSetGameId(String value) {
+		_gameId = value;
+	}
+
+
 	@Override
 	public String jsonType() {
 		return JOIN_ANNOUNCE__TYPE;
@@ -89,19 +98,19 @@ public class JoinAnnounce extends Msg {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(GAME_ID);
-		out.value(getGameId());
 		if (hasPlayer()) {
 			out.name(PLAYER);
 			getPlayer().writeTo(out);
 		}
+		out.name(GAME_ID);
+		out.value(getGameId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			case PLAYER: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
+			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

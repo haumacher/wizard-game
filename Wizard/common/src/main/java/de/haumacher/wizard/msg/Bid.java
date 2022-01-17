@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Message announcing a player's bid.
+ */
 public class Bid extends GameCmd {
 
 	/**
@@ -12,15 +15,15 @@ public class Bid extends GameCmd {
 	/** Identifier for the {@link Bid} type in JSON format. */
 	public static final String BID__TYPE = "Bid";
 
-	/** @see #getExpected() */
-	private static final String EXPECTED = "expected";
-
 	/** @see #getCnt() */
 	private static final String CNT = "cnt";
 
-	private int _expected = 0;
+	/** @see #getExpected() */
+	private static final String EXPECTED = "expected";
 
 	private int _cnt = 0;
+
+	private int _expected = 0;
 
 	/**
 	 * Creates a {@link Bid} instance.
@@ -30,6 +33,26 @@ public class Bid extends GameCmd {
 	protected Bid() {
 		super();
 	}
+
+	/**
+	 * The bid of the current player
+	 */
+	public final int getCnt() {
+		return _cnt;
+	}
+
+	/**
+	 * @see #getCnt()
+	 */
+	public Bid setCnt(int value) {
+		internalSetCnt(value);
+		return this;
+	}
+	/** Internal setter for {@link #getCnt()} without chain call utility. */
+	protected final void internalSetCnt(int value) {
+		_cnt = value;
+	}
+
 
 	/**
 	 * The sum of tricks expected by all players so far.
@@ -55,26 +78,6 @@ public class Bid extends GameCmd {
 	}
 
 
-	/**
-	 * The bid of the current player
-	 */
-	public final int getCnt() {
-		return _cnt;
-	}
-
-	/**
-	 * @see #getCnt()
-	 */
-	public Bid setCnt(int value) {
-		internalSetCnt(value);
-		return this;
-	}
-	/** Internal setter for {@link #getCnt()} without chain call utility. */
-	protected final void internalSetCnt(int value) {
-		_cnt = value;
-	}
-
-
 	@Override
 	public String jsonType() {
 		return BID__TYPE;
@@ -92,17 +95,17 @@ public class Bid extends GameCmd {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(EXPECTED);
-		out.value(getExpected());
 		out.name(CNT);
 		out.value(getCnt());
+		out.name(EXPECTED);
+		out.value(getExpected());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case EXPECTED: setExpected(in.nextInt()); break;
 			case CNT: setCnt(in.nextInt()); break;
+			case EXPECTED: setExpected(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

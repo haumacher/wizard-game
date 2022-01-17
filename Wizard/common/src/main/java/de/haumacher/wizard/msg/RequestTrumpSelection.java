@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Requests a player to select the trump suit in case the trump card was a wizard.
+ */
 public class RequestTrumpSelection extends Msg {
 
 	/**
@@ -26,6 +29,9 @@ public class RequestTrumpSelection extends Msg {
 		super();
 	}
 
+	/**
+	 * The ID of the player that is expected to select the trump suit.
+	 */
 	public final String getPlayerId() {
 		return _playerId;
 	}

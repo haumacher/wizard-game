@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Informs members of a game and idle players that a game has started and is not accepting players anymore.
+ */
 public class StartGame extends Cmd {
 
 	/**
@@ -26,6 +29,9 @@ public class StartGame extends Cmd {
 		super();
 	}
 
+	/**
+	 * The ID of the game that has started.
+	 */
 	public final String getGameId() {
 		return _gameId;
 	}

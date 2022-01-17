@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Message sent after each round that announces the points received in this round.
+ */
 public class FinishRound extends Msg {
 
 	/**
@@ -26,6 +29,9 @@ public class FinishRound extends Msg {
 		super();
 	}
 
+	/**
+	 * For each player ID the number of points this player wins. The number may be negative.
+	 */
 	public final java.util.Map<String, Integer> getPoints() {
 		return _points;
 	}

@@ -5,6 +5,9 @@ package de.haumacher.wizard.msg;
  */
 public enum Value implements de.haumacher.msgbuf.data.ProtocolEnum {
 
+	/**
+	 * A jester.
+	 */
 	N("N"),
 
 	C_1("C1"),
@@ -33,6 +36,9 @@ public enum Value implements de.haumacher.msgbuf.data.ProtocolEnum {
 
 	C_13("C13"),
 
+	/**
+	 * A wizard.
+	 */
 	Z("Z"),
 
 	;

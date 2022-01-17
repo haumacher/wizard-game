@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Announces that a player has left a game.
+ */
 public class LeaveAnnounce extends Msg {
 
 	/**
@@ -12,15 +15,15 @@ public class LeaveAnnounce extends Msg {
 	/** Identifier for the {@link LeaveAnnounce} type in JSON format. */
 	public static final String LEAVE_ANNOUNCE__TYPE = "LeaveAnnounce";
 
-	/** @see #getGameId() */
-	private static final String GAME_ID = "gameId";
-
 	/** @see #getPlayerId() */
 	private static final String PLAYER_ID = "playerId";
 
-	private String _gameId = "";
+	/** @see #getGameId() */
+	private static final String GAME_ID = "gameId";
 
 	private String _playerId = "";
+
+	private String _gameId = "";
 
 	/**
 	 * Creates a {@link LeaveAnnounce} instance.
@@ -31,23 +34,9 @@ public class LeaveAnnounce extends Msg {
 		super();
 	}
 
-	public final String getGameId() {
-		return _gameId;
-	}
-
 	/**
-	 * @see #getGameId()
+	 * The ID of the player that left a game.
 	 */
-	public LeaveAnnounce setGameId(String value) {
-		internalSetGameId(value);
-		return this;
-	}
-	/** Internal setter for {@link #getGameId()} without chain call utility. */
-	protected final void internalSetGameId(String value) {
-		_gameId = value;
-	}
-
-
 	public final String getPlayerId() {
 		return _playerId;
 	}
@@ -62,6 +51,26 @@ public class LeaveAnnounce extends Msg {
 	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
 	protected final void internalSetPlayerId(String value) {
 		_playerId = value;
+	}
+
+
+	/**
+	 * The ID of the game the player left.
+	 */
+	public final String getGameId() {
+		return _gameId;
+	}
+
+	/**
+	 * @see #getGameId()
+	 */
+	public LeaveAnnounce setGameId(String value) {
+		internalSetGameId(value);
+		return this;
+	}
+	/** Internal setter for {@link #getGameId()} without chain call utility. */
+	protected final void internalSetGameId(String value) {
+		_gameId = value;
 	}
 
 
@@ -82,17 +91,17 @@ public class LeaveAnnounce extends Msg {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(GAME_ID);
-		out.value(getGameId());
 		out.name(PLAYER_ID);
 		out.value(getPlayerId());
+		out.name(GAME_ID);
+		out.value(getGameId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

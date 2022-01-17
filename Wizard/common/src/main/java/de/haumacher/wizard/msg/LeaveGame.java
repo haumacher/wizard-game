@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * Command to request leaving a game.
+ */
 public class LeaveGame extends Cmd {
 
 	/**
@@ -26,6 +29,9 @@ public class LeaveGame extends Cmd {
 		super();
 	}
 
+	/**
+	 * The ID of the game to leave.
+	 */
 	public final String getGameId() {
 		return _gameId;
 	}

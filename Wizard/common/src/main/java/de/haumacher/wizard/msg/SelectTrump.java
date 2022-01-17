@@ -1,5 +1,8 @@
 package de.haumacher.wizard.msg;
 
+/**
+ * {@link GameCmd} to select the trump suit in response to {@link RequestTrumpSelection}.
+ */
 public class SelectTrump extends GameCmd {
 
 	/**
@@ -26,6 +29,9 @@ public class SelectTrump extends GameCmd {
 		super();
 	}
 
+	/**
+	 * The trump suit selected.
+	 */
 	public final Suit getTrumpSuit() {
 		return _trumpSuit;
 	}
