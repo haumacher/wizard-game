@@ -1,6 +1,5 @@
 package de.haumacher.wizard.msg;
 
-option NoBinary;
 option NoReflection;
 option NoListener;
 option NoBinary;
