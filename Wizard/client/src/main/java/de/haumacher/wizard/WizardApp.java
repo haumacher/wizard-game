@@ -56,9 +56,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Client {@link Application} providing the user interface for the Wizard game.
  */
 public class WizardApp extends Application implements Msg.Visitor<Void, Void, IOException>, GameCmd.Visitor<Void, String, IOException> {
 	
@@ -257,7 +255,7 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 
 	@Override
 	public Void visit(SelectTrump self, String playerId) throws IOException {
-		_gameView.selectTrump(self.getTrumpColor());
+		_gameView.selectTrump(self.getTrumpSuit());
 		return null;
 	}
 	

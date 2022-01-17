@@ -20,9 +20,11 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Handler for the client {@link Socket}.
+ * 
+ * <p>
+ * Connects to the Wizard game server and processes messages in a separate {@link Thread}.
+ * </p>
  */
 public abstract class ClientHandler implements AutoCloseable {
 
@@ -32,6 +34,12 @@ public abstract class ClientHandler implements AutoCloseable {
 
 	private Thread _consumer;
 
+	/**
+	 * Opens the connection to the game server and starts receiving messages from it.
+	 *
+	 * @param host The host name of the game server.
+	 * @param port The game server port.
+	 */
 	public void start(String host, int port) throws IOException {
 		_socket = new Socket(host, port);
 		JsonReader in = new JsonReader(new ReaderAdapter(new InputStreamReader(_socket.getInputStream(), "utf-8")));
@@ -63,7 +71,7 @@ public abstract class ClientHandler implements AutoCloseable {
 
 
 	/** 
-	 * Sends a command back to the server.
+	 * Sends the given command to the server.
 	 */
 	public void sendCommand(Cmd cmd) {
 		try {

@@ -12,10 +12,10 @@ public class SelectTrump extends GameCmd {
 	/** Identifier for the {@link SelectTrump} type in JSON format. */
 	public static final String SELECT_TRUMP__TYPE = "SelectTrump";
 
-	/** @see #getTrumpColor() */
-	private static final String TRUMP_COLOR = "trumpColor";
+	/** @see #getTrumpSuit() */
+	private static final String TRUMP_SUIT = "trumpSuit";
 
-	private Color _trumpColor = de.haumacher.wizard.msg.Color.YELLOW;
+	private Suit _trumpSuit = de.haumacher.wizard.msg.Suit.DIAMOND;
 
 	/**
 	 * Creates a {@link SelectTrump} instance.
@@ -26,21 +26,21 @@ public class SelectTrump extends GameCmd {
 		super();
 	}
 
-	public final Color getTrumpColor() {
-		return _trumpColor;
+	public final Suit getTrumpSuit() {
+		return _trumpSuit;
 	}
 
 	/**
-	 * @see #getTrumpColor()
+	 * @see #getTrumpSuit()
 	 */
-	public SelectTrump setTrumpColor(Color value) {
-		internalSetTrumpColor(value);
+	public SelectTrump setTrumpSuit(Suit value) {
+		internalSetTrumpSuit(value);
 		return this;
 	}
-	/** Internal setter for {@link #getTrumpColor()} without chain call utility. */
-	protected final void internalSetTrumpColor(Color value) {
-		if (value == null) throw new IllegalArgumentException("Property 'trumpColor' cannot be null.");
-		_trumpColor = value;
+	/** Internal setter for {@link #getTrumpSuit()} without chain call utility. */
+	protected final void internalSetTrumpSuit(Suit value) {
+		if (value == null) throw new IllegalArgumentException("Property 'trumpSuit' cannot be null.");
+		_trumpSuit = value;
 	}
 
 
@@ -61,14 +61,14 @@ public class SelectTrump extends GameCmd {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(TRUMP_COLOR);
-		getTrumpColor().writeTo(out);
+		out.name(TRUMP_SUIT);
+		getTrumpSuit().writeTo(out);
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case TRUMP_COLOR: setTrumpColor(de.haumacher.wizard.msg.Color.readColor(in)); break;
+			case TRUMP_SUIT: setTrumpSuit(de.haumacher.wizard.msg.Suit.readSuit(in)); break;
 			default: super.readField(in, field);
 		}
 	}

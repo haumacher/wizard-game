@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import de.haumacher.wizard.ClientHandler;
 import de.haumacher.wizard.WizardApp;
 import de.haumacher.wizard.msg.Card;
-import de.haumacher.wizard.msg.Color;
+import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.Player;
@@ -107,8 +107,8 @@ public class GameView extends Controller {
 		_trumpSelection.init(_handler, _players.get(playerId), _playerId.equals(playerId));
 	}
 
-	public void selectTrump(Color trumpColor) {
-		trumpPane.getChildren().setAll(CardView.createCard(Card.create().setColor(trumpColor).setValue(Value.Z)));
+	public void selectTrump(Suit trumpSuit) {
+		trumpPane.getChildren().setAll(CardView.createCard(Card.create().setSuit(trumpSuit).setValue(Value.Z)));
 		_trumpSelection = null;
 	}
 

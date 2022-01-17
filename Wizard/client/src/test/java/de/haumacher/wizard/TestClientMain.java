@@ -14,7 +14,7 @@ import de.haumacher.wizard.msg.Msg;
 /**
  * Dummy game client that allows to communicate with a game through entering JSON messages on the command line.
  */
-public class ClientMain {
+public class TestClientMain {
 
 	public static void main(String[] args) throws IOException {
 		ClientHandler handler = new ClientHandler() {

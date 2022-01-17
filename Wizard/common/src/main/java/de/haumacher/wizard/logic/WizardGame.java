@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Card;
-import de.haumacher.wizard.msg.Color;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.FinishGame;
@@ -42,6 +41,7 @@ import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartBids;
 import de.haumacher.wizard.msg.StartLead;
 import de.haumacher.wizard.msg.StartRound;
+import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
 
 /**
@@ -55,13 +55,13 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	
 	static {
 		List<Card> cards = new ArrayList<>();
-		for (Color color : Color.values()) {
+		for (Suit suit : Suit.values()) {
 			for (Value value : Value.values()) {
 				Card card = Card.create().setValue(value);
 				if (value != Value.N && value != Value.Z) {
-					card.setColor(color);
+					card.setSuit(suit);
 				} else {
-					card.setColor(null);
+					card.setSuit(null);
 				}
 				cards.add(card);
 			}
@@ -80,7 +80,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	private List<PlayerState> _players;
 	
 	private Card _trumpCard;
-	private Color _trumpColor;
+	private Suit _trumpSuit;
 
 	/**
 	 * Index of the player in {@link #_players} that must make the first bid.
@@ -182,7 +182,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		
 		int trumpIndex = _players.size() * _round;
 		_trumpCard = trumpIndex < cards.size() ? cards.get(trumpIndex) : null;
-		_trumpColor = _trumpCard != null ? _trumpCard.getColor() : null;
+		_trumpSuit = _trumpCard != null ? _trumpCard.getSuit() : null;
 		
 		int firstCard = 0;
 		for (PlayerState player : _players) {
@@ -241,7 +241,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 
 	@Override
 	public Void visit(SelectTrump self, GameClient arg)  {
-		if (_trumpColor != null) {
+		if (_trumpSuit != null) {
 			arg.sendError("Es ist bereits eine Trumpffarbe gewählt.");
 			return null;
 		}
@@ -249,7 +249,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			arg.sendError("Du darfst nicht die Trumpffarbe wählen.");
 			return null;
 		}
-		if (self.getTrumpColor() == null) {
+		if (self.getTrumpSuit() == null) {
 			arg.sendError("Es muss eine Trumpffarbe gewählt werden.");
 			return null;
 		}
@@ -258,7 +258,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			return null;
 		}
 
-		_trumpColor = self.getTrumpColor();
+		_trumpSuit = self.getTrumpSuit();
 		forward(arg, self);
 		
 		startBids();
@@ -332,16 +332,16 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		List<Card> deck = roundState.getCards();
 		Card putCard = self.getCard();
 		Optional<Card> searchResult = 
-			deck.stream().filter(c -> c.getColor() == putCard.getColor() && c.getValue() == putCard.getValue()).findFirst();
+			deck.stream().filter(c -> c.getSuit() == putCard.getSuit() && c.getValue() == putCard.getValue()).findFirst();
 		if (!searchResult.isPresent()) {
 			arg.sendError("Du hast eine Karte gespielt, die Du gar nicht besitzt.");
 			return null;
 		}
 		Card playedCard = searchResult.get();
 		
-		Color leadColor = leadColor(_turn);
-		if (leadColor != null && playedCard.getColor() != null && playedCard.getColor() != leadColor) {
-			if (deck.stream().filter(c -> c.getColor() == leadColor).findFirst().isPresent()) {
+		Suit leadSuit = leadSuit(_turn);
+		if (leadSuit != null && playedCard.getSuit() != null && playedCard.getSuit() != leadSuit) {
+			if (deck.stream().filter(c -> c.getSuit() == leadSuit).findFirst().isPresent()) {
 				arg.sendError("Du musst Farbe bekennen.");
 				return null;
 			}
@@ -379,15 +379,15 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 	
 	/** 
-	 * The {@link Color} the next player must follow if it is in his deck.
+	 * The {@link Suit} the next player must follow if it is in his deck.
 	 */
-	private Color leadColor(List<Card> turn) {
+	private Suit leadSuit(List<Card> turn) {
 		for (Card card : turn) {
 			if (card.getValue() == Value.Z) {
 				return null;
 			}
-			if (card.hasColor()) {
-				return card.getColor();
+			if (card.hasSuit()) {
+				return card.getSuit();
 			}
 		}
 		return null;
@@ -499,10 +499,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		if (best.getValue() == Value.N) {
 			return true;
 		}
-		if (best.getColor() != _trumpColor && current.getColor() == _trumpColor) {
+		if (best.getSuit() != _trumpSuit && current.getSuit() == _trumpSuit) {
 			return true;
 		}
-		if (current.getColor() != best.getColor()) {
+		if (current.getSuit() != best.getSuit()) {
 			return false;
 		}
 		return current.getValue().ordinal() > best.getValue().ordinal();

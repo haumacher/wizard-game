@@ -61,16 +61,16 @@ public class CardView extends Controller {
 	}
 
 	private static Node loadCardView(Card card) {
-		// Note: For selecting the trump color, even a wizard with a color must be displayed.
-		if (card.getColor() != null) {
-			switch (card.getColor()) {
-			case RED:
+		// Note: For selecting the trump suit, even a wizard with a suit must be displayed.
+		if (card.getSuit() != null) {
+			switch (card.getSuit()) {
+			case HEART:
 				return WizardApp.load(CardView.class, "card-heart.fxml");
-			case GREEN:
+			case SPADE:
 				return WizardApp.load(CardView.class, "card-pik.fxml");
-			case BLUE:
+			case CLUB:
 				return WizardApp.load(CardView.class, "card-cross.fxml");
-			case YELLOW:
+			case DIAMOND:
 				return WizardApp.load(CardView.class, "card-caro.fxml");
 			}
 		}

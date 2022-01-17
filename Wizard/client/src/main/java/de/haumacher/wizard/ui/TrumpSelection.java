@@ -5,9 +5,9 @@ package de.haumacher.wizard.ui;
 
 import de.haumacher.wizard.ClientHandler;
 import de.haumacher.wizard.msg.Card;
-import de.haumacher.wizard.msg.Color;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.SelectTrump;
+import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -44,13 +44,13 @@ public class TrumpSelection extends Controller {
 			info.setText(player.getName() + " wählt die Trumpffarbe...");
 		}
 		
-		for (Color color : Color.values()) {
-			Node cardView = CardView.createCard(Card.create().setColor(color).setValue(Value.Z));
+		for (Suit suit : Suit.values()) {
+			Node cardView = CardView.createCard(Card.create().setSuit(suit).setValue(Value.Z));
 			selectPane.getChildren().add(cardView);
 
 			if (allowSelect) {
 				cardView.setOnMouseClicked(e -> {
-					_handler.sendCommand(SelectTrump.create().setTrumpColor(color));
+					_handler.sendCommand(SelectTrump.create().setTrumpSuit(suit));
 				});
 			}
 		}

@@ -15,13 +15,13 @@ public class Card extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/** Identifier for the {@link Card} type in JSON format. */
 	public static final String CARD__TYPE = "Card";
 
-	/** @see #getColor() */
-	private static final String COLOR = "color";
+	/** @see #getSuit() */
+	private static final String SUIT = "suit";
 
 	/** @see #getValue() */
 	private static final String VALUE = "value";
 
-	private Color _color = null;
+	private Suit _suit = null;
 
 	private Value _value = de.haumacher.wizard.msg.Value.N;
 
@@ -35,30 +35,30 @@ public class Card extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 	/**
-	 * The card color, <code>null</code> for wizards and fools.
+	 * The card suit, <code>null</code> for wizards and fools.
 	 */
-	public final Color getColor() {
-		return _color;
+	public final Suit getSuit() {
+		return _suit;
 	}
 
 	/**
-	 * @see #getColor()
+	 * @see #getSuit()
 	 */
-	public Card setColor(Color value) {
-		internalSetColor(value);
+	public Card setSuit(Suit value) {
+		internalSetSuit(value);
 		return this;
 	}
-	/** Internal setter for {@link #getColor()} without chain call utility. */
-	protected final void internalSetColor(Color value) {
-		_color = value;
+	/** Internal setter for {@link #getSuit()} without chain call utility. */
+	protected final void internalSetSuit(Suit value) {
+		_suit = value;
 	}
 
 
 	/**
-	 * Checks, whether {@link #getColor()} has a value.
+	 * Checks, whether {@link #getSuit()} has a value.
 	 */
-	public final boolean hasColor() {
-		return _color != null;
+	public final boolean hasSuit() {
+		return _suit != null;
 	}
 
 	/**
@@ -104,9 +104,9 @@ public class Card extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		if (hasColor()) {
-			out.name(COLOR);
-			getColor().writeTo(out);
+		if (hasSuit()) {
+			out.name(SUIT);
+			getSuit().writeTo(out);
 		}
 		out.name(VALUE);
 		getValue().writeTo(out);
@@ -115,7 +115,7 @@ public class Card extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case COLOR: setColor(de.haumacher.wizard.msg.Color.readColor(in)); break;
+			case SUIT: setSuit(de.haumacher.wizard.msg.Suit.readSuit(in)); break;
 			case VALUE: setValue(de.haumacher.wizard.msg.Value.readValue(in)); break;
 			default: super.readField(in, field);
 		}

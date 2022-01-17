@@ -6,13 +6,13 @@ option NoBinary;
 option NoTypeKind;
 
 /**
- * The color of a card.
+ * The suit of a card.
  */
-enum Color {
-	yellow;
-	red;
-	green;
-	blue;
+enum Suit {
+	diamond;
+	heart;
+	spade;
+	club;
 }
 
 /**
@@ -40,9 +40,9 @@ enum Value {
  * A card of the Wizard game.
  */
 message Card {
-    /** The card color, <code>null</code> for wizards and fools. */
+    /** The card suit, <code>null</code> for wizards and fools. */
 	@Nullable
-	Color color;
+	Suit suit;
 	
     /** The value of the card. */
 	Value value;
@@ -191,7 +191,7 @@ message RequestTrumpSelection extends Msg {
 }
 
 message SelectTrump extends GameCmd {
-	Color trumpColor;
+	Suit trumpSuit;
 }
 
 message StartBids extends Msg {

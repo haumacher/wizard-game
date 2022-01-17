@@ -24,13 +24,13 @@ public class CardComparator implements Comparator<Card> {
 
 	@Override
 	public int compare(Card c1, Card c2) {
-		return c1.getValue() == c2.getValue() && c1.getColor() == c2.getColor() ? 0 : 
+		return c1.getValue() == c2.getValue() && c1.getSuit() == c2.getSuit() ? 0 : 
 			c1.getValue() == Value.Z ? -1 :
 				c2.getValue() == Value.Z ? 1 :
 					c1.getValue() == Value.N ? 1 :
 						c2.getValue() == Value.N ? -1 :
-							c1.getColor() != c2.getColor() ? 
-								-Integer.compare(c1.getColor().ordinal(), c2.getColor().ordinal()) :
+							c1.getSuit() != c2.getSuit() ? 
+								-Integer.compare(c1.getSuit().ordinal(), c2.getSuit().ordinal()) :
 								-Integer.compare(c1.getValue().ordinal(), c2.getValue().ordinal());
 		}
 

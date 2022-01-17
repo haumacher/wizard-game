@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import de.haumacher.wizard.logic.CardComparator;
 import de.haumacher.wizard.msg.Card;
-import de.haumacher.wizard.msg.Color;
+import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
 import junit.framework.TestCase;
 
@@ -22,9 +22,9 @@ public class TestCardComparator extends TestCase {
 	public void testCompare() {
 		List<Card> cards = Arrays.asList(
 			Card.create().setValue(Value.Z),
-			Card.create().setValue(Value.C_12).setColor(Color.RED),
+			Card.create().setValue(Value.C_12).setSuit(Suit.HEART),
 			Card.create().setValue(Value.Z),
-			Card.create().setValue(Value.C_13).setColor(Color.YELLOW));
+			Card.create().setValue(Value.C_13).setSuit(Suit.DIAMOND));
 			
 		Collections.sort(cards, CardComparator.INSTANCE);
 		

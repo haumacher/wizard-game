@@ -4,7 +4,7 @@
 package de.haumacher.wizard;
 
 /**
- * TODO
+ * Command line launcher for the {@link WizardApp}.
  *
  * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
