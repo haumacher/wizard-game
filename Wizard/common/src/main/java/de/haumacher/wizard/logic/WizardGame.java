@@ -26,13 +26,13 @@ import de.haumacher.wizard.msg.FinishTurn;
 import de.haumacher.wizard.msg.Game;
 import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.JoinAnnounce;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.LeaveAnnounce;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
 import de.haumacher.wizard.msg.PlayerScore;
 import de.haumacher.wizard.msg.PlayerState;
-import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.RequestBid;
 import de.haumacher.wizard.msg.RequestLead;
 import de.haumacher.wizard.msg.RequestTrumpSelection;
@@ -161,7 +161,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		_started = true;
 		
 		_round = 1;
-		_maxRound = CARDS.size() / _clients.size();
+		_maxRound = 2;// CARDS.size() / _clients.size();
 
 		_players = _clients.values().stream().map(c -> PlayerState.create().setPlayer(c.getData())).collect(Collectors.toList());
 		Collections.shuffle(_players);
@@ -414,8 +414,6 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			
 			initBarrier();
 			broadCast(finishRound);
-			
-			nextRound();
 		}
 	}
 	
