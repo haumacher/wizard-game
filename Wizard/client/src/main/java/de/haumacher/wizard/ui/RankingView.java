@@ -30,12 +30,12 @@ public class RankingView extends Controller {
 	Button okButton;
 
 	public void show(ClientHandler handler, FinishGame msg, EventHandler<ActionEvent> onOk) {
-		int lastPoints = Integer.MIN_VALUE;
+		int lastPoints = Integer.MAX_VALUE;
 		int rank = 0;
 		int row = 1;
 		for (PlayerScore playerScore : msg.getScores()) {
 			int currentPoints = playerScore.getPoints();
-			if (currentPoints > lastPoints) {
+			if (currentPoints < lastPoints) {
 				rank++;
 				lastPoints = currentPoints;
 			}
