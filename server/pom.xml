@@ -10,6 +10,7 @@
 	</parent>
 	
 	<artifactId>wizard-server</artifactId>
+	<name>wizard-server</name>
 
 	<dependencies>
 		<dependency>

@@ -9,8 +9,8 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>wizard</artifactId>
-	
+	<artifactId>wizard-client</artifactId>
+
 	<name>Zauberer</name>
 	<description>Multi player online variant of the famous card game "Wizard" by Ken Fisher.</description>
 
@@ -99,7 +99,7 @@
 						</goals>
 						<configuration>
 							<headerType>gui</headerType>
-							<jar>target/wizard-${project.version}.jar</jar>
+							<jar>target/${project.artifactId}-${project.version}.jar</jar>
 							<outfile>target/${project.name}.exe</outfile>
 							<downloadUrl>http://java.com/download</downloadUrl>
 							<classPath>
