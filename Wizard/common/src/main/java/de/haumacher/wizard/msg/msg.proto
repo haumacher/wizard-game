@@ -170,7 +170,7 @@ message FinishGame extends Msg {
 
 message PlayerScore {
 	Player player;
-	int score;
+	int points;
 }
 
 message LeaveGame extends Cmd {
@@ -246,13 +246,13 @@ message Put extends GameCmd {
 
 message RoundState {
 	int bidCnt;
-	int hitCnt;
+	int winCnt;
 	repeated Card cards;
 }
 
 message PlayerState {
 	Player player;
-	int score;
+	int points;
 	RoundState roundState;
 }
 

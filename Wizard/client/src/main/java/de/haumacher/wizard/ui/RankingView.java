@@ -30,17 +30,17 @@ public class RankingView extends Controller {
 	Button okButton;
 
 	public void show(ClientHandler handler, FinishGame msg, EventHandler<ActionEvent> onOk) {
-		int lastScore = Integer.MIN_VALUE;
+		int lastPoints = Integer.MIN_VALUE;
 		int rank = 0;
 		int row = 1;
 		for (PlayerScore playerScore : msg.getScores()) {
-			int currentScore = playerScore.getScore();
-			if (currentScore > lastScore) {
+			int currentPoints = playerScore.getPoints();
+			if (currentPoints > lastPoints) {
 				rank++;
-				lastScore = currentScore;
+				lastPoints = currentPoints;
 			}
 			rankingTable.add(new Text(Integer.toString(rank)), 0, row);
-			rankingTable.add(new Text(playerScore.getPlayer().getName() + " mit " + Integer.toString(currentScore) + " Punkten"), 1, row);
+			rankingTable.add(new Text(playerScore.getPlayer().getName() + " mit " + Integer.toString(currentPoints) + " Punkten"), 1, row);
 			row++;
 		}
 		okButton.setOnAction(onOk);

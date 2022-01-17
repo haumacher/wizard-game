@@ -305,9 +305,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			for (PlayerState state : _players) {
 				startLead.getState().put(state.getPlayer().getId(), 
 					PlayerInfo.create()
-						.setScore(state.getScore())
+						.setScore(state.getPoints())
 						.setBid(state.getRoundState().getBidCnt())
-						.setTricks(state.getRoundState().getHitCnt()));
+						.setTricks(state.getRoundState().getWinCnt()));
 			}
 			broadCast(startLead);
 			
@@ -354,30 +354,11 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		if (_turn.size() < _players.size()) {
 			requestNextPut();
 		} else {
-			int hitIndex = 0;
-			Card best = _turn.get(hitIndex);
-			for (int n = 1, cnt = _turn.size(); n < cnt; n++) {
-				Card current = _turn.get(n);
-				if (hits(best, current)) {
-					hitIndex = n;
-					best = current;
-				}
-			}
-			
-			int nextStartIndex = _turnOffset + hitIndex;
-			PlayerState winnerState = getPlayerState(nextStartIndex);
-			RoundState winnerRoundState = winnerState.getRoundState();
-			winnerRoundState.setHitCnt(winnerRoundState.getHitCnt() + 1);
-			
-			_turn = new ArrayList<>();
-			_turnOffset = normalizeIndex(nextStartIndex);
-			initBarrier();
-			
-			broadCast(FinishTurn.create().setTrick(_turn).setWinner(winnerState.getPlayer()));
+			finishTurn();
 		}
 		return null;
 	}
-	
+
 	/** 
 	 * The {@link Suit} the next player must follow if it is in his deck.
 	 */
@@ -415,7 +396,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			// Compute points.
 			FinishRound finishRound = FinishRound.create();
 			for (PlayerState state : _players) {
-				int hitCnt = state.getRoundState().getHitCnt();
+				int hitCnt = state.getRoundState().getWinCnt();
 				int bidCnt = state.getRoundState().getBidCnt();
 				int delta;
 				if (hitCnt == bidCnt) {
@@ -423,8 +404,8 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 				} else {
 					delta = -Math.abs(hitCnt - bidCnt) * 10;
 				}
-				int newPoints = state.getScore() + delta;
-				state.setScore(newPoints);
+				int newPoints = state.getPoints() + delta;
+				state.setPoints(newPoints);
 				
 				finishRound.getPoints().put(state.getPlayer().getId(), delta);
 			}
@@ -436,6 +417,29 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 	}
 	
+	private void finishTurn() {
+		int hitIndex = 0;
+		Card best = _turn.get(hitIndex);
+		for (int n = 1, cnt = _turn.size(); n < cnt; n++) {
+			Card current = _turn.get(n);
+			if (hits(best, current)) {
+				hitIndex = n;
+				best = current;
+			}
+		}
+		
+		int winnerOffset = normalizeIndex(_turnOffset + hitIndex);
+		PlayerState winnerState = _players.get(winnerOffset);
+		RoundState winnerRoundState = winnerState.getRoundState();
+		winnerRoundState.setWinCnt(winnerRoundState.getWinCnt() + 1);
+		
+		_turn = new ArrayList<>();
+		_turnOffset = winnerOffset;
+		initBarrier();
+		
+		broadCast(FinishTurn.create().setTrick(_turn).setWinner(winnerState.getPlayer()));
+	}
+
 	@Override
 	public Void visit(ConfirmRound self, GameClient arg) throws IOException {
 		GameClient client = _barrier.remove(arg.getId());
@@ -456,17 +460,21 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			_bidOffset++;
 			startRound();
 		} else {
-			FinishGame finishGame = FinishGame.create();
-			for (PlayerState state : _players) {
-				int score = state.getScore();
-				finishGame.addScore(PlayerScore.create().setPlayer(state.getPlayer()).setScore(score));
-			}
-			Collections.sort(finishGame.getScores(), (s1, s2) -> Integer.compare(s1.getScore(), s2.getScore()));
-			
-			broadCast(finishGame);
-			
-			gameFinished();
+			finishGame();
 		}
+	}
+
+	private void finishGame() {
+		FinishGame finishGame = FinishGame.create();
+		for (PlayerState state : _players) {
+			int points = state.getPoints();
+			finishGame.addScore(PlayerScore.create().setPlayer(state.getPlayer()).setPoints(points));
+		}
+		Collections.sort(finishGame.getScores(), (s1, s2) -> -Integer.compare(s1.getPoints(), s2.getPoints()));
+		
+		broadCast(finishGame);
+		
+		gameFinished();
 	}
 
 	private void gameFinished() {

@@ -15,15 +15,15 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/** @see #getPlayer() */
 	private static final String PLAYER = "player";
 
-	/** @see #getScore() */
-	private static final String SCORE = "score";
+	/** @see #getPoints() */
+	private static final String POINTS = "points";
 
 	/** @see #getRoundState() */
 	private static final String ROUND_STATE = "roundState";
 
 	private Player _player = null;
 
-	private int _score = 0;
+	private int _points = 0;
 
 	private RoundState _roundState = null;
 
@@ -60,20 +60,20 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		return _player != null;
 	}
 
-	public final int getScore() {
-		return _score;
+	public final int getPoints() {
+		return _points;
 	}
 
 	/**
-	 * @see #getScore()
+	 * @see #getPoints()
 	 */
-	public PlayerState setScore(int value) {
-		internalSetScore(value);
+	public PlayerState setPoints(int value) {
+		internalSetPoints(value);
 		return this;
 	}
-	/** Internal setter for {@link #getScore()} without chain call utility. */
-	protected final void internalSetScore(int value) {
-		_score = value;
+	/** Internal setter for {@link #getPoints()} without chain call utility. */
+	protected final void internalSetPoints(int value) {
+		_points = value;
 	}
 
 
@@ -127,8 +127,8 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 			out.name(PLAYER);
 			getPlayer().writeTo(out);
 		}
-		out.name(SCORE);
-		out.value(getScore());
+		out.name(POINTS);
+		out.value(getPoints());
 		if (hasRoundState()) {
 			out.name(ROUND_STATE);
 			getRoundState().writeTo(out);
@@ -139,7 +139,7 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
 			case PLAYER: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
-			case SCORE: setScore(in.nextInt()); break;
+			case POINTS: setPoints(in.nextInt()); break;
 			case ROUND_STATE: setRoundState(de.haumacher.wizard.msg.RoundState.readRoundState(in)); break;
 			default: super.readField(in, field);
 		}

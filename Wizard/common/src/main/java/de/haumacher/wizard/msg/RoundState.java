@@ -15,15 +15,15 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/** @see #getBidCnt() */
 	private static final String BID_CNT = "bidCnt";
 
-	/** @see #getHitCnt() */
-	private static final String HIT_CNT = "hitCnt";
+	/** @see #getWinCnt() */
+	private static final String WIN_CNT = "winCnt";
 
 	/** @see #getCards() */
 	private static final String CARDS = "cards";
 
 	private int _bidCnt = 0;
 
-	private int _hitCnt = 0;
+	private int _winCnt = 0;
 
 	private final java.util.List<Card> _cards = new java.util.ArrayList<>();
 
@@ -53,20 +53,20 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	}
 
 
-	public final int getHitCnt() {
-		return _hitCnt;
+	public final int getWinCnt() {
+		return _winCnt;
 	}
 
 	/**
-	 * @see #getHitCnt()
+	 * @see #getWinCnt()
 	 */
-	public RoundState setHitCnt(int value) {
-		internalSetHitCnt(value);
+	public RoundState setWinCnt(int value) {
+		internalSetWinCnt(value);
 		return this;
 	}
-	/** Internal setter for {@link #getHitCnt()} without chain call utility. */
-	protected final void internalSetHitCnt(int value) {
-		_hitCnt = value;
+	/** Internal setter for {@link #getWinCnt()} without chain call utility. */
+	protected final void internalSetWinCnt(int value) {
+		_winCnt = value;
 	}
 
 
@@ -133,8 +133,8 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		super.writeFields(out);
 		out.name(BID_CNT);
 		out.value(getBidCnt());
-		out.name(HIT_CNT);
-		out.value(getHitCnt());
+		out.name(WIN_CNT);
+		out.value(getWinCnt());
 		out.name(CARDS);
 		out.beginArray();
 		for (Card x : getCards()) {
@@ -147,7 +147,7 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
 			case BID_CNT: setBidCnt(in.nextInt()); break;
-			case HIT_CNT: setHitCnt(in.nextInt()); break;
+			case WIN_CNT: setWinCnt(in.nextInt()); break;
 			case CARDS: {
 				in.beginArray();
 				while (in.hasNext()) {
