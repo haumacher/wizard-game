@@ -46,8 +46,8 @@
             </goals>
             <configuration>
               <headerType>gui</headerType>
-              <jar>target/${project.artifactId}-${project.version}.jar</jar>
-              <outfile>target/${project.name}.exe</outfile>
+              <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
+              <outfile>${project.build.directory}/${project.name}-${project.version}.exe</outfile>
               <downloadUrl>http://java.com/download</downloadUrl>
               <classPath>
                 <mainClass>${mainClassName}</mainClass>

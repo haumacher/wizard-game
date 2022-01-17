@@ -100,7 +100,7 @@
 						<configuration>
 							<headerType>gui</headerType>
 							<jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
-							<outfile>${project.build.directory}/${project.name}.exe</outfile>
+							<outfile>${project.build.directory}/${project.name}-${project.version}.exe</outfile>
 							<downloadUrl>http://java.com/download</downloadUrl>
 							<classPath>
 								<mainClass>${mainClassName}</mainClass>
