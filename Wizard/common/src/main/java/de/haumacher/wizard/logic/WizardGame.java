@@ -456,7 +456,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 
 	private void nextRound() {
 		_round++;
-		if (_round < _maxRound) {
+		if (_round <= _maxRound) {
 			_bidOffset++;
 			startRound();
 		} else {
