@@ -29,4 +29,4 @@ Start the server on some machine and the clients on at least three machines for 
 to the game server. One of the clients is then expected to start a game. The other clients join the started game. After
 all players have joined, the game can be started. Follow the instructions in the UI.
  
-![Screenshot](docs/screenshot.png "It's your turn!")
+![Screenshot](doc/screenshot.png "It's your turn!")
