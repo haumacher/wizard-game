@@ -52,7 +52,7 @@
 				<groupId>com.ragedunicorn.tools.maven</groupId>
 				<artifactId>github-release-maven-plugin</artifactId>
 				<version>1.0.3</version>
-
+				
 				<executions>
 					<execution>
 						<id>create-github-release</id>
@@ -61,29 +61,30 @@
 							<goal>github-release</goal>
 						</goals>
 						
-						<phase>release</phase>
 						<inherited>false</inherited>
-						
-						<configuration>
-							<name>Wizard</name>
-							
-							<tagName>v1.0.0</tagName>
-							<draft>true</draft>
-
-							<server>github-haumacher</server>
-							<repository>wizard-game</repository>
-							<owner>haumacher</owner>
-							<targetCommitish>master</targetCommitish>
-
-							<releaseNotes>release-notes.md</releaseNotes>
-							<assets>
-								<asset>${basedir}/client/target/wizard-client-${project.version}.jar/</asset>
-								<asset>${basedir}/client/target/Zauberer-${project.version}.exe</asset>
-								<asset>${basedir}/server/target/wizard-server-${project.version}-full.jar/</asset>
-							</assets>
-						</configuration>
 					</execution>
 				</executions>
+				
+				<inherited>false</inherited>
+				
+				<configuration>
+					<name>Wizard ${project.version}</name>
+					
+					<tagName>v${project.version}</tagName>
+					<draft>true</draft>
+	
+					<server>github-haumacher</server>
+					<repository>wizard-game</repository>
+					<owner>haumacher</owner>
+					<targetCommitish>master</targetCommitish>
+	
+					<releaseNotes>release-notes.md</releaseNotes>
+					<assets>
+						<asset>${basedir}/client/target/wizard-client-${project.version}.jar/</asset>
+						<asset>${basedir}/client/target/Zauberer-${project.version}.exe</asset>
+						<asset>${basedir}/server/target/wizard-server-${project.version}-full.jar/</asset>
+					</assets>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
