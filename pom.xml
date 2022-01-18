@@ -3,7 +3,7 @@
 
 	<groupId>de.haumacher.games</groupId>
 	<artifactId>wizard-parent</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
@@ -27,7 +27,7 @@
 	</dependencies>
 
 	<scm>
-		<tag>v1.0.1</tag>
+		<tag>v1.0.0</tag>
 		<url>https://github.com/haumacher/wizard-game</url>
 		<connection>scm:git:https://github.com/haumacher/wizard-game.git</connection>
 		<developerConnection>scm:git:https://github.com/haumacher/wizard-game.git</developerConnection>
