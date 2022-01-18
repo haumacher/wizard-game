@@ -1,18 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Text?>
 
-<HBox fx:id="main" alignment="CENTER_LEFT" spacing="5.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.PlayerStatus">
+
+<VBox fx:id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.PlayerStatus">
    <children>
-      <Rectangle fx:id="activityView" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="20.0" stroke="BLACK" strokeType="INSIDE" width="20.0" HBox.hgrow="NEVER" />
-      <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+      <HBox alignment="CENTER_LEFT" VBox.vgrow="SOMETIMES">
          <children>
-            <Text fx:id="nameField" strokeType="OUTSIDE" strokeWidth="0.0" text="Anne (20)" />
+            <Rectangle fx:id="activityView" fill="#fff71f" height="20.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="2.0" width="20.0" />
+            <Text fx:id="nameField" strokeType="OUTSIDE" strokeWidth="0.0" text="Anne">
+               <HBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </HBox.margin>
+            </Text>
+            <VBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+               <children>
+                  <Text fx:id="pointsField" strokeType="OUTSIDE" strokeWidth="0.0" text="20" textAlignment="RIGHT" />
+               </children>
+            </VBox>
          </children>
-      </VBox>
-      <Text fx:id="pointsField" strokeType="OUTSIDE" strokeWidth="0.0" text="(0/2)" HBox.hgrow="NEVER" />
+      </HBox>
+      <HBox fx:id="bidAndTrickPane">
+         <children>
+            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0" />
+            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+               <HBox.margin>
+                  <Insets left="-1.0" />
+               </HBox.margin>
+            </Rectangle>
+            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+               <HBox.margin>
+                  <Insets left="-1.0" />
+               </HBox.margin>
+            </Rectangle>
+            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+               <HBox.margin>
+                  <Insets left="-1.0" />
+               </HBox.margin>
+            </Rectangle>
+            <Rectangle fill="#d00e0e" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+               <HBox.margin>
+                  <Insets left="-1.0" />
+               </HBox.margin>
+            </Rectangle>
+            <Rectangle fill="#d00e0e" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+               <HBox.margin>
+                  <Insets left="-1.0" />
+               </HBox.margin>
+            </Rectangle>
+         </children>
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </HBox>
    </children>
-</HBox>
+</VBox>

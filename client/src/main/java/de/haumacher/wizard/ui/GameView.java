@@ -13,42 +13,54 @@ import java.util.stream.Collectors;
 import de.haumacher.wizard.ClientHandler;
 import de.haumacher.wizard.WizardApp;
 import de.haumacher.wizard.msg.Card;
-import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
-import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.StartRound;
+import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Main view while a trick is played.
  */
 public class GameView extends Controller {
 	
+	/**
+	 * Area showing the currently played cards (the current trick).
+	 */
 	@FXML
-	AnchorPane actionPane;
+	Pane actionPane;
 	
+	/**
+	 * Area showning the players hand.
+	 */
 	@FXML
-	TilePane cardsPane;
+	Pane cardsPane;
 	
+	/**
+	 * Area showing the trump card.
+	 */
 	@FXML
-	TilePane trumpPane;
+	Pane trumpPane;
 
+	/**
+	 * Text field showing the current round information (round x of y).
+	 */
 	@FXML
 	Text roundDisplay;
 	
+	/**
+	 * Area, where {@link PlayerStatus} views are shown for each player.
+	 */
 	@FXML
-	VBox statusPane;
+	Pane statusPane;
 
 	private ProphecyPane _prophecy;
 

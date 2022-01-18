@@ -5,6 +5,10 @@ package de.haumacher.wizard.ui;
 
 import de.haumacher.wizard.msg.Player;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
@@ -15,14 +19,30 @@ import javafx.scene.text.Text;
  */
 public class PlayerStatus extends Controller {
 	
+	/**
+	 * {@link Rectangle} showing by color, if this player is currently in command.
+	 */
 	@FXML
 	Rectangle activityView;
 	
+	/**
+	 * Display of the player name.
+	 */
 	@FXML
 	Text nameField;
 
+	/**
+	 * Points of this player collected so far.
+	 */
 	@FXML
 	Text pointsField;
+	
+	/**
+	 * Box showing {@link Rectangle}s for bids (gray), green colored ones are tricks already won if they match the bid
+	 * and red if they exceed the bid.
+	 */
+	@FXML
+	HBox bidAndTrickPane;
 
 	private Player _player;
 
@@ -37,6 +57,8 @@ public class PlayerStatus extends Controller {
 		super.initialize();
 		
 		pointsField.setText("");
+		bidAndTrickPane.getChildren().clear();
+		activityView.setFill(Color.WHITE);
 	}
 	
 	public Player getPlayer() {
@@ -74,13 +96,36 @@ public class PlayerStatus extends Controller {
 	}
 
 	private void updateTricks() {
-		nameField.setText(_player.getName() + " " + _tricks + " von " + _bid);
+		bidAndTrickPane.getChildren().clear();
+		for (int n = 0; n < _bid; n++) {
+			addRect(n, rect(n < _tricks ? Color.GREEN : Color.LIGHTGRAY));
+		}
+		for (int n = _bid; n < _tricks; n++) {
+			addRect(n, rect(Color.RED));
+		}
+	}
+
+	private void addRect(int n, Rectangle rect) {
+		bidAndTrickPane.getChildren().add(rect);
+		if (n > 0) {
+			// Overlap borders.
+			HBox.setMargin(rect, new Insets(0, 0, 0, -2));
+		}
+	}
+
+	private Rectangle rect(Paint fill) {
+		Rectangle rect = new Rectangle(15, 40, fill);
+		rect.setStroke(Color.BLACK);
+		rect.setStrokeWidth(2);
+		rect.setArcWidth(0);
+		rect.setArcHeight(0);
+		return rect;
 	}
 
 	public void clearTricks() {
 		_bid = 0;
 		_tricks = 0;
-		nameField.setText(_player.getName());
+		bidAndTrickPane.getChildren().clear();
 	}
 
 	public void incTricks() {

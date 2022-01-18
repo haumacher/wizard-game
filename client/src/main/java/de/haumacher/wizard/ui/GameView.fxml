@@ -9,40 +9,37 @@
 
 <VBox fx:id="main" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.GameView">
    <children>
+      <VBox>
+         <children>
+            <HBox>
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Spielstand" />
+                  <Text fx:id="roundDisplay" strokeType="OUTSIDE" strokeWidth="0.0" text="Runde 2 von 10">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Text>
+               </children>
+            </HBox>
+            <TilePane fx:id="statusPane" hgap="20.0" prefColumns="3" prefHeight="75.0" prefRows="2" tileAlignment="TOP_LEFT" vgap="10.0">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </TilePane>
+         </children>
+         <padding>
+            <Insets left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </VBox>
       <HBox prefHeight="150.0" VBox.vgrow="ALWAYS">
          <children>
-            <AnchorPane fx:id="actionPane" HBox.hgrow="ALWAYS" />
-            <VBox>
-               <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Spielstand">
-                     <VBox.margin>
-                        <Insets left="5.0" top="5.0" />
-                     </VBox.margin>
-                  </Text>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Text fx:id="roundDisplay" strokeType="OUTSIDE" strokeWidth="0.0" text="Runde 2 von 10" />
-                        <VBox fx:id="statusPane" spacing="5.0">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <padding>
-                              <Insets left="5.0" top="5.0" />
-                           </padding>
-                           <VBox.margin>
-                              <Insets left="5.0" />
-                           </VBox.margin>
-                        </VBox>
-                     </children>
-                     <VBox.margin>
-                        <Insets left="10.0" top="5.0" />
-                     </VBox.margin>
-                  </VBox>
-               </children>
+            <AnchorPane fx:id="actionPane" HBox.hgrow="ALWAYS">
                <HBox.margin>
-                  <Insets />
+                  <Insets top="10.0" />
                </HBox.margin>
-            </VBox>
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding></AnchorPane>
          </children>
       </HBox>
       <HBox prefHeight="150.0">
@@ -72,6 +69,9 @@
                <padding>
                   <Insets right="5.0" top="5.0" />
                </padding>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
             </VBox>
          </children>
          <VBox.margin>
@@ -79,7 +79,4 @@
          </VBox.margin>
       </HBox>
    </children>
-   <padding>
-      <Insets right="10.0" />
-   </padding>
 </VBox>
