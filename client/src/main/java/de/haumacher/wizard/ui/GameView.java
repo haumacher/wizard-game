@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 
 import de.haumacher.wizard.ClientHandler;
 import de.haumacher.wizard.WizardApp;
+import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
+import de.haumacher.wizard.msg.RequestBid;
 import de.haumacher.wizard.msg.StartRound;
 import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
@@ -80,6 +82,8 @@ public class GameView extends Controller {
 
 	private TrumpSelection _trumpSelection;
 
+	private Map<String, PlayerStatus> _activePlayers = new HashMap<>();
+
 	public void init(ClientHandler handler, String playerId) {
 		_handler = handler;
 		_playerId = playerId;
@@ -117,11 +121,13 @@ public class GameView extends Controller {
 	public void requestTrumpSelection(String playerId) {
 		_trumpSelection = load(TrumpSelection.class, "TrumpSelection.fxml");
 		_trumpSelection.init(_handler, _players.get(playerId), _playerId.equals(playerId));
+		setActive(playerId);
 	}
 
 	public void selectTrump(Suit trumpSuit) {
 		trumpPane.getChildren().setAll(CardView.createCard(Card.create().setSuit(trumpSuit).setValue(Value.Z)));
 		_trumpSelection = null;
+		clearActive();
 	}
 
 	public void startBids() {
@@ -129,18 +135,16 @@ public class GameView extends Controller {
 		_prophecy.setPlayers(_handler, _players);
 	}
 
-	private <T extends Controller> T load(Class<T> controllerClass, String resourceFxml) {
-		Node view = WizardApp.load(controllerClass, resourceFxml);
-		actionPane.getChildren().setAll(view);
-		AnchorPane.setTopAnchor(view, 0.0);
-		AnchorPane.setLeftAnchor(view, 0.0);
-		AnchorPane.setRightAnchor(view, 0.0);
-		AnchorPane.setBottomAnchor(view, 0.0);
-		@SuppressWarnings("unchecked")
-		T controller = (T) view.getUserData();
-		return controller;
+	public void requestBid(String playerId, RequestBid self) {
+		_prophecy.requestBid(playerId, self.getRound(), self.getExpected());
+		setActive(playerId);
 	}
-	
+
+	public void setBid(String playerId, Bid self) {
+		_prophecy.setBid(playerId, self.getCnt(), self.getExpected());
+		removeActive(playerId);
+	}
+
 	public void startLead(Map<String, PlayerInfo> state) {
 		for (Entry<String, PlayerInfo> entry : state.entrySet()) {
 			PlayerStatus playerStatus = _playerStatus.get(entry.getKey());
@@ -167,6 +171,7 @@ public class GameView extends Controller {
 		}
 		
 		cardsPane.getChildren().forEach(n -> n.setOnMouseClicked(e -> leadCard(n)));
+		setActive(playerId);
 	}
 
 	private void leadCard(Node n) {
@@ -181,16 +186,22 @@ public class GameView extends Controller {
 			_cardBeingPut = null;
 		}
 		_currentTrick.addCard(card);
+		removeActive(playerId);
 	}
 
 	public void finishTurn(String winnerId) {
 		_playerStatus.get(winnerId).incTricks();
+		setActiveAll();
 		
 		_currentTrick.confirm("Dieser Stich geht an " + name(winnerId) + ".", e -> {
 			_handler.sendCommand(ConfirmTrick.create());
 			_currentTrick.setInfo("Warte auf die Bestätigung der anderen Spieler.");
 			_trickFinished = true;
 		});
+	}
+
+	public void confirmTrick(String playerId) {
+		removeActive(playerId);
 	}
 
 	private String name(String playerId) {
@@ -205,10 +216,16 @@ public class GameView extends Controller {
 			_playerStatus.get(entry.getKey()).addScore(entry.getValue().intValue());
 		}
 		
+		setActiveAll();
+		
 		_currentTrick.confirm("In dieser Runde erhälst Du " + points.get(_playerId) + " Punkte.", e -> {
 			_handler.sendCommand(ConfirmRound.create());
 			_currentTrick.setInfo("Warte auf die anderen Spieler...");
 		});
+	}
+
+	public void confirmRound(String playerId) {
+		removeActive(playerId);
 	}
 
 	private void clearTrick() {
@@ -219,6 +236,51 @@ public class GameView extends Controller {
 
 	public ProphecyPane getProphecy() {
 		return _prophecy;
+	}
+
+	private void setActiveAll() {
+		for (Entry<String, PlayerStatus> entry : _playerStatus.entrySet()) {
+			PlayerStatus status = entry.getValue();
+			status.setActive(true);
+			_activePlayers.put(entry.getKey(), status);
+		}
+	}
+
+	private void setActive(String playerId) {
+		clearActive();
+		addActive(playerId);
+	}
+
+	private void clearActive() {
+		for (PlayerStatus status : _activePlayers.values()) {
+			status.setActive(false);
+		}
+		_activePlayers.clear();
+	}
+
+	private void addActive(String playerId) {
+		PlayerStatus state = _playerStatus.get(playerId);
+		state.setActive(true);
+		_activePlayers.put(playerId, state);
+	}
+
+	private void removeActive(String playerId) {
+		PlayerStatus state = _activePlayers.remove(playerId);
+		if (state != null) {
+			state.setActive(false);
+		}
+	}
+
+	private <T extends Controller> T load(Class<T> controllerClass, String resourceFxml) {
+		Node view = WizardApp.load(controllerClass, resourceFxml);
+		actionPane.getChildren().setAll(view);
+		AnchorPane.setTopAnchor(view, 0.0);
+		AnchorPane.setLeftAnchor(view, 0.0);
+		AnchorPane.setRightAnchor(view, 0.0);
+		AnchorPane.setBottomAnchor(view, 0.0);
+		@SuppressWarnings("unchecked")
+		T controller = (T) view.getUserData();
+		return controller;
 	}
 
 }

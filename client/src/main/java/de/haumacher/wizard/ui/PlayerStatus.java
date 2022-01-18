@@ -56,9 +56,13 @@ public class PlayerStatus extends Controller {
 	public void initialize() {
 		super.initialize();
 		
-		pointsField.setText("");
-		bidAndTrickPane.getChildren().clear();
-		activityView.setFill(Color.WHITE);
+		clearPoints();
+		clearTricks();
+		setActive(false);
+	}
+
+	public void setActive(boolean value) {
+		activityView.setFill(value ? Color.YELLOW : Color.WHITE);
 	}
 	
 	public Player getPlayer() {
@@ -84,6 +88,10 @@ public class PlayerStatus extends Controller {
 		pointsField.setText("(" + _score + ")");
 	}
 	
+	private void clearPoints() {
+		pointsField.setText("");
+	}
+
 	public void setBid(int bid) {
 		_bid = bid;
 		_tricks = 0;

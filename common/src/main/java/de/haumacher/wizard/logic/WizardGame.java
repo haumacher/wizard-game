@@ -53,7 +53,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	
 	static final List<Card> CARDS;
 
-	public static final int PROTOCOL_VERSION = 1;
+	public static final int PROTOCOL_VERSION = 2;
 	
 	static {
 		List<Card> cards = new ArrayList<>();
@@ -383,6 +383,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			arg.sendError("Du hast den Stich schon bestätigt.");
 			return null;
 		}
+		forward(arg, self);
 		
 		if (_barrier.isEmpty()) {
 			nextTurn();
@@ -447,6 +448,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			arg.sendError("Du hast die Runde schon bestätigt.");
 			return null;
 		}
+		forward(arg, self);
 		
 		if (_barrier.isEmpty()) {
 			nextRound();

@@ -21,8 +21,9 @@ import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameCreated;
 import de.haumacher.wizard.msg.GameDeleted;
 import de.haumacher.wizard.msg.GameStarted;
-import de.haumacher.wizard.msg.JoinGame;
 import de.haumacher.wizard.msg.JoinAnnounce;
+import de.haumacher.wizard.msg.JoinGame;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.LeaveAnnounce;
 import de.haumacher.wizard.msg.LeaveGame;
 import de.haumacher.wizard.msg.ListGames;
@@ -30,7 +31,6 @@ import de.haumacher.wizard.msg.ListGamesResult;
 import de.haumacher.wizard.msg.LoggedIn;
 import de.haumacher.wizard.msg.Login;
 import de.haumacher.wizard.msg.Msg;
-import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.RequestBid;
 import de.haumacher.wizard.msg.RequestLead;
 import de.haumacher.wizard.msg.RequestTrumpSelection;
@@ -268,13 +268,13 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 
 	@Override
 	public Void visit(RequestBid self, Void arg) throws IOException {
-		_gameView.getProphecy().requestBid(_playerId, self.getRound(), self.getExpected());
+		_gameView.requestBid(_playerId, self);
 		return null;
 	}
 
 	@Override
 	public Void visit(Bid self, String playerId) throws IOException {
-		_gameView.getProphecy().setBid(playerId, self.getCnt(), self.getExpected());
+		_gameView.setBid(playerId, self);
 		return null;
 	}
 
@@ -303,8 +303,8 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 	}
 
 	@Override
-	public Void visit(ConfirmTrick self, String arg) throws IOException {
-		// Not forwarded to other players.
+	public Void visit(ConfirmTrick self, String playerId) throws IOException {
+		_gameView.confirmTrick(playerId);
 		return null;
 	}
 
@@ -315,8 +315,8 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 	}
 
 	@Override
-	public Void visit(ConfirmRound self, String arg) throws IOException {
-		// Not forwarded to other players.
+	public Void visit(ConfirmRound self, String playerId) throws IOException {
+		_gameView.confirmRound(playerId);
 		return null;
 	}
 
