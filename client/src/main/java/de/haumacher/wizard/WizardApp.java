@@ -268,7 +268,7 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 
 	@Override
 	public Void visit(RequestBid self, Void arg) throws IOException {
-		_gameView.requestBid(_playerId, self);
+		_gameView.requestBid(self.getPlayerId(), self);
 		return null;
 	}
 

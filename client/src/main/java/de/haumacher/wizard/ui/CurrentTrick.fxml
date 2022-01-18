@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox fx:id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.CurrentTrick">
+<VBox fx:id="main" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.CurrentTrick">
    <children>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Der aktuelle Stich">
          <VBox.margin>
@@ -17,7 +17,7 @@
          <VBox.margin>
             <Insets left="5.0" top="5.0" />
          </VBox.margin></TilePane>
-      <VBox alignment="CENTER" prefWidth="500.0">
+      <VBox alignment="CENTER">
          <children>
             <Text fx:id="info" strokeType="OUTSIDE" strokeWidth="0.0" text="Es liegen noch keine Karten auf dem Tisch. Spieler A ist am Zug." textAlignment="CENTER">
                <VBox.margin>

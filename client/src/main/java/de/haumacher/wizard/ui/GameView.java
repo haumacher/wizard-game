@@ -59,6 +59,12 @@ public class GameView extends Controller {
 	Text roundDisplay;
 	
 	/**
+	 * Text field showing the total number of tricks expected by players.
+	 */
+	@FXML
+	Text prophecySum;
+	
+	/**
 	 * Area, where {@link PlayerStatus} views are shown for each player.
 	 */
 	@FXML
@@ -90,6 +96,7 @@ public class GameView extends Controller {
 	}
 
 	public void startRound(StartRound msg) {
+		setProphecySum(0);
 		trumpPane.getChildren().setAll(CardView.createCard(msg.getTrumpCard()));
 		cardsPane.getChildren().setAll(msg.getCards().stream().map(CardView::createCard).collect(Collectors.toList()));
 		
@@ -136,13 +143,18 @@ public class GameView extends Controller {
 	}
 
 	public void requestBid(String playerId, RequestBid self) {
-		_prophecy.requestBid(playerId, self.getRound(), self.getExpected());
+		_prophecy.requestBid(_players.get(playerId), playerId.equals(_playerId), self.getRound(), self.getRound() - self.getExpected());
 		setActive(playerId);
 	}
 
 	public void setBid(String playerId, Bid self) {
-		_prophecy.setBid(playerId, self.getCnt(), self.getExpected());
+		setProphecySum(self.getExpected());
+		_playerStatus.get(playerId).setBid(self.getCnt());
 		removeActive(playerId);
+	}
+
+	private void setProphecySum(int self) {
+		prophecySum.setText(self + " Stiche vorhergesagt");
 	}
 
 	public void startLead(Map<String, PlayerInfo> state) {

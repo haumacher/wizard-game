@@ -15,11 +15,16 @@ public class RequestBid extends Msg {
 	/** Identifier for the {@link RequestBid} type in JSON format. */
 	public static final String REQUEST_BID__TYPE = "RequestBid";
 
+	/** @see #getPlayerId() */
+	private static final String PLAYER_ID = "playerId";
+
 	/** @see #getExpected() */
 	private static final String EXPECTED = "expected";
 
 	/** @see #getRound() */
 	private static final String ROUND = "round";
+
+	private String _playerId = "";
 
 	private int _expected = 0;
 
@@ -33,6 +38,26 @@ public class RequestBid extends Msg {
 	protected RequestBid() {
 		super();
 	}
+
+	/**
+	 * The player that is expected to place a bid.
+	 */
+	public final String getPlayerId() {
+		return _playerId;
+	}
+
+	/**
+	 * @see #getPlayerId()
+	 */
+	public RequestBid setPlayerId(String value) {
+		internalSetPlayerId(value);
+		return this;
+	}
+	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
+	protected final void internalSetPlayerId(String value) {
+		_playerId = value;
+	}
+
 
 	/**
 	 * The number of tricks expected by other players so far.
@@ -91,6 +116,8 @@ public class RequestBid extends Msg {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
+		out.name(PLAYER_ID);
+		out.value(getPlayerId());
 		out.name(EXPECTED);
 		out.value(getExpected());
 		out.name(ROUND);
@@ -100,6 +127,7 @@ public class RequestBid extends Msg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
+			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			case EXPECTED: setExpected(in.nextInt()); break;
 			case ROUND: setRound(in.nextInt()); break;
 			default: super.readField(in, field);

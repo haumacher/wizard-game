@@ -218,7 +218,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void requestNextBid()  {
-		getClient(_bidOffset + _bidCount).sendMessage(RequestBid.create().setRound(_round).setExpected(_totalBids));
+		broadCast(RequestBid.create().setPlayerId(getPlayerId(_bidOffset + _bidCount)).setRound(_round).setExpected(_totalBids));
 	}
 
 	private GameClient getClient(int index) {

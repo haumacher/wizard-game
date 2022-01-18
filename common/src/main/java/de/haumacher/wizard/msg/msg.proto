@@ -221,6 +221,9 @@ message StartBids extends Msg {
 
 /** Requests a bid. */
 message RequestBid extends Msg {
+	/** The player that is expected to place a bid. */
+	string playerId;
+
 	/** The number of tricks expected by other players so far. */
 	int expected;
 	

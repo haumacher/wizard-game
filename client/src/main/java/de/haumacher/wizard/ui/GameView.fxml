@@ -19,6 +19,11 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </Text>
+                  <Text fx:id="prophecySum" strokeType="OUTSIDE" strokeWidth="0.0" text="3 Stiche vorhergesagt">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Text>
                </children>
             </HBox>
             <TilePane fx:id="statusPane" hgap="20.0" prefColumns="3" prefHeight="75.0" prefRows="2" tileAlignment="TOP_LEFT" vgap="10.0">
@@ -31,7 +36,7 @@
             <Insets left="5.0" right="5.0" top="5.0" />
          </padding>
       </VBox>
-      <HBox prefHeight="150.0" VBox.vgrow="ALWAYS">
+      <HBox VBox.vgrow="ALWAYS">
          <children>
             <AnchorPane fx:id="actionPane" HBox.hgrow="ALWAYS">
                <HBox.margin>
