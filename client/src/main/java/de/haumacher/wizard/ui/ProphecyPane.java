@@ -53,7 +53,7 @@ public class ProphecyPane extends Controller {
 			prophecySelector.setVisible(true);
 		} else {
 			prophecySelector.setVisible(false);
-			infoField.setText(player.getName() + " macht seine Vorhersage...");
+			infoField.setText(player.getName() + " macht eine Vorhersage...");
 		}
 	}
 
