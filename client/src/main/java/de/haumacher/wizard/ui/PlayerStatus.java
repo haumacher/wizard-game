@@ -122,7 +122,7 @@ public class PlayerStatus extends Controller {
 	}
 
 	private Rectangle rect(Paint fill) {
-		Rectangle rect = new Rectangle(15, 40, fill);
+		Rectangle rect = new Rectangle(10, 20, fill);
 		rect.setStroke(Color.BLACK);
 		rect.setStrokeWidth(2);
 		rect.setArcWidth(0);

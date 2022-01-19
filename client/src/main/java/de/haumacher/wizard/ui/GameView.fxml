@@ -7,35 +7,55 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
+
 <VBox fx:id="main" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.GameView">
    <children>
-      <VBox>
+      <HBox>
          <children>
-            <HBox>
+            <VBox HBox.hgrow="ALWAYS">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Spielstand" />
-                  <Text fx:id="roundDisplay" strokeType="OUTSIDE" strokeWidth="0.0" text="Runde 2 von 10">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </Text>
-                  <Text fx:id="prophecySum" strokeType="OUTSIDE" strokeWidth="0.0" text="3 Stiche vorhergesagt">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </Text>
+                  <HBox>
+                     <children>
+                        <Text fx:id="roundDisplay" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Runde 2 von 10">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Text>
+                        <Text fx:id="prophecySum" strokeType="OUTSIDE" strokeWidth="0.0" text="3 Stiche vorhergesagt">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Text>
+                     </children>
+                  </HBox>
+                  <TilePane fx:id="statusPane" hgap="20.0" prefColumns="3" prefHeight="75.0" prefRows="2" tileAlignment="TOP_LEFT" vgap="10.0">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </TilePane>
                </children>
-            </HBox>
-            <TilePane fx:id="statusPane" hgap="20.0" prefColumns="3" prefHeight="75.0" prefRows="2" tileAlignment="TOP_LEFT" vgap="10.0">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </TilePane>
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox prefWidth="100.0" HBox.hgrow="NEVER">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Trumpf" />
+                  <TilePane fx:id="trumpPane" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets left="5.0" top="5.0" />
+                     </padding>
+                  </TilePane>
+               </children>
+               <HBox.margin>
+                  <Insets left="10.0" right="5.0" />
+               </HBox.margin>
+            </VBox>
          </children>
-         <padding>
-            <Insets left="5.0" right="5.0" top="5.0" />
-         </padding>
-      </VBox>
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </HBox>
       <HBox VBox.vgrow="ALWAYS">
          <children>
             <AnchorPane fx:id="actionPane" HBox.hgrow="ALWAYS">
@@ -44,7 +64,8 @@
                </HBox.margin>
                <padding>
                   <Insets bottom="10.0" />
-               </padding></AnchorPane>
+               </padding>
+            </AnchorPane>
          </children>
       </HBox>
       <HBox prefHeight="150.0">
@@ -59,24 +80,8 @@
                   </TilePane>
                </children>
                <padding>
-                  <Insets left="5.0" top="5.0" />
+                  <Insets left="5.0" right="5.0" top="5.0" />
                </padding>
-            </VBox>
-            <VBox prefWidth="100.0" HBox.hgrow="NEVER">
-               <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Trumpf" />
-                  <TilePane fx:id="trumpPane" VBox.vgrow="ALWAYS">
-                     <padding>
-                        <Insets left="5.0" top="5.0" />
-                     </padding>
-                  </TilePane>
-               </children>
-               <padding>
-                  <Insets right="5.0" top="5.0" />
-               </padding>
-               <HBox.margin>
-                  <Insets left="20.0" />
-               </HBox.margin>
             </VBox>
          </children>
          <VBox.margin>

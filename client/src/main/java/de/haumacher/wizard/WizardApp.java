@@ -53,7 +53,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 
 /**
@@ -61,11 +61,11 @@ import javafx.stage.Stage;
  */
 public class WizardApp extends Application implements Msg.Visitor<Void, Void, IOException>, GameCmd.Visitor<Void, String, IOException> {
 	
+	@FXML
+	ScrollPane main;
+	
 	private Scene _scene;
 	ClientHandler _handler;
-	
-	@FXML
-	AnchorPane main;
 	private GameSelector _gameSelector;
 	private String _playerId;
 	private Game _game;
@@ -142,12 +142,9 @@ public class WizardApp extends Application implements Msg.Visitor<Void, Void, IO
 
 	private <T> T showView(Class<T> controllerType, String resourceName) {
 		Node view = load(controllerType, resourceName);
-		main.getChildren().setAll(view);
+		main.setContent(view);
+		main.layout();
 		
-		AnchorPane.setTopAnchor(view, 0.0);
-		AnchorPane.setLeftAnchor(view, 0.0);
-		AnchorPane.setRightAnchor(view, 0.0);
-		AnchorPane.setBottomAnchor(view, 0.0);
 		@SuppressWarnings("unchecked")
 		T controller = (T) view.getUserData();
 		return controller;

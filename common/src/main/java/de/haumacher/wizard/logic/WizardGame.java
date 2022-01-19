@@ -162,7 +162,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		
 		_round = 1;
 		_maxRound = CARDS.size() / _clients.size();
-
+		
 		_players = _clients.values().stream().map(c -> PlayerState.create().setPlayer(c.getData())).collect(Collectors.toList());
 		Collections.shuffle(_players);
 		
