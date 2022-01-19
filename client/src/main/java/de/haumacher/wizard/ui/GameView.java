@@ -199,7 +199,7 @@ public class GameView extends Controller {
 			cardsPane.getChildren().forEach(n -> n.setOnMouseClicked(null));
 			_cardBeingPut = null;
 		}
-		_currentTrick.addCard(card);
+		_currentTrick.addCard(card, _players.get(playerId).getName());
 		removeActive(playerId);
 	}
 

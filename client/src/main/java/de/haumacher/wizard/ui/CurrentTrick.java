@@ -42,8 +42,8 @@ public class CurrentTrick extends Controller {
 		next.setVisible(false);
 	}
 
-	public void addCard(Card card) {
-		table.getChildren().add(CardView.createCard(card));
+	public void addCard(Card card, String playerName) {
+		table.getChildren().add(CardWithPlayer.createCard(card, playerName));
 	}
 
 	public void clear() {

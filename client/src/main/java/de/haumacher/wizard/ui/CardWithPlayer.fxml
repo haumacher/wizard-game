@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox fx:id="main" alignment="CENTER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.CardWithPlayer">
+   <children>
+      <Pane fx:id="card" prefHeight="140.0" prefWidth="100.0" />
+      <Text fx:id="name" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+         <VBox.margin>
+            <Insets top="4.0" />
+         </VBox.margin></Text>
+   </children>
+</VBox>
