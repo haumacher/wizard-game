@@ -8,10 +8,10 @@
 
 <VBox fx:id="main" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.PlayerStatus">
    <children>
-      <HBox alignment="CENTER_LEFT" VBox.vgrow="SOMETIMES">
+      <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
          <children>
             <Rectangle fx:id="activityView" fill="#fff71f" height="20.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="2.0" width="20.0" />
-            <Text fx:id="nameField" strokeType="OUTSIDE" strokeWidth="0.0" text="Anne">
+            <Text fx:id="nameField" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Anne">
                <HBox.margin>
                   <Insets left="10.0" right="10.0" />
                </HBox.margin>
@@ -19,25 +19,25 @@
             <Text fx:id="pointsField" strokeType="OUTSIDE" strokeWidth="0.0" text="20" textAlignment="RIGHT" />
          </children>
       </HBox>
-      <HBox fx:id="bidAndTrickPane" prefWidth="150.0">
+      <HBox fx:id="bidAndTrickPane" minHeight="20.0" prefWidth="150.0">
          <children>
-            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0" />
-            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+            <Rectangle fill="#11a13f" height="20.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="10.0" />
+            <Rectangle fill="#11a13f" height="20.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="10.0">
                <HBox.margin>
                   <Insets left="-1.0" />
                </HBox.margin>
             </Rectangle>
-            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+            <Rectangle fill="#11a13f" height="20.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="10.0">
                <HBox.margin>
                   <Insets left="-1.0" />
                </HBox.margin>
             </Rectangle>
-            <Rectangle fill="#11a13f" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+            <Rectangle fill="#11a13f" height="20.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="10.0">
                <HBox.margin>
                   <Insets left="-1.0" />
                </HBox.margin>
             </Rectangle>
-            <Rectangle fill="#d00e0e" height="50.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="15.0">
+            <Rectangle fill="#d00e0e" height="20.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="10.0">
                <HBox.margin>
                   <Insets left="-1.0" />
                </HBox.margin>

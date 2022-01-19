@@ -21,6 +21,9 @@ public class StartRound extends GameMsg {
 	/** @see #getMaxRound() */
 	private static final String MAX_ROUND = "maxRound";
 
+	/** @see #getStartPlayer() */
+	private static final String START_PLAYER = "startPlayer";
+
 	/** @see #getPlayers() */
 	private static final String PLAYERS = "players";
 
@@ -33,6 +36,8 @@ public class StartRound extends GameMsg {
 	private int _round = 0;
 
 	private int _maxRound = 0;
+
+	private String _startPlayer = "";
 
 	private final java.util.List<Player> _players = new java.util.ArrayList<>();
 
@@ -86,6 +91,26 @@ public class StartRound extends GameMsg {
 	/** Internal setter for {@link #getMaxRound()} without chain call utility. */
 	protected final void internalSetMaxRound(int value) {
 		_maxRound = value;
+	}
+
+
+	/**
+	 * The ID of the player that must make the first bid and leads the first card.
+	 */
+	public final String getStartPlayer() {
+		return _startPlayer;
+	}
+
+	/**
+	 * @see #getStartPlayer()
+	 */
+	public StartRound setStartPlayer(String value) {
+		internalSetStartPlayer(value);
+		return this;
+	}
+	/** Internal setter for {@link #getStartPlayer()} without chain call utility. */
+	protected final void internalSetStartPlayer(String value) {
+		_startPlayer = value;
 	}
 
 
@@ -221,6 +246,8 @@ public class StartRound extends GameMsg {
 		out.value(getRound());
 		out.name(MAX_ROUND);
 		out.value(getMaxRound());
+		out.name(START_PLAYER);
+		out.value(getStartPlayer());
 		out.name(PLAYERS);
 		out.beginArray();
 		for (Player x : getPlayers()) {
@@ -244,6 +271,7 @@ public class StartRound extends GameMsg {
 		switch (field) {
 			case ROUND: setRound(in.nextInt()); break;
 			case MAX_ROUND: setMaxRound(in.nextInt()); break;
+			case START_PLAYER: setStartPlayer(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			case PLAYERS: {
 				in.beginArray();
 				while (in.hasNext()) {

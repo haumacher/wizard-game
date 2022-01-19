@@ -117,14 +117,11 @@ public class GameView extends Controller {
 				
 				_playerStatus.put(player.getId(), status);
 			}
-		} else {
-			// Reorder players for current turn.
-			statusPane.getChildren().clear();
-			for (Player player : players) {
-				PlayerStatus playerStatus = _playerStatus.get(player.getId());
-				statusPane.getChildren().add(playerStatus.getView());
-				playerStatus.clearTricks();
-			}
+		}
+
+		for (PlayerStatus status : _playerStatus.values()) {
+			status.clearTricks();
+			status.markStartPlayer(status.getPlayer().getId().equals(msg.getStartPlayer()));
 		}
 		
 		roundDisplay.setText("Runde " + msg.getRound() + " von " + msg.getMaxRound());

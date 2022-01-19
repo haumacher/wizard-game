@@ -6,6 +6,7 @@ package de.haumacher.wizard.logic;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,7 +76,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 
 	private String _id = UUID.randomUUID().toString();
 	
-	private Map<String, GameClient> _clients = new ConcurrentHashMap<>();
+	private Map<String, GameClient> _clients = new LinkedHashMap<>();
 
 	private boolean _started;
 
@@ -89,6 +90,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 * Index of the player in {@link #_players} that must make the first bid.
 	 */
 	private int _bidOffset;
+	
+	/**
+	 * The number of bids already placed in this round.
+	 */
 	private int _bidCount;
 	
 	/**
@@ -137,7 +142,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		return true;
 	}
 	
-	public void removePlayer(GameClient player) {
+	public synchronized void removePlayer(GameClient player) {
 		GameClient removedPlayer = _clients.remove(player.getId());
 		if (removedPlayer != null) {
 			broadCast(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
@@ -154,7 +159,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 	}
 
-	public boolean isStarted() {
+	public synchronized boolean isStarted() {
 		return _started;
 	}
 
@@ -172,9 +177,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		_maxRound = CARDS.size() / _clients.size();
 		
 		_players = _clients.values().stream().map(c -> PlayerState.create().setPlayer(c.getData())).collect(Collectors.toList());
-		Collections.shuffle(_players);
 		
-		_bidOffset = 0;
+		// Choose starting player.
+		_bidOffset = (int) (Math.random() * _players.size());
 
 		startRound();
 	}
@@ -209,6 +214,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 					.setRound(_round)
 					.setMaxRound(_maxRound)
 					.setPlayers(players)
+					.setStartPlayer(players.get(_bidOffset).getId())
 					.setCards(playerCards)
 					.setTrumpCard(_trumpCard);
 			getClient(player.getPlayer().getId()).sendMessage(message);
@@ -467,7 +473,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	private void nextRound() {
 		_round++;
 		if (_round <= _maxRound) {
-			_bidOffset++;
+			_bidOffset = normalizeIndex(_bidOffset + 1);
 			startRound();
 		} else {
 			finishGame();

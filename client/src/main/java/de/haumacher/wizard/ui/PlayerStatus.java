@@ -61,6 +61,13 @@ public class PlayerStatus extends Controller {
 		setActive(false);
 	}
 
+	/** 
+	 * Marks this player as start player of the current round.
+	 */
+	public void markStartPlayer(boolean value) {
+		nameField.setStyle(value ? "-fx-font-weight: bold;" : "");
+	}
+
 	public void setActive(boolean value) {
 		activityView.setFill(value ? Color.YELLOW : Color.WHITE);
 	}
@@ -110,6 +117,12 @@ public class PlayerStatus extends Controller {
 		}
 		for (int n = _bid; n < _tricks; n++) {
 			addRect(n, rect(Color.RED));
+		}
+		
+		if (_bid == 0 && _tricks == 0) {
+			Rectangle marker = rect(Color.BLACK);
+			marker.setWidth(0);
+			addRect(0, marker);
 		}
 	}
 

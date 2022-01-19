@@ -197,6 +197,9 @@ message StartRound extends GameMsg {
 	/** The number of rounds being played in this game (depends on the number of players). */
 	int maxRound;
 	
+	/** The ID of the player that must make the first bid and leads the first card. */
+	string startPlayer;
+	
 	/** The players and their order in this round. */
 	repeated Player players;
 	
