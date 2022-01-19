@@ -184,8 +184,13 @@ abstract message GameCmd extends Cmd {
 
 }
 
+/** A {@link Msg} targeting a running game and is only interesting for players of that game. */
+abstract message GameMsg extends Msg {
+
+}
+
 /** Starts a round by assigning cards to players. */
-message StartRound extends Msg {
+message StartRound extends GameMsg {
 	/** The number of the round. 1 is the first round. */
 	int round;
 	
@@ -204,7 +209,7 @@ message StartRound extends Msg {
 }
 
 /** Requests a player to select the trump suit in case the trump card was a wizard. */
-message RequestTrumpSelection extends Msg {
+message RequestTrumpSelection extends GameMsg {
 	/** The ID of the player that is expected to select the trump suit. */
 	string playerId;
 }
@@ -216,11 +221,11 @@ message SelectTrump extends GameCmd {
 }
 
 /** Message that starts the bid phase. */
-message StartBids extends Msg {
+message StartBids extends GameMsg {
 }
 
 /** Requests a bid. */
-message RequestBid extends Msg {
+message RequestBid extends GameMsg {
 	/** The player that is expected to place a bid. */
 	string playerId;
 
@@ -249,7 +254,7 @@ message Bid extends GameCmd {
 /**
  * Message announcing that all bids are placed.
  */
-message StartLead extends Msg {
+message StartLead extends GameMsg {
 	/** Score information of all players by their IDs. */
 	map<string, PlayerInfo> state;
 }
@@ -269,7 +274,7 @@ message PlayerInfo {
 /**
  * Message sent to all players that announces the player that is about to put a card on the table.
  */
-message RequestLead extends Msg {
+message RequestLead extends GameMsg {
 	/** The ID of the player that is expected to send a {@link Lead} message. All other playes are only informed about the player that is in command. */
 	string playerId;
 }
@@ -281,7 +286,7 @@ message Lead extends GameCmd {
 }
 
 /** Message sent at the end of each turn announcing the winner. */
-message FinishTurn extends Msg {
+message FinishTurn extends GameMsg {
 	/** The cards that have been played in this turn. */
 	repeated Card trick;
 	
@@ -294,7 +299,7 @@ message ConfirmTrick extends GameCmd {
 }
 
 /** Message sent after each round that announces the points received in this round. */
-message FinishRound extends Msg {
+message FinishRound extends GameMsg {
 	/** For each player ID the number of points this player wins. The number may be negative. */
 	map<string, int> points;
 }
@@ -304,7 +309,7 @@ message ConfirmRound extends GameCmd {
 }
 
 /** Message sent after the last round of a game. */
-message FinishGame extends Msg {
+message FinishGame extends GameMsg {
 	/** The total score for each player. The list is ordered by the points the players have won. */
 	repeated PlayerScore scores;
 }
@@ -325,7 +330,7 @@ message LeaveGame extends Cmd {
 }
 
 /** Message to forward a {@link GameCmd} sent by one player of a game to all other players. */
-message Announce extends Msg {
+message Announce extends GameMsg {
 	/** The ID of the player that sent the command. */
 	string playerId;
 	

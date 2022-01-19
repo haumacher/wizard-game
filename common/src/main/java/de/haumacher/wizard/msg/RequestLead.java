@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Message sent to all players that announces the player that is about to put a card on the table.
  */
-public class RequestLead extends Msg {
+public class RequestLead extends GameMsg {
 
 	/**
 	 * Creates a {@link RequestLead} instance.
@@ -79,7 +79,7 @@ public class RequestLead extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

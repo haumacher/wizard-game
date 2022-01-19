@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Requests a player to select the trump suit in case the trump card was a wizard.
  */
-public class RequestTrumpSelection extends Msg {
+public class RequestTrumpSelection extends GameMsg {
 
 	/**
 	 * Creates a {@link RequestTrumpSelection} instance.
@@ -79,7 +79,7 @@ public class RequestTrumpSelection extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

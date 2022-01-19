@@ -38,7 +38,7 @@ public class GameLobby extends Controller implements ListChangeListener<Player>,
 		super.initialize();
 		
 		playerList.getItems().addListener(this);
-		startGame.addEventFilter(ActionEvent.ACTION, this);
+		startGame.setOnAction(this);
 		playerList.setEditable(false);
 		playerList.setCellFactory(this);
 		playerList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

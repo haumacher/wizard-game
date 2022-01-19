@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Starts a round by assigning cards to players.
  */
-public class StartRound extends Msg {
+public class StartRound extends GameMsg {
 
 	/**
 	 * Creates a {@link StartRound} instance.
@@ -266,7 +266,7 @@ public class StartRound extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

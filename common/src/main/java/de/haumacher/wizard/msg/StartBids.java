@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Message that starts the bid phase.
  */
-public class StartBids extends Msg {
+public class StartBids extends GameMsg {
 
 	/**
 	 * Creates a {@link StartBids} instance.
@@ -39,7 +39,7 @@ public class StartBids extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

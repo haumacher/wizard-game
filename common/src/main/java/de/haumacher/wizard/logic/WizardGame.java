@@ -25,6 +25,7 @@ import de.haumacher.wizard.msg.FinishRound;
 import de.haumacher.wizard.msg.FinishTurn;
 import de.haumacher.wizard.msg.Game;
 import de.haumacher.wizard.msg.GameCmd;
+import de.haumacher.wizard.msg.GameMsg;
 import de.haumacher.wizard.msg.JoinAnnounce;
 import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.LeaveAnnounce;
@@ -51,10 +52,10 @@ import de.haumacher.wizard.msg.Value;
  */
 public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException> {
 	
+	public static final int PROTOCOL_VERSION = 3;
+	
 	static final List<Card> CARDS;
 
-	public static final int PROTOCOL_VERSION = 2;
-	
 	static {
 		List<Card> cards = new ArrayList<>();
 		for (Suit suit : Suit.values()) {
@@ -107,15 +108,18 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	private String _trumpSelectorId;
 
 	private Consumer<Game> _onFinish;
+
+	private Consumer<Msg> _broadCastAll;
 	
 	public WizardGame() {
-		this(g -> {});
+		this(msg -> {}, g -> {});
 	}
 	
 	/** 
 	 * Creates a {@link WizardGame}.
 	 */
-	public WizardGame(Consumer<Game> onFinish) {
+	public WizardGame(Consumer<Msg> broadCastAll, Consumer<Game> onFinish) {
+		_broadCastAll = broadCastAll;
 		_onFinish = onFinish;
 	}
 
@@ -141,6 +145,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void broadCast(Msg msg) {
+		_broadCastAll.accept(msg);
+	}
+	
+	private void broadCast(GameMsg msg) {
 		for (GameClient player : _clients.values()) {
 			player.sendMessage(msg);
 		}

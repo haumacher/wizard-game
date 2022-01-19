@@ -34,6 +34,7 @@ import de.haumacher.wizard.msg.GameCreated;
 import de.haumacher.wizard.msg.GameDeleted;
 import de.haumacher.wizard.msg.GameStarted;
 import de.haumacher.wizard.msg.JoinGame;
+import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.LeaveGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.ListGamesResult;
@@ -41,7 +42,6 @@ import de.haumacher.wizard.msg.LoggedIn;
 import de.haumacher.wizard.msg.Login;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.Player;
-import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
 
@@ -174,9 +174,9 @@ public class Server {
 		public Void visit(Login self, Void arg) throws IOException {
 			if (self.getVersion() != WizardGame.PROTOCOL_VERSION) {
 				if (self.getVersion() > WizardGame.PROTOCOL_VERSION) {
-					sendError("Die Version von deinem Programm ist zu neu. Sie ist nicht mit diesem Server kompatibel.");
+					sendError("Die Version deines Programms ist zu neu. Sie ist nicht mit diesem Server kompatibel.");
 				} else {
-					sendError("Die Version von deinem Programm ist zu alt. Sie ist nicht mit diesem Server kompatibel.");
+					sendError("Die Version deines Programms ist zu alt. Sie ist nicht mit diesem Server kompatibel.");
 				}
 				return null;
 			}
@@ -193,7 +193,7 @@ public class Server {
 				return null;
 			}
 			
-			_game = new WizardGame(g -> _games.remove(g.getGameId()));
+			_game = new WizardGame(Server.this::broadCast, g -> _games.remove(g.getGameId()));
 			_games.put(_game.getGameId(), _game);
 			broadCast(GameCreated.create().setOwnerId(getId()).setGame(_game.getData()));
 			_game.addPlayer(this);

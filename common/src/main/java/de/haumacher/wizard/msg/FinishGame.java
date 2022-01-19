@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Message sent after the last round of a game.
  */
-public class FinishGame extends Msg {
+public class FinishGame extends GameMsg {
 
 	/**
 	 * Creates a {@link FinishGame} instance.
@@ -112,7 +112,7 @@ public class FinishGame extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

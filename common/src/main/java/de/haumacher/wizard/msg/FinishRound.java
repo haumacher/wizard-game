@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Message sent after each round that announces the points received in this round.
  */
-public class FinishRound extends Msg {
+public class FinishRound extends GameMsg {
 
 	/**
 	 * Creates a {@link FinishRound} instance.
@@ -116,7 +116,7 @@ public class FinishRound extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

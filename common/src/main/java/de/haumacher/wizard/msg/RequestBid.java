@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Requests a bid.
  */
-public class RequestBid extends Msg {
+public class RequestBid extends GameMsg {
 
 	/**
 	 * Creates a {@link RequestBid} instance.
@@ -135,7 +135,7 @@ public class RequestBid extends Msg {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

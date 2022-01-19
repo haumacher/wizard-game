@@ -6,7 +6,7 @@ package de.haumacher.wizard.msg;
 public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/** Visitor interface for the {@link Msg} hierarchy.*/
-	public interface Visitor<R,A,E extends Throwable> extends ResultMsg.Visitor<R,A,E> {
+	public interface Visitor<R,A,E extends Throwable> extends ResultMsg.Visitor<R,A,E>, GameMsg.Visitor<R,A,E> {
 
 		/** Visit case for {@link GameCreated}.*/
 		R visit(GameCreated self, A arg) throws E;
@@ -22,36 +22,6 @@ public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 		/** Visit case for {@link LeaveAnnounce}.*/
 		R visit(LeaveAnnounce self, A arg) throws E;
-
-		/** Visit case for {@link StartRound}.*/
-		R visit(StartRound self, A arg) throws E;
-
-		/** Visit case for {@link RequestTrumpSelection}.*/
-		R visit(RequestTrumpSelection self, A arg) throws E;
-
-		/** Visit case for {@link StartBids}.*/
-		R visit(StartBids self, A arg) throws E;
-
-		/** Visit case for {@link RequestBid}.*/
-		R visit(RequestBid self, A arg) throws E;
-
-		/** Visit case for {@link StartLead}.*/
-		R visit(StartLead self, A arg) throws E;
-
-		/** Visit case for {@link RequestLead}.*/
-		R visit(RequestLead self, A arg) throws E;
-
-		/** Visit case for {@link FinishTurn}.*/
-		R visit(FinishTurn self, A arg) throws E;
-
-		/** Visit case for {@link FinishRound}.*/
-		R visit(FinishRound self, A arg) throws E;
-
-		/** Visit case for {@link FinishGame}.*/
-		R visit(FinishGame self, A arg) throws E;
-
-		/** Visit case for {@link Announce}.*/
-		R visit(Announce self, A arg) throws E;
 
 	}
 
@@ -76,6 +46,9 @@ public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 			case GameStarted.GAME_STARTED__TYPE: result = de.haumacher.wizard.msg.GameStarted.readGameStarted(in); break;
 			case JoinAnnounce.JOIN_ANNOUNCE__TYPE: result = de.haumacher.wizard.msg.JoinAnnounce.readJoinAnnounce(in); break;
 			case LeaveAnnounce.LEAVE_ANNOUNCE__TYPE: result = de.haumacher.wizard.msg.LeaveAnnounce.readLeaveAnnounce(in); break;
+			case Error.ERROR__TYPE: result = de.haumacher.wizard.msg.Error.readError(in); break;
+			case LoggedIn.LOGGED_IN__TYPE: result = de.haumacher.wizard.msg.LoggedIn.readLoggedIn(in); break;
+			case ListGamesResult.LIST_GAMES_RESULT__TYPE: result = de.haumacher.wizard.msg.ListGamesResult.readListGamesResult(in); break;
 			case StartRound.START_ROUND__TYPE: result = de.haumacher.wizard.msg.StartRound.readStartRound(in); break;
 			case RequestTrumpSelection.REQUEST_TRUMP_SELECTION__TYPE: result = de.haumacher.wizard.msg.RequestTrumpSelection.readRequestTrumpSelection(in); break;
 			case StartBids.START_BIDS__TYPE: result = de.haumacher.wizard.msg.StartBids.readStartBids(in); break;
@@ -86,9 +59,6 @@ public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 			case FinishRound.FINISH_ROUND__TYPE: result = de.haumacher.wizard.msg.FinishRound.readFinishRound(in); break;
 			case FinishGame.FINISH_GAME__TYPE: result = de.haumacher.wizard.msg.FinishGame.readFinishGame(in); break;
 			case Announce.ANNOUNCE__TYPE: result = de.haumacher.wizard.msg.Announce.readAnnounce(in); break;
-			case Error.ERROR__TYPE: result = de.haumacher.wizard.msg.Error.readError(in); break;
-			case LoggedIn.LOGGED_IN__TYPE: result = de.haumacher.wizard.msg.LoggedIn.readLoggedIn(in); break;
-			case ListGamesResult.LIST_GAMES_RESULT__TYPE: result = de.haumacher.wizard.msg.ListGamesResult.readListGamesResult(in); break;
 			default: in.skipValue(); result = null; break;
 		}
 		in.endArray();
