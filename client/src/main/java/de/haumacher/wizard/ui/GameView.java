@@ -97,7 +97,12 @@ public class GameView extends Controller {
 
 	public void startRound(StartRound msg) {
 		setProphecySum(0);
-		trumpPane.getChildren().setAll(CardView.createCard(msg.getTrumpCard()));
+		Card trumpCard = msg.getTrumpCard();
+		if (trumpCard == null) {
+			trumpPane.getChildren().clear();
+		} else {
+			trumpPane.getChildren().setAll(CardView.createCard(trumpCard));
+		}
 		cardsPane.getChildren().setAll(msg.getCards().stream().map(CardView::createCard).collect(Collectors.toList()));
 		
 		List<Player> players = msg.getPlayers();
