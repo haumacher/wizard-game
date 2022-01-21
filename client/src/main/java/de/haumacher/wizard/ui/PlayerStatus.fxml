@@ -19,7 +19,7 @@
             <Text fx:id="pointsField" strokeType="OUTSIDE" strokeWidth="0.0" text="20" textAlignment="RIGHT" />
          </children>
       </HBox>
-      <HBox fx:id="bidAndTrickPane" minHeight="20.0" prefWidth="150.0">
+      <HBox fx:id="bidAndTrickPane" minHeight="20.0">
          <children>
             <Rectangle fill="#11a13f" height="20.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="10.0" />
             <Rectangle fill="#11a13f" height="20.0" stroke="BLACK" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="2.0" width="10.0">
