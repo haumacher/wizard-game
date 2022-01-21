@@ -3,7 +3,6 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardApp;
 import de.haumacher.wizard.msg.Card;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -29,10 +28,9 @@ public class CardWithPlayer extends Controller {
 
 
 	public static Node createCard(Card cardData, String playerName) {
-		Node view = WizardApp.load(CardWithPlayer.class, "CardWithPlayer.fxml");
-		CardWithPlayer result = (CardWithPlayer) view.getUserData();
+		CardWithPlayer result = Controller.load(CardWithPlayer.class, "CardWithPlayer.fxml");
 		result.initialize(CardView.createCard(cardData), playerName);
-		return view;
+		return result.getView();
 	}
 
 }

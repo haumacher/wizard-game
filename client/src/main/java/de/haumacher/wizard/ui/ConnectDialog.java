@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 import de.haumacher.wizard.data.ConnectData;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -18,10 +20,7 @@ import javafx.stage.Stage;
  *
  * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
-public class ConnectDialog {
-	
-	@FXML
-	Stage main;
+public class ConnectDialog extends Controller<Parent> {
 	
 	@FXML
 	TextField nickName;
@@ -30,6 +29,8 @@ public class ConnectDialog {
 	TextField serverAddr;
 
 	private Consumer<ConnectData> _onConnect;
+
+	private Stage _dialog;
 	
 	/** 
 	 * Creates a {@link ConnectDialog}.
@@ -37,22 +38,17 @@ public class ConnectDialog {
 	public ConnectDialog() {
 	}
 	
-	@FXML
-	public void initialize() {
-		main.setUserData(this);
-		
-		nickName.requestFocus();
-	}
-	
 	public void show(Consumer<ConnectData> onConnect) {
 		_onConnect = onConnect;
-		main.showAndWait();
+		
+		Scene scene = new Scene(getView());
+		
+		_dialog = new Stage();
+		_dialog.setScene(scene);
+		_dialog.setOnShown(e -> nickName.requestFocus());
+		_dialog.showAndWait();
 	}
 
-	public void onCloseDialog(Event evt) {
-		main.hide();
-	}
-	
 	public void onEnter(Event evt) {
 		Control source = (Control) evt.getSource();
 		source.setStyle("");
@@ -75,7 +71,7 @@ public class ConnectDialog {
 		}
 		if (!error) {
 			_onConnect.accept(ConnectData.create().setNickName(name).setServerAddr(addr));
-			main.hide();
+			_dialog.hide();
 		}
 	}
 }

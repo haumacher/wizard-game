@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.function.Consumer;
 
 import de.haumacher.msgbuf.json.JsonReader;
 import de.haumacher.msgbuf.json.JsonToken;
@@ -26,22 +27,39 @@ import javafx.scene.control.ButtonType;
  * Connects to the Wizard game server and processes messages in a separate {@link Thread}.
  * </p>
  */
-public abstract class ClientHandler implements AutoCloseable {
+public class GameConnection implements AutoCloseable, WizardServer {
 
 	private JsonWriter _out;
-	
+
 	private Socket _socket;
 
 	private Thread _consumer;
 
+	private String _host;
+
+	private int _port;
+
+	/**
+	 * Creates a {@link GameConnection}.
+	 * 
+	 * @param host
+	 *        The host name of the game server.
+	 * @param port
+	 *        The game server port.
+	 */
+	public GameConnection(String host, int port) {
+		_host = host;
+		_port = port;
+	}
+
 	/**
 	 * Opens the connection to the game server and starts receiving messages from it.
-	 *
-	 * @param host The host name of the game server.
-	 * @param port The game server port.
+	 * 
+	 * @param onMessage
+	 *        the consumer of messages received from the server.
 	 */
-	public void start(String host, int port) throws IOException {
-		_socket = new Socket(host, port);
+	public void start(Consumer<Msg> onMessage) throws IOException {
+		_socket = new Socket(_host, _port);
 		JsonReader in = new JsonReader(new ReaderAdapter(new InputStreamReader(_socket.getInputStream(), "utf-8")));
 		_consumer = new Thread() {
 			@Override
@@ -53,9 +71,9 @@ public abstract class ClientHandler implements AutoCloseable {
 							break;
 						}
 						Msg msg = Msg.readMsg(in);
-						
+
 						System.out.println("< " + msg);
-						onMessage(msg);
+						onMessage.accept(msg);
 					}
 					in.endArray();
 				} catch (IOException ex) {
@@ -69,26 +87,20 @@ public abstract class ClientHandler implements AutoCloseable {
 		_out.beginArray();
 	}
 
-
-	/** 
-	 * Sends the given command to the server.
-	 */
+	@Override
 	public void sendCommand(Cmd cmd) {
 		try {
 			cmd.writeTo(_out);
 			_out.flush();
 		} catch (IOException ex) {
-			new Alert(AlertType.ERROR, "Kommunikation fehlgeschlagen: " + ex.getMessage(), ButtonType.OK).show();
+			new Alert(AlertType.ERROR,
+					"Kommunikation fehlgeschlagen: " + ex.getMessage(),
+					ButtonType.OK).show();
 		}
-		
+
 		System.out.println("> " + cmd);
 	}
 
-	/** 
-	 * Callback invoked if a message arrives.
-	 */
-	protected abstract void onMessage(Msg msg) throws IOException;
-	
 	@Override
 	public void close() throws IOException {
 		_out.endArray();

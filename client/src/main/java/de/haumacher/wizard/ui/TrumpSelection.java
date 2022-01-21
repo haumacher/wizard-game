@@ -3,7 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.ClientHandler;
+import de.haumacher.wizard.WizardServer;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.SelectTrump;
@@ -27,14 +27,14 @@ public class TrumpSelection extends Controller {
 	@FXML
 	Text info;
 
-	private ClientHandler _handler;
+	private WizardServer _server;
 
 	private Player _player;
 
 	private boolean _allowSelect;
 
-	public void init(ClientHandler handler, Player player, boolean allowSelect) {
-		_handler = handler;
+	public void init(WizardServer server, Player player, boolean allowSelect) {
+		_server = server;
 		_player = player;
 		_allowSelect = allowSelect;
 		
@@ -50,7 +50,7 @@ public class TrumpSelection extends Controller {
 
 			if (allowSelect) {
 				cardView.setOnMouseClicked(e -> {
-					_handler.sendCommand(SelectTrump.create().setTrumpSuit(suit));
+					_server.sendCommand(SelectTrump.create().setTrumpSuit(suit));
 				});
 			}
 		}

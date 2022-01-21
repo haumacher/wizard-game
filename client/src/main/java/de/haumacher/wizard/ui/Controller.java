@@ -3,7 +3,11 @@
  */
 package de.haumacher.wizard.ui;
 
+import java.io.IOError;
+import java.io.IOException;
+
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 
 /**
@@ -11,10 +15,10 @@ import javafx.scene.Node;
  *
  * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
-public abstract class Controller {
+public abstract class Controller<N extends Node> {
 
 	@FXML
-	Node main;
+	N main;
 	
 	@FXML
 	public void initialize() {
@@ -24,8 +28,35 @@ public abstract class Controller {
 	/**
 	 * The top-level view of this {@link Controller}.
 	 */
-	public Node getView() {
+	public N getView() {
 		return main;
+	}
+
+	public static <T extends Controller> T load(Class<T> controllerClass)  {
+		return load(controllerClass, resourceName(controllerClass));
+	}
+
+	public static <T extends Controller> T load(Class<T> controllerClass, String resource)  {
+		Node view = loadView(controllerClass, resource);
+		@SuppressWarnings("unchecked")
+		T controller = (T) view.getUserData();
+		return controller;
+	}
+	
+	public static <T> T loadView(Class<?> controllerClass)  {
+		return loadView(controllerClass, resourceName(controllerClass));
+	}
+	
+	public static <T> T loadView(Class<?> controllerClass, String resource)  {
+		try {
+			return FXMLLoader.load(controllerClass.getResource(resource));
+		} catch (IOException ex) {
+			throw new IOError(ex);
+		}
+	}
+
+	private static String resourceName(Class<?> controllerClass) {
+		return controllerClass.getSimpleName() + ".fxml";
 	}
 	
 }

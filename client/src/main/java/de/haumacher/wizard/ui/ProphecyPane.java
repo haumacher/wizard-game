@@ -5,7 +5,7 @@ package de.haumacher.wizard.ui;
 
 import java.util.Map;
 
-import de.haumacher.wizard.ClientHandler;
+import de.haumacher.wizard.WizardServer;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Player;
 import javafx.fxml.FXML;
@@ -25,10 +25,10 @@ public class ProphecyPane extends Controller {
 	@FXML
 	Text infoField;
 
-	private ClientHandler _client;
+	private WizardServer _server;
 
-	public void setPlayers(ClientHandler client, Map<String, Player> players) {
-		_client = client;
+	public void setPlayers(WizardServer server, Map<String, Player> players) {
+		_server = server;
 		
 		prophecySelector.setVisible(false);
 	}
@@ -47,7 +47,7 @@ public class ProphecyPane extends Controller {
 			prophecySelector.setOnAction(e -> {
 				Integer value = prophecySelector.getValue();
 				if (value != null) {
-					_client.sendCommand(Bid.create().setCnt(value.intValue()));
+					_server.sendCommand(Bid.create().setCnt(value.intValue()));
 				}
 			});
 			prophecySelector.setVisible(true);

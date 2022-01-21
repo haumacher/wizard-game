@@ -10,8 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import de.haumacher.wizard.ClientHandler;
-import de.haumacher.wizard.WizardApp;
+import de.haumacher.wizard.WizardServer;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.ConfirmRound;
@@ -32,7 +31,7 @@ import javafx.scene.text.Text;
 /**
  * Main view while a trick is played.
  */
-public class GameView extends Controller {
+public class GameView extends GenericController {
 	
 	/**
 	 * Area showing the currently played cards (the current trick).
@@ -72,7 +71,7 @@ public class GameView extends Controller {
 
 	private ProphecyPane _prophecy;
 
-	private ClientHandler _handler;
+	private WizardServer _server;
 	
 	private Map<String, PlayerStatus> _playerStatus = new HashMap<>();
 
@@ -90,8 +89,8 @@ public class GameView extends Controller {
 
 	private Map<String, PlayerStatus> _activePlayers = new HashMap<>();
 
-	public void init(ClientHandler handler, String playerId) {
-		_handler = handler;
+	public void init(WizardServer server, String playerId) {
+		_server = server;
 		_playerId = playerId;
 	}
 
@@ -110,10 +109,9 @@ public class GameView extends Controller {
 			for (Player player : players) {
 				_players.put(player.getId(), player);
 				
-				Node statusView = WizardApp.load(PlayerStatus.class, "PlayerStatus.fxml");
-				PlayerStatus status = (PlayerStatus) statusView.getUserData();
+				PlayerStatus status = Controller.load(PlayerStatus.class, "PlayerStatus.fxml");
 				status.setPlayer(player);
-				statusPane.getChildren().add(statusView);
+				statusPane.getChildren().add(status.getView());
 				
 				_playerStatus.put(player.getId(), status);
 			}
@@ -128,8 +126,8 @@ public class GameView extends Controller {
 	}
 
 	public void requestTrumpSelection(String playerId) {
-		_trumpSelection = load(TrumpSelection.class, "TrumpSelection.fxml");
-		_trumpSelection.init(_handler, _players.get(playerId), _playerId.equals(playerId));
+		_trumpSelection = showView(TrumpSelection.class, "TrumpSelection.fxml");
+		_trumpSelection.init(_server, _players.get(playerId), _playerId.equals(playerId));
 		setActive(playerId);
 	}
 
@@ -140,8 +138,8 @@ public class GameView extends Controller {
 	}
 
 	public void startBids() {
-		_prophecy = load(ProphecyPane.class, "ProphecyPane.fxml");
-		_prophecy.setPlayers(_handler, _players);
+		_prophecy = showView(ProphecyPane.class, "ProphecyPane.fxml");
+		_prophecy.setPlayers(_server, _players);
 	}
 
 	public void requestBid(String playerId, RequestBid self) {
@@ -168,8 +166,8 @@ public class GameView extends Controller {
 			playerStatus.setScore(info.getPoints());
 		}
 		
-		_currentTrick = load(CurrentTrick.class, "CurrentTrick.fxml");
-		_currentTrick.init(_handler);
+		_currentTrick = showView(CurrentTrick.class, "CurrentTrick.fxml");
+		_currentTrick.init(_server);
 	}
 
 	public void requestLead(String playerId) {
@@ -190,7 +188,7 @@ public class GameView extends Controller {
 
 	private void leadCard(Node n) {
 		_cardBeingPut = (CardView) n.getUserData();
-		_handler.sendCommand(Lead.create().setCard(_cardBeingPut.getCard()));
+		_server.sendCommand(Lead.create().setCard(_cardBeingPut.getCard()));
 	}
 
 	public void announceLead(String playerId, Card card) {
@@ -208,7 +206,7 @@ public class GameView extends Controller {
 		setActiveAll();
 		
 		_currentTrick.confirm("Dieser Stich geht an " + name(winnerId) + ".", e -> {
-			_handler.sendCommand(ConfirmTrick.create());
+			_server.sendCommand(ConfirmTrick.create());
 			_currentTrick.setInfo("Warte auf die Bestätigung der anderen Spieler.");
 			_trickFinished = true;
 		});
@@ -233,7 +231,7 @@ public class GameView extends Controller {
 		setActiveAll();
 		
 		_currentTrick.confirm("In dieser Runde erhälst Du " + points.get(_playerId) + " Punkte.", e -> {
-			_handler.sendCommand(ConfirmRound.create());
+			_server.sendCommand(ConfirmRound.create());
 			_currentTrick.setInfo("Warte auf die anderen Spieler...");
 		});
 	}
@@ -285,15 +283,16 @@ public class GameView extends Controller {
 		}
 	}
 
-	private <T extends Controller> T load(Class<T> controllerClass, String resourceFxml) {
-		Node view = WizardApp.load(controllerClass, resourceFxml);
+	private <T extends Controller> T showView(Class<T> controllerClass, String resourceFxml) {
+		T controller = Controller.load(controllerClass, resourceFxml);
+		
+		Node view = controller.getView();
 		actionPane.getChildren().setAll(view);
 		AnchorPane.setTopAnchor(view, 0.0);
 		AnchorPane.setLeftAnchor(view, 0.0);
 		AnchorPane.setRightAnchor(view, 0.0);
 		AnchorPane.setBottomAnchor(view, 0.0);
-		@SuppressWarnings("unchecked")
-		T controller = (T) view.getUserData();
+		
 		return controller;
 	}
 

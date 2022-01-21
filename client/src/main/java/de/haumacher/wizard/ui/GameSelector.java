@@ -18,7 +18,6 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -31,14 +30,8 @@ import javafx.util.Callback;
  *
  * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
-public class GameSelector implements EventHandler<Event> {
+public class GameSelector extends Controller<TableView<Game>> implements EventHandler<Event> {
 	
-	/**
-	 * Top-level {@link Node} of the view.
-	 */
-	@FXML
-	TableView<Game> table;
-
 	private final Callback<TableColumn<Game, Object>, TableCell<Game, Object>> BUTTON_CELL_FACTORY = new Callback<TableColumn<Game, Object>, TableCell<Game, Object>>() {
 		@Override
 		public TableCell<Game, Object> call(TableColumn<Game, Object> param) {
@@ -86,19 +79,19 @@ public class GameSelector implements EventHandler<Event> {
 
 	@FXML
 	public void initialize() {
-		TableColumn<Game, Object> nameColumn = (TableColumn<Game, Object>) table.getColumns().get(0);
+		TableColumn<Game, Object> nameColumn = (TableColumn<Game, Object>) getView().getColumns().get(0);
 		nameColumn.setCellValueFactory(NAME_VALUE_FACTORY);
 
-		TableColumn<Game, Object> buttonColumn = (TableColumn<Game, Object>) table.getColumns().get(1);
+		TableColumn<Game, Object> buttonColumn = (TableColumn<Game, Object>) getView().getColumns().get(1);
 		buttonColumn.setCellValueFactory(SELF_VALUE_FACTORY);
 		buttonColumn.setCellFactory(BUTTON_CELL_FACTORY);
 
-		table.setUserData(this);
+		getView().setUserData(this);
 	}
 
 	public void init(ListGamesResult self, Consumer<Game> onSelect) {
 		_onSelect = onSelect;
-		table.getItems().setAll(self.getGames());
+		getView().getItems().setAll(self.getGames());
 	}
 
 	@Override
@@ -111,11 +104,11 @@ public class GameSelector implements EventHandler<Event> {
 	}
 
 	public void processJoin(JoinAnnounce self) {
-		table.getItems().replaceAll(g -> g.getGameId().equals(self.getGameId()) ? g.addPlayer(self.getPlayer()) : g);
+		getView().getItems().replaceAll(g -> g.getGameId().equals(self.getGameId()) ? g.addPlayer(self.getPlayer()) : g);
 	}
 
 	public void processLeave(LeaveAnnounce self) {
-		table.getItems().replaceAll(g -> g.getGameId().equals(self.getGameId()) ? removePlayer(g, self.getPlayerId()) : g);
+		getView().getItems().replaceAll(g -> g.getGameId().equals(self.getGameId()) ? removePlayer(g, self.getPlayerId()) : g);
 	}
 
 	private static Game removePlayer(Game g, String playerId) {
@@ -124,11 +117,11 @@ public class GameSelector implements EventHandler<Event> {
 	}
 
 	public void processCreate(GameCreated self) {
-		table.getItems().add(self.getGame());
+		getView().getItems().add(self.getGame());
 	}
 
 	public void removeGame(String gameId) {
-		table.getItems().removeIf(g -> g.getGameId().equals(gameId));
+		getView().getItems().removeIf(g -> g.getGameId().equals(gameId));
 	}
 
 }

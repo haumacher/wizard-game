@@ -5,7 +5,7 @@ package de.haumacher.wizard.ui;
 
 import java.util.List;
 
-import de.haumacher.wizard.ClientHandler;
+import de.haumacher.wizard.WizardServer;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.StartGame;
 import javafx.collections.ListChangeListener;
@@ -21,7 +21,7 @@ import javafx.util.Callback;
 /**
  * Controller for the game lobby view listing joining players.
  */
-public class GameLobby extends Controller implements ListChangeListener<Player>, EventHandler<ActionEvent>, Callback<ListView<Player>, ListCell<Player>> {
+public class GameLobby extends GenericController implements ListChangeListener<Player>, EventHandler<ActionEvent>, Callback<ListView<Player>, ListCell<Player>> {
 	
 	@FXML
 	ListView<Player> playerList;
@@ -29,7 +29,7 @@ public class GameLobby extends Controller implements ListChangeListener<Player>,
 	@FXML
 	Button startGame;
 
-	private ClientHandler _handler;
+	private WizardServer _server;
 
 	private String _gameId;
 	
@@ -59,11 +59,11 @@ public class GameLobby extends Controller implements ListChangeListener<Player>,
 
 	@Override
 	public void handle(ActionEvent event) {
-		_handler.sendCommand(StartGame.create().setGameId(_gameId));
+		_server.sendCommand(StartGame.create().setGameId(_gameId));
 	}
 
-	public void initController(ClientHandler handler, String gameId) {
-		_handler = handler;
+	public void initController(WizardServer server, String gameId) {
+		_server = server;
 		_gameId = gameId;
 	}
 

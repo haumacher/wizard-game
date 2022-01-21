@@ -3,7 +3,6 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardApp;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.Value;
 import javafx.fxml.FXML;
@@ -15,7 +14,7 @@ import javafx.scene.text.Text;
  *
  * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
-public class CardView extends Controller {
+public class CardView extends GenericController {
 	
 	@FXML
 	Text valueView;
@@ -44,10 +43,9 @@ public class CardView extends Controller {
 	}
 	
 	public static Node createCard(Card card) {
-		Node view = loadCardView(card);
-		CardView controller = (CardView) view.getUserData();
+		CardView controller = loadCardView(card);
 		controller.setCard(card);
-		return view;
+		return controller.getView();
 	}
 	
 	private String text(Value value) {
@@ -60,25 +58,25 @@ public class CardView extends Controller {
 		}
 	}
 
-	private static Node loadCardView(Card card) {
+	private static CardView loadCardView(Card card) {
 		// Note: For selecting the trump suit, even a wizard with a suit must be displayed.
 		if (card.getSuit() != null) {
 			switch (card.getSuit()) {
 			case HEART:
-				return WizardApp.load(CardView.class, "card-heart.fxml");
+				return Controller.load(CardView.class, "card-heart.fxml");
 			case SPADE:
-				return WizardApp.load(CardView.class, "card-pik.fxml");
+				return Controller.load(CardView.class, "card-pik.fxml");
 			case CLUB:
-				return WizardApp.load(CardView.class, "card-cross.fxml");
+				return Controller.load(CardView.class, "card-cross.fxml");
 			case DIAMOND:
-				return WizardApp.load(CardView.class, "card-caro.fxml");
+				return Controller.load(CardView.class, "card-caro.fxml");
 			}
 		}
 		switch (card.getValue()) {
 			case N:
-				return WizardApp.load(CardView.class, "card-none.fxml");
+				return Controller.load(CardView.class, "card-none.fxml");
 			case Z:
-				return WizardApp.load(CardView.class, "card-wizard.fxml");
+				return Controller.load(CardView.class, "card-wizard.fxml");
 			default:
 		}
 		
