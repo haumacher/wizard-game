@@ -343,6 +343,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			arg.sendError("Du bist nicht an der Reihe.");
 			return null;
 		}
+		if (!_barrier.isEmpty()) {
+			arg.sendError("Es müssen zuerst alle Spieler bestätigen.");
+			return null;
+		}
 		
 		RoundState roundState = playerState.getRoundState();
 		List<Card> deck = roundState.getCards();
