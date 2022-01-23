@@ -65,7 +65,6 @@ public class WebsocketConnection implements WizardConnectionSPI {
 	@OnClose
 	public void onClose(Session userSession, CloseReason reason) {
 		System.out.println("Closing websocket.");
-		_session = null;
 	}
 
 	@OnMessage
@@ -92,7 +91,10 @@ public class WebsocketConnection implements WizardConnectionSPI {
 
 	@Override
 	public void close() throws IOException {
-		_session.close();
-		System.out.println("Closed game connection.");
+		if (_session != null) {
+			_session.close();
+			_session = null;
+			System.out.println("Closed game connection.");
+		}
 	}
 }
