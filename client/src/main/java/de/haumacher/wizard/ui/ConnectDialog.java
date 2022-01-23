@@ -5,7 +5,8 @@ package de.haumacher.wizard.ui;
 
 import java.util.function.Consumer;
 
-import de.haumacher.wizard.data.ConnectData;
+import de.haumacher.wizard.controller.Controller;
+import de.haumacher.wizard.ui.data.ConnectData;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;

@@ -5,7 +5,8 @@ package de.haumacher.wizard.ui;
 
 import java.util.List;
 
-import de.haumacher.wizard.WizardConnection;
+import de.haumacher.wizard.controller.GenericController;
+import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.StartGame;
 import javafx.collections.ListChangeListener;

@@ -6,6 +6,7 @@ package de.haumacher.wizard.ui;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import de.haumacher.wizard.controller.Controller;
 import de.haumacher.wizard.msg.Game;
 import de.haumacher.wizard.msg.GameCreated;
 import de.haumacher.wizard.msg.JoinAnnounce;

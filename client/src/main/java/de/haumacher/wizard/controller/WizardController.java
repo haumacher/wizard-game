@@ -1,11 +1,12 @@
 /*
  * Copyright (c) 2022 Bernhard Haumacher et al. All Rights Reserved.
  */
-package de.haumacher.wizard;
+package de.haumacher.wizard.controller;
 
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.ConfirmRound;

@@ -3,7 +3,8 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardConnection;
+import de.haumacher.wizard.controller.GenericController;
+import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.FinishGame;
 import de.haumacher.wizard.msg.PlayerScore;
 import javafx.event.ActionEvent;

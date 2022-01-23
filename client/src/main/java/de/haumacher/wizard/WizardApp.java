@@ -5,12 +5,17 @@ package de.haumacher.wizard;
 
 import java.io.IOException;
 
+import de.haumacher.wizard.controller.Controller;
+import de.haumacher.wizard.controller.WizardController;
+import de.haumacher.wizard.controller.WizardUI;
+import de.haumacher.wizard.io.PlainConnection;
+import de.haumacher.wizard.io.WebsocketConnection;
+import de.haumacher.wizard.io.WizardConnectionSPI;
 import de.haumacher.wizard.logic.WizardGame;
 import de.haumacher.wizard.msg.CreateGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.Login;
 import de.haumacher.wizard.ui.ConnectDialog;
-import de.haumacher.wizard.ui.Controller;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.fxml.FXML;

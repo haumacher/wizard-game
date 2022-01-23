@@ -3,6 +3,8 @@
  */
 package de.haumacher.wizard.ui;
 
+import de.haumacher.wizard.controller.Controller;
+import de.haumacher.wizard.controller.GenericController;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.Value;
 import javafx.fxml.FXML;

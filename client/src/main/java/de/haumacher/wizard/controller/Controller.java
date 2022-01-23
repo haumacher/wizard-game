@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 Bernhard Haumacher et al. All Rights Reserved.
  */
-package de.haumacher.wizard.ui;
+package de.haumacher.wizard.controller;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -11,9 +11,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Base class to use as controller for FXML-defined views.
+ * 
+ * <p>
+ * A view using a specialization of this class as controller is assumed to have it's top-level component labeled with
+ * the ID <code>main</code>.
+ * </p>
  */
 public abstract class Controller<N extends Node> {
 

@@ -3,6 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
+import de.haumacher.wizard.controller.Controller;
 import de.haumacher.wizard.msg.Player;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;

@@ -1,4 +1,4 @@
-package de.haumacher.wizard.data;
+package de.haumacher.wizard.ui.data;
 
 message ConnectData {
 	string nickName;

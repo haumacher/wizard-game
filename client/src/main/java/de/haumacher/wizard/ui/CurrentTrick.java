@@ -3,7 +3,8 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardConnection;
+import de.haumacher.wizard.controller.Controller;
+import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.Card;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

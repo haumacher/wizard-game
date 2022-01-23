@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import de.haumacher.wizard.WizardConnection;
+import de.haumacher.wizard.controller.Controller;
+import de.haumacher.wizard.controller.GenericController;
+import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.ConfirmRound;

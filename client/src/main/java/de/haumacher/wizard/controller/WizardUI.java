@@ -1,14 +1,10 @@
 /*
  * Copyright (c) 2022 Bernhard Haumacher et al. All Rights Reserved.
  */
-package de.haumacher.wizard;
-
-import de.haumacher.wizard.ui.Controller;
+package de.haumacher.wizard.controller;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Abstraction of the UI logic of showing views.
  */
 public interface WizardUI {
 

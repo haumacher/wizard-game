@@ -1,4 +1,4 @@
-package de.haumacher.wizard.data;
+package de.haumacher.wizard.ui.data;
 
 public class ConnectData extends de.haumacher.msgbuf.data.AbstractDataObject implements de.haumacher.msgbuf.binary.BinaryDataObject, de.haumacher.msgbuf.observer.Observable {
 

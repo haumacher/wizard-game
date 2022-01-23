@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 Bernhard Haumacher et al. All Rights Reserved.
  */
-package de.haumacher.wizard;
+package de.haumacher.wizard.io;
 
 import de.haumacher.wizard.msg.Cmd;
 

@@ -3,7 +3,8 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardConnection;
+import de.haumacher.wizard.controller.Controller;
+import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.SelectTrump;
