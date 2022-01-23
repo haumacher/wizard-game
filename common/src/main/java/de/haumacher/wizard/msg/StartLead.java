@@ -18,7 +18,12 @@ public class StartLead extends GameMsg {
 	/** @see #getState() */
 	private static final String STATE = "state";
 
+	/** @see #getCurrentTrick() */
+	private static final String CURRENT_TRICK = "currentTrick";
+
 	private final java.util.Map<String, PlayerInfo> _state = new java.util.HashMap<>();
+
+	private final java.util.List<PlayedCard> _currentTrick = new java.util.ArrayList<>();
 
 	/**
 	 * Creates a {@link StartLead} instance.
@@ -74,6 +79,48 @@ public class StartLead extends GameMsg {
 		_state.remove(key);
 	}
 
+	/**
+	 * The cards played so far. Only relevant when reconnecting to a game.
+	 */
+	public final java.util.List<PlayedCard> getCurrentTrick() {
+		return _currentTrick;
+	}
+
+	/**
+	 * @see #getCurrentTrick()
+	 */
+	public StartLead setCurrentTrick(java.util.List<PlayedCard> value) {
+		internalSetCurrentTrick(value);
+		return this;
+	}
+	/** Internal setter for {@link #getCurrentTrick()} without chain call utility. */
+	protected final void internalSetCurrentTrick(java.util.List<PlayedCard> value) {
+		if (value == null) throw new IllegalArgumentException("Property 'currentTrick' cannot be null.");
+		_currentTrick.clear();
+		_currentTrick.addAll(value);
+	}
+
+
+	/**
+	 * Adds a value to the {@link #getCurrentTrick()} list.
+	 */
+	public StartLead addCurrentTrick(PlayedCard value) {
+		internalAddCurrentTrick(value);
+		return this;
+	}
+
+	/** Implementation of {@link #addCurrentTrick(PlayedCard)} without chain call utility. */
+	protected final void internalAddCurrentTrick(PlayedCard value) {
+		_currentTrick.add(value);
+	}
+
+	/**
+	 * Removes a value from the {@link #getCurrentTrick()} list.
+	 */
+	public final void removeCurrentTrick(PlayedCard value) {
+		_currentTrick.remove(value);
+	}
+
 	@Override
 	public String jsonType() {
 		return START_LEAD__TYPE;
@@ -98,6 +145,12 @@ public class StartLead extends GameMsg {
 			entry.getValue().writeTo(out);
 		}
 		out.endObject();
+		out.name(CURRENT_TRICK);
+		out.beginArray();
+		for (PlayedCard x : getCurrentTrick()) {
+			x.writeTo(out);
+		}
+		out.endArray();
 	}
 
 	@Override
@@ -111,6 +164,14 @@ public class StartLead extends GameMsg {
 				in.endObject();
 				break;
 			}
+			case CURRENT_TRICK: {
+				in.beginArray();
+				while (in.hasNext()) {
+					addCurrentTrick(de.haumacher.wizard.msg.PlayedCard.readPlayedCard(in));
+				}
+				in.endArray();
+			}
+			break;
 			default: super.readField(in, field);
 		}
 	}

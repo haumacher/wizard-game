@@ -27,7 +27,6 @@ import de.haumacher.wizard.msg.LeaveAnnounce;
 import de.haumacher.wizard.msg.LeaveGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.ListGamesResult;
-import de.haumacher.wizard.msg.Welcome;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.RequestBid;
 import de.haumacher.wizard.msg.RequestLead;
@@ -36,6 +35,7 @@ import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartBids;
 import de.haumacher.wizard.msg.StartLead;
 import de.haumacher.wizard.msg.StartRound;
+import de.haumacher.wizard.msg.Welcome;
 import de.haumacher.wizard.ui.GameLobby;
 import de.haumacher.wizard.ui.GameSelector;
 import de.haumacher.wizard.ui.GameView;
@@ -62,8 +62,26 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 	 * Creates a {@link WizardController}.
 	 */
 	public WizardController(WizardConnection server, WizardUI ui) {
+		connectTo(server, ui);
+	}
+
+	public void connectTo(WizardConnection server, WizardUI ui) {
 		_server = server;
 		_ui = ui;
+	}
+	
+	/**
+	 * The assigned player ID.
+	 */
+	public String getPlayerId() {
+		return _playerId;
+	}
+	
+	/**
+	 * The game that has been joined.
+	 */
+	public Game getGame() {
+		return _game;
 	}
 
 	@Override
@@ -80,6 +98,7 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 	@Override
 	public Void visit(Welcome self, Void arg) throws IOException {
 		_playerId = self.getPlayerId();
+		_ui.onLogin();
 		return null;
 	}
 
@@ -198,7 +217,7 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 
 	@Override
 	public Void visit(StartLead self, Void arg) throws IOException {
-		_gameView.startLead(self.getState());
+		_gameView.startLead(self);
 		return null;
 	}
 

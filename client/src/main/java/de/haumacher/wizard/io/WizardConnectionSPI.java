@@ -3,6 +3,7 @@
  */
 package de.haumacher.wizard.io;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 import de.haumacher.wizard.msg.Msg;
@@ -16,5 +17,8 @@ public interface WizardConnectionSPI extends WizardConnection, AutoCloseable {
 	 * Opens the connection.
 	 */
 	void start(Consumer<Msg> client) throws Exception;
+	
+	@Override
+	void close() throws IOException;
 
 }

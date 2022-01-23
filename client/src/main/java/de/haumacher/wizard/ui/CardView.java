@@ -12,9 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.text.Text;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * A single card being displayed.
  */
 public class CardView extends GenericController {
 	
@@ -23,14 +21,22 @@ public class CardView extends GenericController {
 	
 	private Card _card;
 
+	/**
+	 * Sets the value being displayed on the card.
+	 */
 	public void setValue(String value) {
 		valueView.setText(value);
 	}
-
+	
+	/**
+	 * The card model being displayed.
+	 */
+	public Card getCard() {
+		return _card;
+	}
+	
 	/** 
-	 * TODO
-	 *
-	 * @param card
+	 * @see #getCard()
 	 */
 	public void setCard(Card card) {
 		_card = card;
@@ -38,12 +44,8 @@ public class CardView extends GenericController {
 	}
 	
 	/**
-	 * TODO
+	 * Creates a new view for a given {@link Card} model.
 	 */
-	public Card getCard() {
-		return _card;
-	}
-	
 	public static Node createCard(Card card) {
 		CardView controller = loadCardView(card);
 		controller.setCard(card);

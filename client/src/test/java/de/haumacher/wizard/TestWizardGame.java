@@ -5,6 +5,7 @@ package de.haumacher.wizard;
 
 import java.io.IOException;
 
+import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.logic.WizardGame;
 import de.haumacher.wizard.msg.Msg;
@@ -12,18 +13,16 @@ import de.haumacher.wizard.msg.Player;
 import junit.framework.TestCase;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Test for {@link WizardGame}.
  */
-public class TestServer extends TestCase {
+public class TestWizardGame extends TestCase {
 	
 	static class TestClient implements GameClient {
 
 		private final String _id;
 		
 		/** 
-		 * Creates a {@link TestServer.TestClient}.
+		 * Creates a {@link TestWizardGame.TestClient}.
 		 */
 		public TestClient(String id) {
 			_id = id;
@@ -49,9 +48,14 @@ public class TestServer extends TestCase {
 			fail(message);
 		}
 		
+		@Override
+		public void reconnectTo(ClientConnection connection) {
+			throw new UnsupportedOperationException();
+		}
+		
 	}
 	
-	public void testServer() throws IOException {
+	public void testGame() throws IOException {
 		WizardGame game = new WizardGame();
 		
 		TestClient p1 = new TestClient("P1");

@@ -4,10 +4,10 @@
 package de.haumacher.wizard.server;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.logic.WizardGame;
 import de.haumacher.wizard.msg.Bid;
@@ -15,7 +15,6 @@ import de.haumacher.wizard.msg.Cmd;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.CreateGame;
-import de.haumacher.wizard.msg.Error;
 import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameStarted;
 import de.haumacher.wizard.msg.JoinGame;
@@ -25,7 +24,6 @@ import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.ListGamesResult;
 import de.haumacher.wizard.msg.Login;
 import de.haumacher.wizard.msg.Msg;
-import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.Reconnect;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
@@ -34,23 +32,60 @@ import de.haumacher.wizard.msg.Welcome;
 /**
  * Server-side logic for a single player.
  */
-public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, GameClient {
+public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, ClientConnection {
 
 	private final WizardServer _server;
 	
 	private WizardGame _game;
 	
-	private Player _data = Player.create().setId(UUID.randomUUID().toString()).setName("Anonymous");
 	private boolean _loggedIn = false;
 
 	private Consumer<Msg> _msgSink;
 
+	private GameClient _handle;
+	
 	/** 
 	 * Creates a {@link ClientHandler}.
 	 */
 	public ClientHandler(WizardServer server, Consumer<Msg> msgSink) {
 		_server = server;
 		_msgSink = msgSink;
+		
+		_handle = new GameClientImpl(this);
+	}
+
+	public String getId() {
+		return _handle.getId();
+	}
+	
+	public String getName() {
+		return _handle.getName();
+	}
+	
+	@Override
+	public String toString() {
+		return _handle.toString();
+	}
+
+	/** 
+	 * Starts this handler.
+	 * 
+	 * <p>
+	 * Method is called directly after a client opened a connection to the game server.
+	 * </p>
+	 */
+	public void start() {
+		_server.addClient(this);
+	}
+
+	/** 
+	 * Called whenever the client connection to the game server has terminated.
+	 */
+	public void stop() {
+		_server.removeClient(this);
+		if (_game != null) {
+			_game.removePlayer(_handle);
+		}
 	}
 
 	/** 
@@ -58,33 +93,13 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Game
 	 */
 	public void handleCmd(Cmd cmd) throws IOException {
 		if (cmd != null) {
-			System.out.println(_data.getName() + " -> " + cmd);
+			System.out.println(_handle.getName() + " -> " + cmd);
 			cmd.visit(this, null);
 		} else {
-			System.err.println("Received unknown command from '" + _data + "'.");
+			System.err.println("Received unknown command from '" + _handle + "'.");
 		}
 	}
 
-	@Override
-	public Player getData() {
-		return _data;
-	}
-	
-	@Override
-	public String toString() {
-		return getName() + "(" + getId() + ")";
-	}
-
-	@Override
-	public void sendError(String message) {
-		sendMessage(Error.create().setMessage(message));
-	}
-	
-	@Override
-	public synchronized void sendMessage(Msg msg) {
-		_msgSink.accept(msg);
-	}
-	
 	@Override
 	public Void visit(Login self, Void arg) throws IOException {
 		if (self.getVersion() != WizardGame.PROTOCOL_VERSION) {
@@ -96,28 +111,61 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Game
 			return null;
 		}
 		_loggedIn = true;
-		_data.setName(self.getName());
+		_handle.getData().setName(self.getName());
 		sendMessage(Welcome.create().setPlayerId(getId()));
 		return null;
 	}
 	
 	@Override
 	public Void visit(Reconnect self, Void arg) throws IOException {
-		//  TODO: Automatically created
+		if (_game != null) {
+			sendErrorHasGame();
+			return null;
+		}
+		
+		WizardGame game = _server.getGame(self.getGameId());
+		if (game == null) {
+			sendErrorNoSuchGame();
+			return null;
+		}
+		
+		GameClient handle = game.reconnect(self.getPlayerId(), this);
+		if (handle == null) {
+			sendError("Spieler zur Wiederaufnahme nicht gefunden.");
+			return null;
+		}
+		
+		_loggedIn = true;
+		_game = game;
+		_handle = handle;
+		
 		return null;
 	}
 
 	@Override
 	public Void visit(CreateGame self, Void arg) throws IOException {
 		if (_game != null) {
-			sendError("Du bist schon einem Spiel beigetreten.");
+			sendErrorHasGame();
 			return null;
 		}
 		
-		_game = _server.createGame(this);
-		_game.addPlayer(this);
+		_game = _server.createGame(_handle);
+		_game.addPlayer(_handle);
 		
 		return null;
+	}
+
+	private void sendErrorHasGame() {
+		sendError("Du bist schon einem Spiel beigetreten.");
+	}
+
+	private void sendErrorNoSuchGame() {
+		sendError("Das von Dir gewählte Spiel gibt es nicht mehr.");
+	}
+
+	@Override
+	public void sendMessage(Msg msg) {
+		_msgSink.accept(msg);
 	}
 
 	@Override
@@ -142,25 +190,25 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Game
 	@Override
 	public Void visit(JoinGame self, Void arg) throws IOException {
 		if (_game != null) {
-			sendError("Du bist schon einem Spiel beigetreten.");
+			sendErrorHasGame();
 			return null;
 		}
 		_game = _server.getGame(self.getGameId());
 		if (_game == null) {
-			sendError("Das von Dir gewählte Spiel gibt es nicht mehr.");
+			sendErrorNoSuchGame();
 			return null;
 		}
-		if (!_game.addPlayer(this)) {
+		if (!_game.addPlayer(_handle)) {
 			sendError("Das von Dir gewählte Spiel hat schon begonnen.");
 			return null;
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Void visit(LeaveGame self, Void arg) throws IOException {
 		if (_game != null && _game.getGameId().equals(self.getGameId())) {
-			_game.removePlayer(this);
+			_game.removePlayer(_handle);
 			_game = null;
 		}
 		return null;
@@ -209,26 +257,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Game
 			return null;
 		}
 
-		return self.visit(_game, this);
-	}
-
-	/** 
-	 * TODO
-	 *
-	 */
-	public void start() {
-		_server.addClient(this);
-	}
-
-	/** 
-	 * TODO
-	 *
-	 */
-	public void stop() {
-		_server.removeClient(this);
-		if (_game != null) {
-			_server.removePlayer(_game, this);
-		}
+		return self.visit(_game, _handle);
 	}
 
 }

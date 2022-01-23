@@ -13,4 +13,10 @@ public interface WizardUI {
 	 */
 	<C extends Controller<?>> C showView(Class<C> controllerClass);
 
+	/** 
+	 * TODO
+	 *
+	 */
+	void onLogin();
+
 }

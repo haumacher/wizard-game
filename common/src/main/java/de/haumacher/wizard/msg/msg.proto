@@ -112,6 +112,9 @@ message Welcome extends ResultMsg {
 message Reconnect extends Cmd {
 	/** The ID that was assigned to the player in a former {@link Welcome} message. */
 	string playerId;
+	
+	/** The ID of the game that this player would like to reconnect to. */
+	string gameId;
 }
 
 /** Requests a listing of games waiting for player. */
@@ -266,6 +269,18 @@ message Bid extends GameCmd {
 message StartLead extends GameMsg {
 	/** Score information of all players by their IDs. */
 	map<string, PlayerInfo> state;
+	
+	/** The cards played so far. Only relevant when reconnecting to a game. */
+	repeated PlayedCard currentTrick;
+}
+
+/** Info about a {@link Card} played. */
+message PlayedCard {
+	/** ID of the player that played the {@link #card}. */
+	string playerId;
+	
+	/** The {@link Card} that lays on the table. */
+	Card card;
 }
 
 /** Score information for a single player, see {@link StartLead}. */

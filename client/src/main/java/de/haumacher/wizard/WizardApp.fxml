@@ -21,14 +21,14 @@
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#newGame" text="New Game" />
                               <SeparatorMenuItem mnemonicParsing="false" />
-                              <MenuItem id="MenuQuit" mnemonicParsing="false" text="Quit" />
+                              <MenuItem id="MenuQuit" mnemonicParsing="false" onAction="#menuQuit" text="Quit" />
                            </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Connection">
                            <items>
-                              <MenuItem id="MenuStartServer" mnemonicParsing="false" text="Start server" />
-                              <MenuItem id="MenuConnect" mnemonicParsing="false" onAction="#menuConnect" text="Connect..." />
-                              <MenuItem disable="true" mnemonicParsing="false" text="Disconnect" />
+                              <MenuItem id="MenuConnect" fx:id="menuConnect" mnemonicParsing="false" onAction="#menuConnect" text="Connect..." />
+                              <MenuItem fx:id="menuDisconnect" mnemonicParsing="false" onAction="#menuDisconnect" text="Disconnect" visible="false" />
+                              <MenuItem fx:id="menuReconnect" mnemonicParsing="false" onAction="#menuReconnect" text="Reconnect" visible="false" />
                            </items>
                         </Menu>
                      </menus>

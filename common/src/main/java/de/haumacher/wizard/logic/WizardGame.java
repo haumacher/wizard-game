@@ -6,6 +6,7 @@ package de.haumacher.wizard.logic;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +28,12 @@ import de.haumacher.wizard.msg.FinishTurn;
 import de.haumacher.wizard.msg.Game;
 import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameMsg;
+import de.haumacher.wizard.msg.GameStarted;
 import de.haumacher.wizard.msg.JoinAnnounce;
 import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.LeaveAnnounce;
 import de.haumacher.wizard.msg.Msg;
+import de.haumacher.wizard.msg.PlayedCard;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
 import de.haumacher.wizard.msg.PlayerScore;
@@ -47,9 +50,7 @@ import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Game logic controlled by {@link GameCmd} messages and sending {@link GameMsg} messages to corresponding clients.
  */
 public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException> {
 	
@@ -73,12 +74,22 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		
 		CARDS = Collections.unmodifiableList(cards);
 	}
+	
+	enum State {
+		CREATED, STARTED, FINISHED;
+	}
 
+	enum GameState {
+		TRUMP_SELECTION, BIDDING, LEADING, FINISHING_TURN, FINISHING_ROUND;
+	}
+	
 	private String _id = UUID.randomUUID().toString();
 	
 	private Map<String, GameClient> _clients = new LinkedHashMap<>();
 
-	private boolean _started;
+	private State _state = State.CREATED;
+	
+	private GameState _gameState;
 
 	private int _round;
 	private List<PlayerState> _players;
@@ -112,28 +123,49 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 
 	private String _trumpSelectorId;
 
-	private Consumer<Game> _onFinish;
+	private Consumer<String> _onFinish;
 
 	private Consumer<Msg> _broadCastAll;
 	
+	private Map<String, GameClient> _lostClients = new HashMap<>();
+
+	private int _winnerOffset;
+
+
 	public WizardGame() {
 		this(msg -> {}, g -> {});
 	}
 	
 	/** 
 	 * Creates a {@link WizardGame}.
+	 * 
+	 * @param broadCastAll Sink for messages that must be sent to all idle clients.
+	 * @param onFinish Callback that accepts the ID of the game that has finished.
 	 */
-	public WizardGame(Consumer<Msg> broadCastAll, Consumer<Game> onFinish) {
+	public WizardGame(Consumer<Msg> broadCastAll, Consumer<String> onFinish) {
 		_broadCastAll = broadCastAll;
 		_onFinish = onFinish;
 	}
 
+	/**
+	 * The ID of this game.
+	 */
+	public String getGameId() {
+		return _id;
+	}
+
+	/**
+	 * Description of this game.
+	 */
 	public Game getData() {
 		return Game.create().setGameId(_id).setPlayers(_clients.values().stream().map(c -> c.getData()).collect(Collectors.toList()));
 	}
 
+	/**
+	 * Adds a new player to this game.
+	 */
 	public synchronized boolean addPlayer(GameClient player) {
-		if (isStarted()) {
+		if (_state != State.CREATED) {
 			return false;
 		}
 		
@@ -142,10 +174,22 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		return true;
 	}
 	
+	/**
+	 * Removes a player from this game.
+	 */
 	public synchronized void removePlayer(GameClient player) {
-		GameClient removedPlayer = _clients.remove(player.getId());
-		if (removedPlayer != null) {
-			broadCast(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
+		if (_state == State.STARTED) {
+			// A player lost its connection, prepare for reconnect.
+			_lostClients.put(player.getId(), player);
+		} else {
+			GameClient removedPlayer = _clients.remove(player.getId());
+			if (removedPlayer != null) {
+				broadCast(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
+			}
+		}
+		
+		if (_clients.size() - _lostClients.size() == 0) {
+			gameFinished();
 		}
 	}
 
@@ -159,19 +203,14 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 	}
 
-	public synchronized boolean isStarted() {
-		return _started;
-	}
-
-	public String getGameId() {
-		return _id;
-	}
-
+	/**
+	 * Starts the game.
+	 */
 	public synchronized void start()  {
-		if (_started) {
+		if (_state != State.CREATED) {
 			return;
 		}
-		_started = true;
+		_state = State.STARTED;
 		
 		_round = 1;
 		_maxRound = CARDS.size() / _clients.size();
@@ -182,6 +221,45 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		_bidOffset = (int) (Math.random() * _players.size());
 
 		startRound();
+	}
+
+	/** 
+	 * Reconnects to this game.
+	 */
+	public synchronized GameClient reconnect(String clientId, ClientConnection connection) {
+		GameClient result = _lostClients.remove(clientId);
+		if (result != null) {
+			result.reconnectTo(connection);
+			
+			result.sendMessage(GameStarted.create().setGame(getData()));
+			sendStartRound(_players.stream().filter(s -> s.getPlayer().getId().equals(result.getId())).findFirst().get());
+			
+			switch (_gameState) {
+			case TRUMP_SELECTION:
+				result.sendMessage(createSelectTrumpMessage());
+				break;
+				
+			case BIDDING:
+				result.sendMessage(createStartBiddingMessage());
+				result.sendMessage(createBidRequestMessage());
+				break;
+				
+			case LEADING:
+				result.sendMessage(createStartLeadMessage());
+				result.sendMessage(createRequestPutMessage());
+				break;
+				
+			case FINISHING_TURN:
+				result.sendMessage(createStartLeadMessage());
+				result.sendMessage(createFinishTurnMessage());
+				break;
+				
+			case FINISHING_ROUND:
+				result.sendMessage(createStartLeadMessage());
+				result.sendMessage(createFinishRoundMessage());
+			}
+		}
+		return result;
 	}
 
 	private void startRound()  {
@@ -204,35 +282,48 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			RoundState state = RoundState.create();
 			List<Card> playerCards = new ArrayList<>(cards.subList(firstCard, firstCard + _round));
 			Collections.sort(playerCards, CardComparator.INSTANCE);
-			
 			state.getCards().addAll(playerCards);
 			player.setRoundState(state);
 			
-			List<Player> players = _players.stream().map(PlayerState::getPlayer).collect(Collectors.toList());
-			StartRound message = 
-				StartRound.create()
-					.setRound(_round)
-					.setMaxRound(_maxRound)
-					.setPlayers(players)
-					.setStartPlayer(players.get(_bidOffset).getId())
-					.setCards(playerCards)
-					.setTrumpCard(_trumpCard);
-			getClient(player.getPlayer().getId()).sendMessage(message);
+			sendStartRound(player);
 			
 			firstCard += _round;
 		}
 		
 		if (isCustomTrumpSelection()) {
+			_gameState = GameState.TRUMP_SELECTION;
+			
 			int trumpSelectIndex = _clients.size() - 1 + _bidOffset;
 			_trumpSelectorId = getPlayerId(trumpSelectIndex);
-			broadCast(RequestTrumpSelection.create().setPlayerId(_trumpSelectorId));
+			broadCast(createSelectTrumpMessage());
 		} else {
 			startBids();
 		}
 	}
 
+	private RequestTrumpSelection createSelectTrumpMessage() {
+		return RequestTrumpSelection.create().setPlayerId(_trumpSelectorId);
+	}
+
+	private void sendStartRound(PlayerState player) {
+		List<Player> players = _players.stream().map(PlayerState::getPlayer).collect(Collectors.toList());
+		StartRound message = 
+			StartRound.create()
+				.setRound(_round)
+				.setMaxRound(_maxRound)
+				.setPlayers(players)
+				.setStartPlayer(players.get(_bidOffset).getId())
+				.setCards(player.getRoundState().getCards())
+				.setTrumpCard(_trumpCard);
+		getClient(player.getPlayer().getId()).sendMessage(message);
+	}
+
 	private void requestNextBid()  {
-		broadCast(RequestBid.create().setPlayerId(getPlayerId(_bidOffset + _bidCount)).setRound(_round).setExpected(_totalBids));
+		broadCast(createBidRequestMessage());
+	}
+
+	private RequestBid createBidRequestMessage() {
+		return RequestBid.create().setPlayerId(getPlayerId(_bidOffset + _bidCount)).setRound(_round).setExpected(_totalBids);
 	}
 
 	private GameClient getClient(int index) {
@@ -286,9 +377,15 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void startBids() {
+		_gameState = GameState.BIDDING;
+		
 		_trumpSelectorId = null;
-		broadCast(StartBids.create());
+		broadCast(createStartBiddingMessage());
 		requestNextBid();
+	}
+
+	private StartBids createStartBiddingMessage() {
+		return StartBids.create();
 	}
 
 	private void forward(GameClient sender, GameCmd msg)  {
@@ -317,19 +414,30 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		if (_bidCount < _players.size()) {
 			requestNextBid();
 		} else {
-			StartLead startLead = StartLead.create();
-			for (PlayerState state : _players) {
-				startLead.getState().put(state.getPlayer().getId(), 
-					PlayerInfo.create()
-						.setPoints(state.getPoints())
-						.setBid(state.getRoundState().getBidCnt())
-						.setTricks(state.getRoundState().getWinCnt()));
-			}
-			broadCast(startLead);
-			
+			broadCast(createStartLeadMessage());
 			requestNextPut();
 		}
 		return null;
+	}
+
+	private StartLead createStartLeadMessage() {
+		StartLead startLead = StartLead.create();
+		for (PlayerState state : _players) {
+			startLead.getState().put(state.getPlayer().getId(), 
+				PlayerInfo.create()
+					.setPoints(state.getPoints())
+					.setBid(state.getRoundState().getBidCnt())
+					.setTricks(state.getRoundState().getWinCnt()));
+		}
+		
+		// Only relevant when reconnecting to a running game.
+		int playerIndex = _turnOffset;
+		for (Card card : _turn) {
+			startLead.getCurrentTrick().add(PlayedCard.create().setCard(card).setPlayerId(getPlayerId(playerIndex)));
+			playerIndex++;
+		}
+		
+		return startLead;
 	}
 
 	@Override
@@ -404,59 +512,79 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		forward(arg, self);
 		
 		if (_barrier.isEmpty()) {
+			_turnOffset = _winnerOffset;
 			nextTurn();
 		}
 		return null;
 	}
 
 	private void nextTurn() {
+		_turn = new ArrayList<>();
+		
 		_turns--;
 		if (_turns > 0) {
 			requestNextPut();
 		} else {
 			// Compute points.
-			FinishRound finishRound = FinishRound.create();
+			
+			FinishRound finishRound = createFinishRoundMessage();
+			
+			// Apply delta to player state.
 			for (PlayerState state : _players) {
-				int hitCnt = state.getRoundState().getWinCnt();
-				int bidCnt = state.getRoundState().getBidCnt();
-				int delta;
-				if (hitCnt == bidCnt) {
-					delta = 20 + hitCnt * 10;
-				} else {
-					delta = -Math.abs(hitCnt - bidCnt) * 10;
-				}
+				int delta = finishRound.getPoints().get(state.getPlayer().getId());
 				int newPoints = state.getPoints() + delta;
 				state.setPoints(newPoints);
-				
-				finishRound.getPoints().put(state.getPlayer().getId(), delta);
 			}
 			
-			initBarrier();
+			initBarrier(GameState.FINISHING_ROUND);
 			broadCast(finishRound);
 		}
 	}
+
+	private FinishRound createFinishRoundMessage() {
+		FinishRound finishRound = FinishRound.create();
+		for (PlayerState state : _players) {
+			int hitCnt = state.getRoundState().getWinCnt();
+			int bidCnt = state.getRoundState().getBidCnt();
+			int delta;
+			if (hitCnt == bidCnt) {
+				delta = 20 + hitCnt * 10;
+			} else {
+				delta = -Math.abs(hitCnt - bidCnt) * 10;
+			}
+			finishRound.getPoints().put(state.getPlayer().getId(), delta);
+		}
+		return finishRound;
+	}
 	
 	private void finishTurn() {
-		int hitIndex = 0;
-		Card best = _turn.get(hitIndex);
+		int winningCardIndex = computeWinningCardIndex();
+		_winnerOffset = normalizeIndex(_turnOffset + winningCardIndex);
+		RoundState winnerRoundState = _players.get(_winnerOffset).getRoundState();
+		winnerRoundState.setWinCnt(winnerRoundState.getWinCnt() + 1);
+		
+		initBarrier(GameState.FINISHING_TURN);
+		broadCast(createFinishTurnMessage());
+	}
+
+	private FinishTurn createFinishTurnMessage() {
+		return FinishTurn.create().setTrick(_turn).setWinner(_players.get(_winnerOffset).getPlayer());
+	}
+
+	/** 
+	 * Compute the index of the winning card in {@link #_turn}.
+	 */
+	private int computeWinningCardIndex() {
+		int winnerIndex = 0;
+		Card best = _turn.get(winnerIndex);
 		for (int n = 1, cnt = _turn.size(); n < cnt; n++) {
 			Card current = _turn.get(n);
 			if (hits(best, current)) {
-				hitIndex = n;
+				winnerIndex = n;
 				best = current;
 			}
 		}
-		
-		int winnerOffset = normalizeIndex(_turnOffset + hitIndex);
-		PlayerState winnerState = _players.get(winnerOffset);
-		RoundState winnerRoundState = winnerState.getRoundState();
-		winnerRoundState.setWinCnt(winnerRoundState.getWinCnt() + 1);
-		
-		_turn = new ArrayList<>();
-		_turnOffset = winnerOffset;
-		initBarrier();
-		
-		broadCast(FinishTurn.create().setTrick(_turn).setWinner(winnerState.getPlayer()));
+		return winnerIndex;
 	}
 
 	@Override
@@ -498,20 +626,26 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void gameFinished() {
-		_onFinish.accept(getData());
+		if (_state != State.FINISHED) {
+			_state = State.FINISHED;
+			
+			_onFinish.accept(getGameId());
+		}
 	}
 
-	private void initBarrier() {
+	private void initBarrier(GameState nextState) {
+		_gameState = nextState;
 		_barrier.clear();
 		_barrier.putAll(_clients);
 	}
 	
 	private void requestNextPut()  {
-		requestPut(_turnOffset + _turn.size());
+		_gameState = GameState.LEADING;
+		broadCast(createRequestPutMessage());
 	}
 
-	private void requestPut(int nextPlayer) {
-		broadCast(RequestLead.create().setPlayerId(getPlayerId(nextPlayer)));
+	private RequestLead createRequestPutMessage() {
+		return RequestLead.create().setPlayerId(getPlayerId(_turnOffset + _turn.size()));
 	}
 
 	private boolean hits(Card best, Card current) {

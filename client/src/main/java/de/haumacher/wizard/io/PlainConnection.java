@@ -62,6 +62,8 @@ public class PlainConnection implements WizardConnectionSPI {
 	public void start(Consumer<Msg> onMessage) throws IOException {
 		_socket = new Socket(_host, _port);
 		JsonReader in = new JsonReader(new ReaderAdapter(new InputStreamReader(_socket.getInputStream(), "utf-8")));
+		_out = new JsonWriter(new WriterAdapter(new OutputStreamWriter(_socket.getOutputStream(), "utf-8")));
+		_out.beginArray();
 		_consumer = new Thread() {
 			@Override
 			public void run() {
@@ -83,9 +85,6 @@ public class PlainConnection implements WizardConnectionSPI {
 			}
 		};
 		_consumer.start();
-
-		_out = new JsonWriter(new WriterAdapter(new OutputStreamWriter(_socket.getOutputStream(), "utf-8")));
-		_out.beginArray();
 	}
 
 	@Override
@@ -93,7 +92,8 @@ public class PlainConnection implements WizardConnectionSPI {
 		try {
 			cmd.writeTo(_out);
 			_out.flush();
-		} catch (IOException ex) {
+		} catch (Throwable ex) {
+			ex.printStackTrace();
 			new Alert(AlertType.ERROR,
 					"Kommunikation fehlgeschlagen: " + ex.getMessage(),
 					ButtonType.OK).show();

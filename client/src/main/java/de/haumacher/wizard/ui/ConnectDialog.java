@@ -81,4 +81,11 @@ public class ConnectDialog extends Controller<Parent> {
 	public void setServerAddr(String value) {
 		serverAddr.setText(value);
 	}
+
+	/**
+	 * Sets the nick name being displayed.
+	 */
+	public void setNickName(String value) {
+		nickName.setText(value);
+	}
 }

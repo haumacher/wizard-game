@@ -18,9 +18,11 @@ import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.Lead;
+import de.haumacher.wizard.msg.PlayedCard;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
 import de.haumacher.wizard.msg.RequestBid;
+import de.haumacher.wizard.msg.StartLead;
 import de.haumacher.wizard.msg.StartRound;
 import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
@@ -159,8 +161,8 @@ public class GameView extends GenericController {
 		prophecySum.setText(self + " Stiche vorhergesagt");
 	}
 
-	public void startLead(Map<String, PlayerInfo> state) {
-		for (Entry<String, PlayerInfo> entry : state.entrySet()) {
+	public void startLead(StartLead msg) {
+		for (Entry<String, PlayerInfo> entry : msg.getState().entrySet()) {
 			PlayerStatus playerStatus = _playerStatus.get(entry.getKey());
 			PlayerInfo info = entry.getValue();
 			
@@ -170,6 +172,11 @@ public class GameView extends GenericController {
 		
 		_currentTrick = showView(CurrentTrick.class, "CurrentTrick.fxml");
 		_currentTrick.init(_server);
+		
+		// Restore the current trick - only relevant when reconnecting to a game.
+		for (PlayedCard playedCard : msg.getCurrentTrick()) {
+			announceLead(_playerId, playedCard.getCard());
+		}
 	}
 
 	public void requestLead(String playerId) {
@@ -194,7 +201,8 @@ public class GameView extends GenericController {
 	}
 
 	public void announceLead(String playerId, Card card) {
-		if (playerId.endsWith(_playerId)) {
+		// Note: During replay, this method is invoked without a pending card.
+		if (playerId.endsWith(_playerId) && _cardBeingPut != null) {
 			cardsPane.getChildren().remove(_cardBeingPut.getView());
 			cardsPane.getChildren().forEach(n -> n.setOnMouseClicked(null));
 			_cardBeingPut = null;
@@ -204,13 +212,13 @@ public class GameView extends GenericController {
 	}
 
 	public void finishTurn(String winnerId) {
+		_trickFinished = true;
 		_playerStatus.get(winnerId).incTricks();
 		setActiveAll();
 		
 		_currentTrick.confirm("Dieser Stich geht an " + name(winnerId) + ".", e -> {
 			_server.sendCommand(ConfirmTrick.create());
 			_currentTrick.setInfo("Warte auf die Bestätigung der anderen Spieler.");
-			_trickFinished = true;
 		});
 	}
 
