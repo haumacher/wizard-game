@@ -23,6 +23,8 @@ public class WizardWebapp implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+		System.out.println("Started wizard server.");
+		
 		_server = new WizardServer();
 		
 		sce.getServletContext().setAttribute(WizardServer.class.getName(), _server);
@@ -30,6 +32,8 @@ public class WizardWebapp implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
+		System.out.println("Shutting down wizard server.");
+		
 		if (_server != null) {
 			_server.shutdown();
 		}
