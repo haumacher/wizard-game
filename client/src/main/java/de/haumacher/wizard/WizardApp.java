@@ -91,6 +91,7 @@ public class WizardApp extends Application implements WizardUI {
 				openConnection();
 				_connection.sendCommand(Login.create().setName(_data.getNickName()).setVersion(WizardGame.PROTOCOL_VERSION));
 			} catch (Exception ex) {
+				ex.printStackTrace();
 				_connection = null;
 				showError(ex);
 			}
