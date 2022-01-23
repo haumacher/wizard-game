@@ -72,10 +72,14 @@ public class WebsocketConnection implements WizardConnectionSPI {
 	public void onMessage(String message) {
 		try {
 			Msg msg = Msg.readMsg(new JsonReader(new StringR(message)));
-			System.out.println("< " + msg);
-			_onMessage.accept(msg);
+			if (msg != null) {
+				System.out.println("< " + msg);
+				_onMessage.accept(msg);
+			} else {
+				System.err.println("Message not understood: " + message);
+			}
 		} catch (IOException ex) {
-			System.err.println("Failed to read message.");
+			System.err.println("Failed to read message: " + message);
 			ex.printStackTrace();
 		}
 	}

@@ -100,9 +100,12 @@ public class StandaloneServer {
 						}
 						
 						Cmd cmd = Cmd.readCmd(_in);
-						cmd.visit(this, null);
-						
-						System.out.println(_data.getName() + " -> " + cmd);
+						if (cmd != null) {
+							System.out.println(_data.getName() + " -> " + cmd);
+							cmd.visit(this, null);
+						} else {
+							System.err.println("Received unknown command from '" + _data + "'.");
+						}
 					} catch (RuntimeException ex) {
 						ex.printStackTrace();
 						

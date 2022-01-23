@@ -88,9 +88,12 @@ public class WizardEndpoint implements Cmd.Visitor<Void, Void, IOException>, Gam
     public void onMessage(Session session, String message) throws IOException {
 		try {
 	    	Cmd cmd = Cmd.readCmd(new JsonReader(new StringR(message)));
-			cmd.visit(this, null);
-			
-			System.out.println(_data.getName() + " -> " + cmd);
+	    	if (cmd != null) {
+	    		System.out.println(_data.getName() + " -> " + cmd);
+	    		cmd.visit(this, null);
+	    	} else {
+	    		System.err.println("Reveived unknown command from '" + _data + "': " + message);
+	    	}
 		} catch (RuntimeException ex) {
 			ex.printStackTrace();
 			
