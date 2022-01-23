@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import de.haumacher.wizard.WizardServer;
+import de.haumacher.wizard.WizardConnection;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.ConfirmRound;
@@ -71,7 +71,7 @@ public class GameView extends GenericController {
 
 	private ProphecyPane _prophecy;
 
-	private WizardServer _server;
+	private WizardConnection _server;
 	
 	private Map<String, PlayerStatus> _playerStatus = new HashMap<>();
 
@@ -89,7 +89,7 @@ public class GameView extends GenericController {
 
 	private Map<String, PlayerStatus> _activePlayers = new HashMap<>();
 
-	public void init(WizardServer server, String playerId) {
+	public void init(WizardConnection server, String playerId) {
 		_server = server;
 		_playerId = playerId;
 	}

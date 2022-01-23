@@ -5,7 +5,7 @@ package de.haumacher.wizard.ui;
 
 import java.util.List;
 
-import de.haumacher.wizard.WizardServer;
+import de.haumacher.wizard.WizardConnection;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.StartGame;
 import javafx.collections.ListChangeListener;
@@ -29,7 +29,7 @@ public class GameLobby extends GenericController implements ListChangeListener<P
 	@FXML
 	Button startGame;
 
-	private WizardServer _server;
+	private WizardConnection _server;
 
 	private String _gameId;
 	
@@ -62,7 +62,7 @@ public class GameLobby extends GenericController implements ListChangeListener<P
 		_server.sendCommand(StartGame.create().setGameId(_gameId));
 	}
 
-	public void initController(WizardServer server, String gameId) {
+	public void initController(WizardConnection server, String gameId) {
 		_server = server;
 		_gameId = gameId;
 	}

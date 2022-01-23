@@ -3,7 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardServer;
+import de.haumacher.wizard.WizardConnection;
 import de.haumacher.wizard.msg.Card;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -26,9 +26,9 @@ public class CurrentTrick extends Controller {
 	@FXML
 	Button next;
 
-	private WizardServer _server;
+	private WizardConnection _server;
 
-	public void init(WizardServer server) {
+	public void init(WizardConnection server) {
 		_server = server;
 
 		table.getChildren().clear();

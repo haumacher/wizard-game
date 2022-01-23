@@ -3,7 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardServer;
+import de.haumacher.wizard.WizardConnection;
 import de.haumacher.wizard.msg.Card;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.SelectTrump;
@@ -27,13 +27,13 @@ public class TrumpSelection extends Controller {
 	@FXML
 	Text info;
 
-	private WizardServer _server;
+	private WizardConnection _server;
 
 	private Player _player;
 
 	private boolean _allowSelect;
 
-	public void init(WizardServer server, Player player, boolean allowSelect) {
+	public void init(WizardConnection server, Player player, boolean allowSelect) {
 		_server = server;
 		_player = player;
 		_allowSelect = allowSelect;

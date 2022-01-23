@@ -27,7 +27,7 @@ import javafx.scene.control.ButtonType;
  * Connects to the Wizard game server and processes messages in a separate {@link Thread}.
  * </p>
  */
-public class GameConnection implements AutoCloseable, WizardServer {
+public class PlainConnection implements WizardConnectionSPI {
 
 	private JsonWriter _out;
 
@@ -40,14 +40,14 @@ public class GameConnection implements AutoCloseable, WizardServer {
 	private int _port;
 
 	/**
-	 * Creates a {@link GameConnection}.
+	 * Creates a {@link PlainConnection}.
 	 * 
 	 * @param host
 	 *        The host name of the game server.
 	 * @param port
 	 *        The game server port.
 	 */
-	public GameConnection(String host, int port) {
+	public PlainConnection(String host, int port) {
 		_host = host;
 		_port = port;
 	}
@@ -58,6 +58,7 @@ public class GameConnection implements AutoCloseable, WizardServer {
 	 * @param onMessage
 	 *        the consumer of messages received from the server.
 	 */
+	@Override
 	public void start(Consumer<Msg> onMessage) throws IOException {
 		_socket = new Socket(_host, _port);
 		JsonReader in = new JsonReader(new ReaderAdapter(new InputStreamReader(_socket.getInputStream(), "utf-8")));

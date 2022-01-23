@@ -5,7 +5,7 @@ package de.haumacher.wizard.ui;
 
 import java.util.Map;
 
-import de.haumacher.wizard.WizardServer;
+import de.haumacher.wizard.WizardConnection;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Player;
 import javafx.fxml.FXML;
@@ -25,9 +25,9 @@ public class ProphecyPane extends Controller {
 	@FXML
 	Text infoField;
 
-	private WizardServer _server;
+	private WizardConnection _server;
 
-	public void setPlayers(WizardServer server, Map<String, Player> players) {
+	public void setPlayers(WizardConnection server, Map<String, Player> players) {
 		_server = server;
 		
 		prophecySelector.setVisible(false);

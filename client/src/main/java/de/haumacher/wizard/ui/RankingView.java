@@ -3,7 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
-import de.haumacher.wizard.WizardServer;
+import de.haumacher.wizard.WizardConnection;
 import de.haumacher.wizard.msg.FinishGame;
 import de.haumacher.wizard.msg.PlayerScore;
 import javafx.event.ActionEvent;
@@ -29,7 +29,7 @@ public class RankingView extends GenericController {
 	@FXML
 	Button okButton;
 
-	public void show(WizardServer server, FinishGame msg, EventHandler<ActionEvent> onOk) {
+	public void show(WizardConnection server, FinishGame msg, EventHandler<ActionEvent> onOk) {
 		int lastPoints = Integer.MAX_VALUE;
 		int rank = 0;
 		int row = 1;

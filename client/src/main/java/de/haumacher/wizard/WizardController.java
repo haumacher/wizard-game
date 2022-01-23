@@ -54,13 +54,13 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 	private Game _game;
 	private GameLobby _lobby;
 	private GameView _gameView;
-	private WizardServer _server;
+	private WizardConnection _server;
 	private WizardUI _ui;
 
 	/** 
 	 * Creates a {@link WizardController}.
 	 */
-	public WizardController(WizardServer server, WizardUI ui) {
+	public WizardController(WizardConnection server, WizardUI ui) {
 		_server = server;
 		_ui = ui;
 	}

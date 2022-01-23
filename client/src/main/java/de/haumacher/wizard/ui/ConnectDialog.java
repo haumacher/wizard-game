@@ -42,7 +42,6 @@ public class ConnectDialog extends Controller<Parent> {
 		_onConnect = onConnect;
 		
 		Scene scene = new Scene(getView());
-		
 		_dialog = new Stage();
 		_dialog.setScene(scene);
 		_dialog.setOnShown(e -> nickName.requestFocus());
@@ -73,5 +72,12 @@ public class ConnectDialog extends Controller<Parent> {
 			_onConnect.accept(ConnectData.create().setNickName(name).setServerAddr(addr));
 			_dialog.hide();
 		}
+	}
+
+	/** 
+	 * Sets the server address field to the given value.
+	 */
+	public void setServerAddr(String value) {
+		serverAddr.setText(value);
 	}
 }

@@ -1,12 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>de.haumacher.games</groupId>
 		<artifactId>wizard-parent</artifactId>
 		<version>1.0.4-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>wizard-server</artifactId>
 	<name>wizard-server</name>
 
@@ -15,6 +17,13 @@
 			<groupId>de.haumacher.games</groupId>
 			<artifactId>wizard-common</artifactId>
 			<version>1.0.4-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -33,14 +42,43 @@
 						<configuration>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
 							<shadedClassifierName>full</shadedClassifierName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>de.haumacher.wizard.server.Server</mainClass>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>de.haumacher.wizard.server.StandaloneServer</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.2</version>
+
+				<executions>
+					<execution>
+						<id>build-war</id>
+						<goals>
+							<goal>war</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<ignorePackaging>true</ignorePackaging>
+					<url>${wizard.server.deployUrl}</url>
+					<server>wizard-server</server>
+					<path>/wizard-game</path>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

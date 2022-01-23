@@ -12,8 +12,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import de.haumacher.msgbuf.json.JsonReader;
@@ -30,8 +28,6 @@ import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.CreateGame;
 import de.haumacher.wizard.msg.Error;
 import de.haumacher.wizard.msg.GameCmd;
-import de.haumacher.wizard.msg.GameCreated;
-import de.haumacher.wizard.msg.GameDeleted;
 import de.haumacher.wizard.msg.GameStarted;
 import de.haumacher.wizard.msg.JoinGame;
 import de.haumacher.wizard.msg.Lead;
@@ -46,20 +42,16 @@ import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Stand-alone server for the wizard game that uses plain sockets for communication.
  */
-public class Server {
+public class StandaloneServer {
 
 	public static void main(String[] args) throws IOException {
-		new Server().run();
+		new StandaloneServer().run();
 	}
 	
-	final ConcurrentMap<String, Client> _clients = new ConcurrentHashMap<>();
+	final WizardServer _server = new WizardServer();
 	
-	final ConcurrentMap<String, WizardGame> _games = new ConcurrentHashMap<>();
-
 	private void run() throws IOException {
 		try (ServerSocket server = new ServerSocket(8090)) {
 			while (true) {
@@ -77,9 +69,7 @@ public class Server {
 	}
 	
 	public void broadCast(Msg msg) {
-		for (Client other : _clients.values()) {
-			other.sendMessage(msg);
-		}
+		_server.broadCast(msg);
 	}
 
 	class Client implements Runnable, Cmd.Visitor<Void, Void, IOException>, GameClient {
@@ -99,7 +89,7 @@ public class Server {
 
 		@Override
 		public void run() {
-			_clients.put(getId(), this);
+			_server.addClient(this);
 			try {
 				_out.beginArray();
 				_in.beginArray();
@@ -130,16 +120,9 @@ public class Server {
 			} catch (IOException ex) {
 				System.out.println("Client stopped.");
 			} finally {
-				_clients.remove(getId());
-				
+				_server.removeClient(this);
 				if (_game != null) {
-					_game.removePlayer(this);
-					
-					if (_game.getData().getPlayers().isEmpty()) {
-						String gameId = _game.getGameId();
-						_games.remove(gameId);
-						broadCast(GameDeleted.create().setGameId(gameId));
-					}
+					_server.removePlayer(_game, this);
 				}
 			}
 		}
@@ -193,9 +176,7 @@ public class Server {
 				return null;
 			}
 			
-			_game = new WizardGame(Server.this::broadCast, g -> _games.remove(g.getGameId()));
-			_games.put(_game.getGameId(), _game);
-			broadCast(GameCreated.create().setOwnerId(getId()).setGame(_game.getData()));
+			_game = _server.createGame(this);
 			_game.addPlayer(this);
 			
 			return null;
@@ -226,7 +207,7 @@ public class Server {
 				sendError("Du bist schon einem Spiel beigetreten.");
 				return null;
 			}
-			_game = _games.get(self.getGameId());
+			_game = _server.getGame(self.getGameId());
 			if (_game == null) {
 				sendError("Das von Dir gewählte Spiel gibt es nicht mehr.");
 				return null;
@@ -251,7 +232,7 @@ public class Server {
 		public Void visit(ListGames self, Void arg) throws IOException {
 			sendMessage(
 				ListGamesResult.create()
-					.setGames(_games.values().stream().map(WizardGame::getData).collect(Collectors.toList())));
+					.setGames(_server.getWaitingGames().stream().map(WizardGame::getData).collect(Collectors.toList())));
 			return null;
 		}
 

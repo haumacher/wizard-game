@@ -32,7 +32,7 @@ public class WizardApp extends Application implements WizardUI {
 	ScrollPane main;
 	
 	private Scene _scene;
-	GameConnection _connection;
+	WizardConnectionSPI _connection;
 	
 	private WizardController _client;
 
@@ -61,6 +61,8 @@ public class WizardApp extends Application implements WizardUI {
 	
 	public void menuConnect(Event evt) {
 		ConnectDialog dialog = Controller.load(ConnectDialog.class);
+		dialog.setServerAddr("wss://play.haumacher.de/wizard-game/ws");
+		
 		dialog.show(data -> {
 			try {
 				if (_connection != null) {
@@ -68,19 +70,24 @@ public class WizardApp extends Application implements WizardUI {
 					_connection = null;
 				}
 				
-				_connection = new GameConnection(data.getServerAddr(), 8090);
+				String serverAddr = data.getServerAddr();
+				if (serverAddr.startsWith("wss:") || serverAddr.startsWith("ws:")) {
+					_connection = new WebsocketConnection(serverAddr);
+				} else {
+					_connection = new PlainConnection(serverAddr, 8090);
+				}
 				_client = new WizardController(_connection, this);
 				_connection.start(_client);
 				_connection.sendCommand(Login.create().setName(data.getNickName()).setVersion(WizardGame.PROTOCOL_VERSION));
 				_connection.sendCommand(ListGames.create());
-			} catch (IOException ex) {
+			} catch (Exception ex) {
 				_connection = null;
 				showError(ex);
 			}
 		});
 	}
 	
-	private void showError(IOException ex) {
+	private void showError(Throwable ex) {
 		new Alert(AlertType.ERROR, "Kommunikation nicht möglich: " + ex.getMessage(), ButtonType.CLOSE).show();
 	}
 
