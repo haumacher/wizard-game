@@ -43,11 +43,19 @@ public class WizardEndpoint {
 
 	private ClientHandler _clientHandler;
 	
+	private boolean _closed;
+	
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) throws IOException {
+		System.out.println("Opened websocket connection.");
+		
 		_session = session;
 		
 		_clientHandler = new ClientHandler(WizardWebapp.getServer(), msg -> {
+			if (_closed) {
+				return;
+			}
+			
 			System.out.println(_clientHandler.getName() + " <- " + msg);
 			synchronized (_session) {
 				_session.getAsyncRemote().sendText(msg.toString());
@@ -82,7 +90,10 @@ public class WizardEndpoint {
     
     @OnClose
     public void onClose(Session session) throws IOException {
-    	_clientHandler.stop();
+		System.out.println("Closed websocket connection.");
+
+		_closed = true;
+		_clientHandler.stop();
     }
 
     @OnError
