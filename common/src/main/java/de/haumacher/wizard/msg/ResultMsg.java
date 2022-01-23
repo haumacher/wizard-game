@@ -11,8 +11,8 @@ public abstract class ResultMsg extends Msg {
 		/** Visit case for {@link Error}.*/
 		R visit(Error self, A arg) throws E;
 
-		/** Visit case for {@link LoggedIn}.*/
-		R visit(LoggedIn self, A arg) throws E;
+		/** Visit case for {@link Welcome}.*/
+		R visit(Welcome self, A arg) throws E;
 
 		/** Visit case for {@link ListGamesResult}.*/
 		R visit(ListGamesResult self, A arg) throws E;
@@ -36,7 +36,7 @@ public abstract class ResultMsg extends Msg {
 		String type = in.nextString();
 		switch (type) {
 			case Error.ERROR__TYPE: result = de.haumacher.wizard.msg.Error.readError(in); break;
-			case LoggedIn.LOGGED_IN__TYPE: result = de.haumacher.wizard.msg.LoggedIn.readLoggedIn(in); break;
+			case Welcome.WELCOME__TYPE: result = de.haumacher.wizard.msg.Welcome.readWelcome(in); break;
 			case ListGamesResult.LIST_GAMES_RESULT__TYPE: result = de.haumacher.wizard.msg.ListGamesResult.readListGamesResult(in); break;
 			default: in.skipValue(); result = null; break;
 		}

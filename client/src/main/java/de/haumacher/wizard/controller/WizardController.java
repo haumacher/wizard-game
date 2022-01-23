@@ -27,7 +27,7 @@ import de.haumacher.wizard.msg.LeaveAnnounce;
 import de.haumacher.wizard.msg.LeaveGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.ListGamesResult;
-import de.haumacher.wizard.msg.LoggedIn;
+import de.haumacher.wizard.msg.Welcome;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.RequestBid;
 import de.haumacher.wizard.msg.RequestLead;
@@ -78,7 +78,7 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 	}
 	
 	@Override
-	public Void visit(LoggedIn self, Void arg) throws IOException {
+	public Void visit(Welcome self, Void arg) throws IOException {
 		_playerId = self.getPlayerId();
 		return null;
 	}

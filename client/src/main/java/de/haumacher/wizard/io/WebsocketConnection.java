@@ -53,13 +53,13 @@ public class WebsocketConnection implements WizardConnectionSPI {
 		_onMessage = onMessage;
 		
 		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-		container.connectToServer(this, new URI(_url));
+		container.setDefaultMaxSessionIdleTimeout(0);
+		_session = container.connectToServer(this, new URI(_url));
 	}
 
 	@OnOpen
 	public void onOpen(Session session) {
 		System.out.println("Opening websocket.");
-		_session = session;
 	}
 
 	@OnClose

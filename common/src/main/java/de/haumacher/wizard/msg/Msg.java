@@ -47,7 +47,7 @@ public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 			case JoinAnnounce.JOIN_ANNOUNCE__TYPE: result = de.haumacher.wizard.msg.JoinAnnounce.readJoinAnnounce(in); break;
 			case LeaveAnnounce.LEAVE_ANNOUNCE__TYPE: result = de.haumacher.wizard.msg.LeaveAnnounce.readLeaveAnnounce(in); break;
 			case Error.ERROR__TYPE: result = de.haumacher.wizard.msg.Error.readError(in); break;
-			case LoggedIn.LOGGED_IN__TYPE: result = de.haumacher.wizard.msg.LoggedIn.readLoggedIn(in); break;
+			case Welcome.WELCOME__TYPE: result = de.haumacher.wizard.msg.Welcome.readWelcome(in); break;
 			case ListGamesResult.LIST_GAMES_RESULT__TYPE: result = de.haumacher.wizard.msg.ListGamesResult.readListGamesResult(in); break;
 			case StartRound.START_ROUND__TYPE: result = de.haumacher.wizard.msg.StartRound.readStartRound(in); break;
 			case RequestTrumpSelection.REQUEST_TRUMP_SELECTION__TYPE: result = de.haumacher.wizard.msg.RequestTrumpSelection.readRequestTrumpSelection(in); break;

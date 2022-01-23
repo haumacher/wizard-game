@@ -3,17 +3,17 @@ package de.haumacher.wizard.msg;
 /**
  * Response message upon successful {@link Login}.
  */
-public class LoggedIn extends ResultMsg {
+public class Welcome extends ResultMsg {
 
 	/**
-	 * Creates a {@link LoggedIn} instance.
+	 * Creates a {@link Welcome} instance.
 	 */
-	public static LoggedIn create() {
-		return new LoggedIn();
+	public static Welcome create() {
+		return new Welcome();
 	}
 
-	/** Identifier for the {@link LoggedIn} type in JSON format. */
-	public static final String LOGGED_IN__TYPE = "LoggedIn";
+	/** Identifier for the {@link Welcome} type in JSON format. */
+	public static final String WELCOME__TYPE = "Welcome";
 
 	/** @see #getPlayerId() */
 	private static final String PLAYER_ID = "playerId";
@@ -21,11 +21,11 @@ public class LoggedIn extends ResultMsg {
 	private String _playerId = "";
 
 	/**
-	 * Creates a {@link LoggedIn} instance.
+	 * Creates a {@link Welcome} instance.
 	 *
 	 * @see #create()
 	 */
-	protected LoggedIn() {
+	protected Welcome() {
 		super();
 	}
 
@@ -39,7 +39,7 @@ public class LoggedIn extends ResultMsg {
 	/**
 	 * @see #getPlayerId()
 	 */
-	public LoggedIn setPlayerId(String value) {
+	public Welcome setPlayerId(String value) {
 		internalSetPlayerId(value);
 		return this;
 	}
@@ -51,12 +51,12 @@ public class LoggedIn extends ResultMsg {
 
 	@Override
 	public String jsonType() {
-		return LOGGED_IN__TYPE;
+		return WELCOME__TYPE;
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static LoggedIn readLoggedIn(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		LoggedIn result = new LoggedIn();
+	public static Welcome readWelcome(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		Welcome result = new Welcome();
 		in.beginObject();
 		result.readFields(in);
 		in.endObject();

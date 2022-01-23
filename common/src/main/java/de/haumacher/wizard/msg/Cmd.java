@@ -11,6 +11,9 @@ public abstract class Cmd extends de.haumacher.msgbuf.data.AbstractDataObject {
 		/** Visit case for {@link Login}.*/
 		R visit(Login self, A arg) throws E;
 
+		/** Visit case for {@link Reconnect}.*/
+		R visit(Reconnect self, A arg) throws E;
+
 		/** Visit case for {@link ListGames}.*/
 		R visit(ListGames self, A arg) throws E;
 
@@ -45,6 +48,7 @@ public abstract class Cmd extends de.haumacher.msgbuf.data.AbstractDataObject {
 		String type = in.nextString();
 		switch (type) {
 			case Login.LOGIN__TYPE: result = de.haumacher.wizard.msg.Login.readLogin(in); break;
+			case Reconnect.RECONNECT__TYPE: result = de.haumacher.wizard.msg.Reconnect.readReconnect(in); break;
 			case ListGames.LIST_GAMES__TYPE: result = de.haumacher.wizard.msg.ListGames.readListGames(in); break;
 			case JoinGame.JOIN_GAME__TYPE: result = de.haumacher.wizard.msg.JoinGame.readJoinGame(in); break;
 			case CreateGame.CREATE_GAME__TYPE: result = de.haumacher.wizard.msg.CreateGame.readCreateGame(in); break;

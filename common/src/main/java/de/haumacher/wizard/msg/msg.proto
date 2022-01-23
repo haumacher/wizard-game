@@ -103,8 +103,14 @@ message Login extends Cmd {
 }
 
 /** Response message upon successful {@link Login}. */
-message LoggedIn extends ResultMsg {
+message Welcome extends ResultMsg {
 	/** The ID of the player that logged in to the server. */
+	string playerId;
+}
+
+/** Takes over a lost connection that was established before. */
+message Reconnect extends Cmd {
+	/** The ID that was assigned to the player in a former {@link Welcome} message. */
 	string playerId;
 }
 

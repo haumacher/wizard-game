@@ -13,12 +13,18 @@ import de.haumacher.wizard.msg.Player;
  */
 public interface GameClient {
 
-	String getId();
+	default String getId() {
+		return getData().getId();
+	}
 
-	void sendMessage(Msg msg);
-
+	default String getName() {
+		return getData().getName();
+	}
+	
 	Player getData();
 
+	void sendMessage(Msg msg);
+	
 	void sendError(String message);
 
 }
