@@ -28,9 +28,11 @@ public class StandaloneClient implements Runnable {
 
 		_clientHandler = new ClientHandler(server, msg -> {
 			try {
-				System.out.println(_clientHandler.getName() + " <- " + msg);
-				msg.writeTo(_out);
-				_out.flush();
+				synchronized (_out) {
+					System.out.println(_clientHandler.getName() + " <- " + msg);
+					msg.writeTo(_out);
+					_out.flush();
+				}
 			} catch (IOException ex) {
 				System.err.println("Cannot send to " + _clientHandler + ": " + msg + " (" + ex.getMessage() + ")");
 			}

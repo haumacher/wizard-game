@@ -90,8 +90,10 @@ public class PlainConnection implements WizardConnectionSPI {
 	@Override
 	public void sendCommand(Cmd cmd) {
 		try {
-			cmd.writeTo(_out);
-			_out.flush();
+			synchronized (_out) {
+				cmd.writeTo(_out);
+				_out.flush();
+			}
 		} catch (Throwable ex) {
 			ex.printStackTrace();
 			new Alert(AlertType.ERROR,
