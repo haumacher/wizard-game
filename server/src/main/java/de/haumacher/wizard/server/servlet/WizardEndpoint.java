@@ -49,7 +49,9 @@ public class WizardEndpoint {
 		
 		_clientHandler = new ClientHandler(WizardWebapp.getServer(), msg -> {
 			System.out.println(_clientHandler.getName() + " <- " + msg);
-			_session.getAsyncRemote().sendText(msg.toString());
+			synchronized (_session) {
+				_session.getAsyncRemote().sendText(msg.toString());
+			}
 		});
 		
 		_clientHandler.start();
