@@ -98,6 +98,7 @@
 						<asset>${basedir}/client/target/wizard-client-${project.version}.jar/</asset>
 						<asset>${basedir}/client/target/Zauberer-${project.version}.exe</asset>
 						<asset>${basedir}/server/target/wizard-server-${project.version}-full.jar/</asset>
+						<asset>${basedir}/server/target/wizard-server-${project.version}.war/</asset>
 					</assets>
 				</configuration>
 			</plugin>
