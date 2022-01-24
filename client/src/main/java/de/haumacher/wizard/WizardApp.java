@@ -29,6 +29,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -60,6 +61,10 @@ public class WizardApp extends Application implements WizardUI {
 	@Override
 	public void start(Stage stage) throws Exception {
 		_stage = stage;
+		_stage.setTitle("Zauberer");
+		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-32.png")));
+		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-64.png")));
+		
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("WizardApp.fxml"));
 		loader.setController(this);
 		_scene = loader.load();
