@@ -58,7 +58,11 @@ public class WizardEndpoint {
 			
 			System.out.println(_clientHandler.getName() + " <- " + msg);
 			synchronized (_session) {
-				_session.getAsyncRemote().sendText(msg.toString());
+				try {
+					_session.getBasicRemote().sendText(msg.toString());
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		
@@ -97,8 +101,8 @@ public class WizardEndpoint {
     }
 
     @OnError
-    public void onError(Session session, Throwable throwable) {
-    	System.err.println("Error in endpoint for: " + _clientHandler);
-    	throwable.printStackTrace();
+    public void onError(Session session, Throwable ex) {
+    	System.err.println("Error in endpoint for " + _clientHandler + ": " + ex.getMessage());
+    	ex.printStackTrace();
     }
 }
