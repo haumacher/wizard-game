@@ -6,6 +6,7 @@ package de.haumacher.wizard.server;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
@@ -71,7 +72,7 @@ public class WizardServer {
 	 * Retrieves all games that wait for players.
 	 */
 	public Collection<WizardGame> getWaitingGames() {
-		return _games.values();
+		return _games.values().stream().filter(g -> g.isAcceptingPlayers()).collect(Collectors.toList());
 	}
 
 	/** 

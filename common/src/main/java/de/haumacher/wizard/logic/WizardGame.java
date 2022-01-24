@@ -160,6 +160,13 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	public Game getData() {
 		return Game.create().setGameId(_id).setPlayers(_clients.values().stream().map(c -> c.getData()).collect(Collectors.toList()));
 	}
+	
+	/**
+	 * Whether new players can join this game.
+	 */
+	public synchronized boolean isAcceptingPlayers() {
+		return _state == State.CREATED;
+	}
 
 	/**
 	 * Adds a new player to this game.
