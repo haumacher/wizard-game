@@ -12,7 +12,7 @@ import de.haumacher.wizard.resources.StaticResources;
  */
 public class R extends StaticResources {
 	
-	public static final ResourceBundle BUNDLE = ResourceBundle.getBundle("de/haumacher/wizard/WizardResources");
+	public static final ResourceBundle BUNDLE = bundle(R.class);
 
 	public static R1 communicationError_msg;
 	
