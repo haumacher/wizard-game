@@ -15,6 +15,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+		<project.scm.id>github-haumacher</project.scm.id>
 	</properties>
 
 	<dependencies>
