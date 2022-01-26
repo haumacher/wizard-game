@@ -17,18 +17,18 @@
                <children>
                   <MenuBar>
                      <menus>
-                        <Menu mnemonicParsing="false" text="Game">
+                        <Menu mnemonicParsing="false" text="%ui.menu.game">
                            <items>
-                              <MenuItem mnemonicParsing="false" onAction="#newGame" text="New Game" />
+                              <MenuItem mnemonicParsing="false" onAction="#newGame" text="%ui.menu.newGame" />
                               <SeparatorMenuItem mnemonicParsing="false" />
-                              <MenuItem id="MenuQuit" mnemonicParsing="false" onAction="#menuQuit" text="Quit" />
+                              <MenuItem id="MenuQuit" mnemonicParsing="false" onAction="#menuQuit" text="%ui.menu.quit" />
                            </items>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="Connection">
+                        <Menu mnemonicParsing="false" text="%ui.menu.connection">
                            <items>
-                              <MenuItem id="MenuConnect" fx:id="menuConnect" mnemonicParsing="false" onAction="#menuConnect" text="Connect..." />
-                              <MenuItem fx:id="menuDisconnect" mnemonicParsing="false" onAction="#menuDisconnect" text="Disconnect" visible="false" />
-                              <MenuItem fx:id="menuReconnect" mnemonicParsing="false" onAction="#menuReconnect" text="Reconnect" visible="false" />
+                              <MenuItem id="MenuConnect" fx:id="menuConnect" mnemonicParsing="false" onAction="#menuConnect" text="%ui.menu.connect" />
+                              <MenuItem fx:id="menuDisconnect" mnemonicParsing="false" onAction="#menuDisconnect" text="%ui.menu.disconnect" visible="false" />
+                              <MenuItem fx:id="menuReconnect" mnemonicParsing="false" onAction="#menuReconnect" text="%ui.menu.reconnect" visible="false" />
                            </items>
                         </Menu>
                      </menus>

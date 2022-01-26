@@ -14,6 +14,7 @@ import de.haumacher.msgbuf.json.JsonToken;
 import de.haumacher.msgbuf.json.JsonWriter;
 import de.haumacher.msgbuf.server.io.ReaderAdapter;
 import de.haumacher.msgbuf.server.io.WriterAdapter;
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.msg.Cmd;
 import de.haumacher.wizard.msg.Msg;
 import javafx.scene.control.Alert;
@@ -97,7 +98,7 @@ public class PlainConnection implements WizardConnectionSPI {
 		} catch (Throwable ex) {
 			ex.printStackTrace();
 			new Alert(AlertType.ERROR,
-					"Kommunikation fehlgeschlagen: " + ex.getMessage(),
+					R.communicationError_msg.format(ex.getMessage()),
 					ButtonType.OK).show();
 		}
 

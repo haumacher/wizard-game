@@ -7,7 +7,7 @@
 
 <VBox fx:id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.TrumpSelection">
    <children>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Wahl der Trumpf-Farbe">
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.trumpSelection">
          <VBox.margin>
             <Insets left="5.0" top="5.0" />
          </VBox.margin>
@@ -18,7 +18,7 @@
          </VBox.margin></TilePane>
       <VBox alignment="CENTER" prefWidth="500.0">
          <children>
-            <Text fx:id="info" strokeType="OUTSIDE" strokeWidth="0.0" text="Du darfst die Trumpffarbe wählen!" textAlignment="CENTER">
+            <Text fx:id="info" strokeType="OUTSIDE" strokeWidth="0.0" text="INFO_HERE" textAlignment="CENTER">
                <VBox.margin>
                   <Insets left="5.0" top="5.0" />
                </VBox.margin>

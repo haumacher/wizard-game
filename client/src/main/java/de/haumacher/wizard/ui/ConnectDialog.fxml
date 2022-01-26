@@ -24,9 +24,9 @@
             <RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
          </rowConstraints>
          <children>
-            <Label text="Nick-Name" />
+            <Label text="%ui.nickName" />
             <TextField fx:id="nickName" onKeyTyped="#onEnter" GridPane.columnIndex="1" />
-            <Label text="Serveradresse" GridPane.rowIndex="1" />
+            <Label text="%ui.serverAddress" GridPane.rowIndex="1" />
             <TextField fx:id="serverAddr" onKeyTyped="#onEnter" text="localhost" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
          <padding>
@@ -35,7 +35,7 @@
       </GridPane>
       <ButtonBar prefHeight="40.0" prefWidth="200.0" VBox.vgrow="NEVER">
         <buttons>
-            <Button defaultButton="true" mnemonicParsing="false" onAction="#onConnect" text="Verbinden" />
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#onConnect" text="%ui.connect" />
         </buttons>
          <padding>
             <Insets right="10.0" />

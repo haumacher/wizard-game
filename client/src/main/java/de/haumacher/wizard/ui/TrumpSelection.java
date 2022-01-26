@@ -3,6 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.controller.GenericController;
 import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.Card;
@@ -28,7 +29,7 @@ public class TrumpSelection extends GenericController {
 
 	public void init(WizardConnection server, Player player, boolean allowSelect) {
 		if (allowSelect) {
-			info.setText("Du darfst die Trumpffarbe wählen!");
+			info.setText(R.selectTrump);
 			
 			for (Suit suit : Suit.values()) {
 				Node cardView = CardView.createCard(Card.create().setSuit(suit).setValue(Value.Z));
@@ -39,7 +40,7 @@ public class TrumpSelection extends GenericController {
 				selectPane.getChildren().add(cardView);
 			}
 		} else {
-			info.setText(player.getName() + " wählt die Trumpffarbe...");
+			info.setText(R.selectingTrump_player.format(player.getName()));
 			
 			selectPane.getChildren().clear();
 		}

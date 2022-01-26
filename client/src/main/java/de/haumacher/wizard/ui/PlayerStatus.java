@@ -15,8 +15,6 @@ import javafx.scene.text.Text;
 
 /**
  * Controller of player status view.
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
 public class PlayerStatus extends Controller {
 	

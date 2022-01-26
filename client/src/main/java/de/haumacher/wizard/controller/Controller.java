@@ -5,7 +5,9 @@ package de.haumacher.wizard.controller;
 
 import java.io.IOError;
 import java.io.IOException;
+import java.util.PropertyResourceBundle;
 
+import de.haumacher.wizard.R;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -51,8 +53,10 @@ public abstract class Controller<N extends Node> {
 	}
 	
 	public static <T> T loadView(Class<?> controllerClass, String resource)  {
+		
+		PropertyResourceBundle x;
 		try {
-			return FXMLLoader.load(controllerClass.getResource(resource));
+			return FXMLLoader.load(controllerClass.getResource(resource), R.BUNDLE);
 		} catch (IOException ex) {
 			throw new IOError(ex);
 		}

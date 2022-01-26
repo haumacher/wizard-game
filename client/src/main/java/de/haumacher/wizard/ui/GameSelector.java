@@ -6,6 +6,7 @@ package de.haumacher.wizard.ui;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.controller.Controller;
 import de.haumacher.wizard.msg.Game;
 import de.haumacher.wizard.msg.GameCreated;
@@ -27,9 +28,7 @@ import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * View allowing to choose a game to join.
  */
 public class GameSelector extends Controller<TableView<Game>> implements EventHandler<Event> {
 	
@@ -37,7 +36,7 @@ public class GameSelector extends Controller<TableView<Game>> implements EventHa
 		@Override
 		public TableCell<Game, Object> call(TableColumn<Game, Object> param) {
 			TableCell<Game, Object> result = new TableCell<Game, Object>() {
-				Button button = new Button("Join");
+				Button button = new Button(R.join);
 				{
 					button.addEventHandler(ActionEvent.ACTION, GameSelector.this);
 				}

@@ -5,8 +5,6 @@ package de.haumacher.wizard;
 
 /**
  * Command line launcher for the {@link WizardApp}.
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
 public class WizardLauncher {
 

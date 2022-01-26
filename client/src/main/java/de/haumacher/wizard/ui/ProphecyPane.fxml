@@ -7,7 +7,7 @@
 
 <VBox fx:id="main" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.ProphecyPane">
    <children>
-      <Text fx:id="infoField" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Mache Deine Vorhersage">
+      <Text fx:id="infoField" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.makeYourProphecy">
          <VBox.margin>
             <Insets left="5.0" top="5.0" />
          </VBox.margin>

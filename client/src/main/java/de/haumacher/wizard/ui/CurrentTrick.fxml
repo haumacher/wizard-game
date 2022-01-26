@@ -8,7 +8,7 @@
 
 <VBox fx:id="main" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.CurrentTrick">
    <children>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Der aktuelle Stich">
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.currentTrick">
          <VBox.margin>
             <Insets left="5.0" top="5.0" />
          </VBox.margin>
@@ -19,12 +19,12 @@
          </VBox.margin></TilePane>
       <VBox alignment="CENTER">
          <children>
-            <Text fx:id="info" strokeType="OUTSIDE" strokeWidth="0.0" text="Es liegen noch keine Karten auf dem Tisch. Spieler A ist am Zug." textAlignment="CENTER">
+            <Text fx:id="info" strokeType="OUTSIDE" strokeWidth="0.0" text="INFO_TEXT" textAlignment="CENTER">
                <VBox.margin>
                   <Insets left="5.0" top="5.0" />
                </VBox.margin>
             </Text>
-            <Button fx:id="next" alignment="CENTER" defaultButton="true" mnemonicParsing="false" prefWidth="75.0" text="OK">
+            <Button fx:id="next" alignment="CENTER" defaultButton="true" mnemonicParsing="false" prefWidth="75.0" text="%ui.ok">
                <VBox.margin>
                   <Insets bottom="5.0" top="5.0" />
                </VBox.margin>

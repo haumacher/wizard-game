@@ -3,6 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.controller.Controller;
 import de.haumacher.wizard.controller.GenericController;
 import de.haumacher.wizard.msg.Card;
@@ -55,8 +56,9 @@ public class CardView extends GenericController {
 	private String text(Value value) {
 		switch (value) {
 			case N: 
+				return R.valueJester;
 			case Z:
-				return value.name();
+				return R.valueWizard;
 			default:
 				return value.name().substring(2);
 		}

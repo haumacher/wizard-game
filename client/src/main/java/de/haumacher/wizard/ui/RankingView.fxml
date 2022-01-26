@@ -21,19 +21,19 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
               </rowConstraints>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Platz">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.rank">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
                   </Text>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Spieler" GridPane.columnIndex="1" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.player" GridPane.columnIndex="1" />
                </children>
             </GridPane>
-            <Text fx:id="info" strokeType="OUTSIDE" strokeWidth="0.0" text="Das Spiel ist beendet. Du kannst ein neues Spiel starten.">
+            <Text fx:id="info" strokeType="OUTSIDE" strokeWidth="0.0" text="%ui.finishedRestart">
                <VBox.margin>
                   <Insets top="15.0" />
                </VBox.margin></Text>
-            <Button fx:id="okButton" mnemonicParsing="false" prefWidth="50.0" text="Ok">
+            <Button fx:id="okButton" mnemonicParsing="false" prefWidth="50.0" text="%ui.ok">
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>

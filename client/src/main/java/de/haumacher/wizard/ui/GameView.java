@@ -3,6 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.controller.Controller;
 import de.haumacher.wizard.controller.GenericController;
 import de.haumacher.wizard.io.WizardConnection;
@@ -126,7 +128,7 @@ public class GameView extends GenericController {
 			status.markStartPlayer(status.getPlayer().getId().equals(msg.getStartPlayer()));
 		}
 		
-		roundDisplay.setText("Runde " + msg.getRound() + " von " + msg.getMaxRound());
+		roundDisplay.setText(R.round_round_maxRound.format(msg.getRound(), msg.getMaxRound()));
 	}
 
 	public void requestTrumpSelection(String playerId) {
@@ -158,7 +160,7 @@ public class GameView extends GenericController {
 	}
 
 	private void setProphecySum(int self) {
-		prophecySum.setText(self + " Stiche vorhergesagt");
+		prophecySum.setText(R.tricksAnnounced_tricks.format(self));
 	}
 
 	public void startLead(StartLead msg) {
@@ -186,9 +188,9 @@ public class GameView extends GenericController {
 		}
 		
 		if (_playerId.equals(playerId)) {
-			_currentTrick.setInfo("Du bist am Zug!");
+			_currentTrick.setInfo(R.yourTurn);
 		} else {
-			_currentTrick.setInfo("Spieler " + _players.get(playerId).getName() + " ist am Zug!");
+			_currentTrick.setInfo(R.playersTurn_player.format(_players.get(playerId).getName()));
 		}
 		
 		cardsPane.getChildren().forEach(n -> n.setOnMouseClicked(e -> leadCard(n)));
@@ -216,9 +218,12 @@ public class GameView extends GenericController {
 		_playerStatus.get(winnerId).incTricks();
 		setActiveAll();
 		
-		_currentTrick.confirm("Dieser Stich geht an " + name(winnerId) + ".", e -> {
+		String message = winnerId.equals(_playerId) ? 
+			R.trickWonByYou : R.trickWonBy_player.format(name(winnerId));
+		
+		_currentTrick.confirm(message, e -> {
 			_server.sendCommand(ConfirmTrick.create());
-			_currentTrick.setInfo("Warte auf die Bestätigung der anderen Spieler.");
+			_currentTrick.setInfo(R.waitingForConfirm);
 		});
 	}
 
@@ -227,7 +232,7 @@ public class GameView extends GenericController {
 	}
 
 	private String name(String playerId) {
-		return playerId.equals(_playerId) ? "Dich" : _players.get(playerId).getName();
+		return _players.get(playerId).getName();
 	}
 
 	public void finishRound(Map<String, Integer> points) {
@@ -240,9 +245,9 @@ public class GameView extends GenericController {
 		
 		setActiveAll();
 		
-		_currentTrick.confirm("In dieser Runde erhälst Du " + points.get(_playerId) + " Punkte.", e -> {
+		_currentTrick.confirm(MessageFormat.format(R.youEarn_points, points.get(_playerId)), e -> {
 			_server.sendCommand(ConfirmRound.create());
-			_currentTrick.setInfo("Warte auf die anderen Spieler...");
+			_currentTrick.setInfo(R.waitingForOthers);
 		});
 	}
 

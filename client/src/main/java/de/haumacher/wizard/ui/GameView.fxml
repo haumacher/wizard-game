@@ -16,12 +16,12 @@
                <children>
                   <HBox>
                      <children>
-                        <Text fx:id="roundDisplay" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Runde 2 von 10">
+                        <Text fx:id="roundDisplay" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="ROUND X OF Y">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Text>
-                        <Text fx:id="prophecySum" strokeType="OUTSIDE" strokeWidth="0.0" text="3 Stiche vorhergesagt">
+                        <Text fx:id="prophecySum" strokeType="OUTSIDE" strokeWidth="0.0" text="X TRICKS ANNOUNCED">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -40,7 +40,7 @@
             </VBox>
             <VBox prefWidth="100.0" HBox.hgrow="NEVER">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Trumpf" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.trump" />
                   <TilePane fx:id="trumpPane" VBox.vgrow="ALWAYS">
                      <padding>
                         <Insets left="5.0" top="5.0" />
@@ -72,7 +72,7 @@
          <children>
             <VBox prefWidth="400.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Deine Karten" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.yourCards" />
                   <TilePane fx:id="cardsPane" hgap="5.0" vgap="5.0" VBox.vgrow="ALWAYS">
                      <padding>
                         <Insets left="5.0" top="5.0" />

@@ -9,7 +9,7 @@
 
 <VBox fx:id="main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.GameLobby">
    <children>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Waiting for players">
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="%ui.waitingForPlayers">
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" top="5.0" />
          </VBox.margin>
@@ -17,7 +17,7 @@
       <ListView fx:id="playerList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
       <ButtonBar prefHeight="40.0">
         <buttons>
-          <Button fx:id="startGame" defaultButton="true" disable="true" mnemonicParsing="false" text="Start Game" />
+          <Button fx:id="startGame" defaultButton="true" disable="true" mnemonicParsing="false" text="%ui.startGame" />
         </buttons>
          <padding>
             <Insets right="5.0" />

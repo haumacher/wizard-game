@@ -6,6 +6,7 @@ package de.haumacher.wizard.controller;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
@@ -90,7 +91,7 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 			try {
 				t.visit(this, null);
 			} catch (IOException ex) {
-				new Alert(AlertType.ERROR, "Fehler bei der Kommunikation: " + ex.getMessage(), ButtonType.OK).show();
+				new Alert(AlertType.ERROR, R.communicationError_msg.format(ex.getMessage()), ButtonType.OK).show();
 			}
 		});
 	}

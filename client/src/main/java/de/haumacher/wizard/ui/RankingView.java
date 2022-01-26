@@ -3,6 +3,7 @@
  */
 package de.haumacher.wizard.ui;
 
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.controller.GenericController;
 import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.FinishGame;
@@ -15,9 +16,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * View showing the final points for players after the game ends.
  */
 public class RankingView extends GenericController {
 
@@ -41,7 +40,7 @@ public class RankingView extends GenericController {
 				lastPoints = currentPoints;
 			}
 			rankingTable.add(new Text(Integer.toString(rank)), 0, row);
-			rankingTable.add(new Text(playerScore.getPlayer().getName() + " mit " + Integer.toString(currentPoints) + " Punkten"), 1, row);
+			rankingTable.add(new Text(R.ranking_player_points.format(playerScore.getPlayer().getName(), Integer.toString(currentPoints))), 1, row);
 			row++;
 		}
 		okButton.setOnAction(onOk);

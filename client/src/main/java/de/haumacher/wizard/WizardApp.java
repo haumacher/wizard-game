@@ -61,11 +61,11 @@ public class WizardApp extends Application implements WizardUI {
 	@Override
 	public void start(Stage stage) throws Exception {
 		_stage = stage;
-		_stage.setTitle("Zauberer");
+		_stage.setTitle(R.appName);
 		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-32.png")));
 		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-64.png")));
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("WizardApp.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("WizardApp.fxml"), R.BUNDLE);
 		loader.setController(this);
 		_scene = loader.load();
 		
@@ -172,7 +172,7 @@ public class WizardApp extends Application implements WizardUI {
 	}
 	
 	private void showError(Throwable ex) {
-		new Alert(AlertType.ERROR, "Kommunikation nicht möglich: " + ex.getMessage(), ButtonType.CLOSE).show();
+		new Alert(AlertType.ERROR, R.communicationError_msg.format(ex.getMessage()), ButtonType.CLOSE).show();
 	}
 
 	public void newGame(Event evt) {

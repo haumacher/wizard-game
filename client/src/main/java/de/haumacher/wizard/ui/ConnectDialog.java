@@ -5,6 +5,7 @@ package de.haumacher.wizard.ui;
 
 import java.util.function.Consumer;
 
+import de.haumacher.wizard.R;
 import de.haumacher.wizard.controller.Controller;
 import de.haumacher.wizard.ui.data.ConnectData;
 import javafx.event.Event;
@@ -17,9 +18,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * Form showing nick name and server address fields.
  */
 public class ConnectDialog extends Controller<Parent> {
 	
@@ -61,12 +60,12 @@ public class ConnectDialog extends Controller<Parent> {
 		boolean error = false;
 		if (name.isEmpty()) {
 			nickName.setStyle("-fx-border-color: red;");
-			nickName.setTooltip(new Tooltip("Du musst einen Nick-Name angeben."));
+			nickName.setTooltip(new Tooltip(R.nicknameRequired));
 			error = true;
 		}
 		if (addr.isEmpty()) {
 			serverAddr.setStyle("-fx-border-color: red;");
-			serverAddr.setTooltip(new Tooltip("Die Server-Adresse darf nicht leer sein."));
+			serverAddr.setTooltip(new Tooltip(R.serverAddressRequired));
 			error = true;
 		}
 		if (!error) {
