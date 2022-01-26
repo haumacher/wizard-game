@@ -1,7 +1,9 @@
 /*
  * Copyright (c) 2022 Bernhard Haumacher et al. All Rights Reserved.
  */
-package de.haumacher.wizard.resources;
+package test.de.haumacher.wizard.resources;
+
+import de.haumacher.wizard.resources.StaticResources;
 
 /**
  * Test fixture for {@link TestResources}.

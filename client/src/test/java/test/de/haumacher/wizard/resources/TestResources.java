@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 Bernhard Haumacher et al. All Ri"ghts Reserved.
  */
-package de.haumacher.wizard.resources;
+package test.de.haumacher.wizard.resources;
 
 import de.haumacher.wizard.R;
 import junit.framework.TestCase;
