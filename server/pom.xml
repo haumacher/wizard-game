@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.haumacher.games</groupId>
 		<artifactId>wizard-parent</artifactId>
-		<version>1.0.6</version>
+		<version>1.0.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wizard-server</artifactId>
@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>de.haumacher.games</groupId>
 			<artifactId>wizard-common</artifactId>
-			<version>1.0.6</version>
+			<version>1.0.7-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
