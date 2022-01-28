@@ -4,12 +4,14 @@
 package test.de.haumacher.wizard.logic;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.logic.WizardGame;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.Player;
+import de.haumacher.wizard.resources.StaticResources.Resource;
 import junit.framework.TestCase;
 
 /**
@@ -44,8 +46,8 @@ public class TestWizardGame extends TestCase {
 		}
 		
 		@Override
-		public void sendError(String message) {
-			fail(message);
+		public void sendError(Resource message) {
+			fail(message.format(Locale.getDefault()));
 		}
 		
 		@Override

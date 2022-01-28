@@ -55,7 +55,7 @@ public abstract class StaticResources {
 				
 				@Override
 				public String format(Locale locale) {
-					String pattern = _bundleLoader.apply(locale).getString(_key);
+					String pattern = lookup(locale);
 					if (args.length == 0) {
 						return pattern;
 					} else {
@@ -68,12 +68,16 @@ public abstract class StaticResources {
 		String fmt(Object... args) {
 			return MessageFormat.format(_pattern, args);
 		}
+
+		protected final String lookup(Locale locale) {
+			return _bundleLoader.apply(locale).getString(_key);
+		}
 	}
 	
 	/**
 	 * A message resource with a single parameter.
 	 */
-	public static class M0 extends M {
+	public static class M0 extends M implements Resource {
 		/** Only for internal use, called by reflection. */
 		public M0(String key, String pattern) {
 			super(key, pattern);
@@ -84,6 +88,11 @@ public abstract class StaticResources {
 		 */
 		public String format() {
 			return pattern();
+		}
+
+		@Override
+		public String format(Locale locale) {
+			return lookup(locale);
 		}
 	}
 	

@@ -63,7 +63,7 @@ public class StandaloneClient implements Runnable {
 					} else {
 						message = ex.getClass().getName() + ": " + message;
 					}
-					_clientHandler.sendError(R.errFailureOccurred_message.format(message));
+					_clientHandler.sendError(R.errFailureOccurred_message.fill(message));
 				}
 			}
 			_in.endArray();

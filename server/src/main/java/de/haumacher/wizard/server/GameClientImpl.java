@@ -9,6 +9,7 @@ import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.Player;
+import de.haumacher.wizard.resources.StaticResources.Resource;
 
 /**
  * TODO
@@ -41,6 +42,11 @@ public class GameClientImpl implements GameClient {
 	@Override
 	public String getId() {
 		return _data.getId();
+	}
+	
+	@Override
+	public void sendError(Resource message) {
+		_connection.sendError(message);
 	}
 
 	@Override

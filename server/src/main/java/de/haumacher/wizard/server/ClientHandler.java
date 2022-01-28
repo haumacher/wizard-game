@@ -4,6 +4,7 @@
 package de.haumacher.wizard.server;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import de.haumacher.wizard.msg.Cmd;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.CreateGame;
+import de.haumacher.wizard.msg.Error;
 import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameStarted;
 import de.haumacher.wizard.msg.JoinGame;
@@ -29,6 +31,7 @@ import de.haumacher.wizard.msg.Reconnect;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
 import de.haumacher.wizard.msg.Welcome;
+import de.haumacher.wizard.resources.StaticResources.Resource;
 
 /**
  * Server-side logic for a single player.
@@ -44,6 +47,8 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	private Consumer<Msg> _msgSink;
 
 	private GameClient _handle;
+	
+	private Locale _locale = Locale.getDefault();
 	
 	/** 
 	 * Creates a {@link ClientHandler}.
@@ -112,6 +117,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 			return null;
 		}
 		_loggedIn = true;
+		_locale = new Locale(self.getLocale());
 		_handle.getData().setName(self.getName());
 		sendMessage(Welcome.create().setPlayerId(getId()));
 		return null;
@@ -162,6 +168,11 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 
 	private void sendErrorNoSuchGame() {
 		sendError(R.errGameNoLongerExists);
+	}
+	
+	@Override
+	public void sendError(Resource message) {
+		sendMessage(Error.create().setMessage(message.format(_locale)));
 	}
 
 	@Override

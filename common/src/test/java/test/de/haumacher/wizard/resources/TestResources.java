@@ -42,7 +42,9 @@ public class TestResources extends TestCase {
 	
 	public void testDynamic() {
 		assertEquals("Default(42)", TestR.dynamic.fill(42).format(Locale.ENGLISH));
+		assertEquals("Default(42)", TestR.dynamic.fill(42).format(new Locale("en")));
 		assertEquals("Deutsch(42)", TestR.dynamic.fill(42).format(Locale.GERMAN));
+		assertEquals("Deutsch(42)", TestR.dynamic.fill(42).format(new Locale("de")));
 	}
 	
 }

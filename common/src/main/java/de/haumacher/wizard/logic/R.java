@@ -10,27 +10,31 @@ import de.haumacher.wizard.resources.StaticResources;
  */
 public class R extends StaticResources {
 
-	public static String errAllBidsPlaced;
-	public static String errNotYourTurnToBid;
-	public static String errNotAllBidsPlaced;
-	public static String errNotYourTurn;
-	public static String errAllPlayersMustConfirm;
-	public static String errWrongCard;
-	public static String errMustFollowSuit;
-	public static String errAlreadyConfirmed;
-	public static String errTrumpAlreadySelected;
-	public static String errYouCannotSelectTrump;
-	public static String errMustSelectTrump;
-	public static String errNoTrumpSelectionAllowed;
-	public static String errNotLoggedIn;
-	public static String errNoGameJoined;
-	public static String errGameAlreadyJoined;
-	public static String errGameNoLongerExists;
-	public static String errMustNotStartForeignGame;
-	public static String errGameAlreadyStarted;
-	public static String errVersionToNew;
-	public static String errVersionToOld;
-	public static String errPlayerNotFound;
+	public static M0 errAllBidsPlaced;
+	public static M0 errNotYourTurnToBid;
+	public static M0 errNotAllBidsPlaced;
+	public static M0 errNotYourTurn;
+	public static M0 errAllPlayersMustConfirm;
+	public static M0 errWrongCard;
+	public static M0 errMustFollowSuit;
+	public static M0 errAlreadyConfirmed;
+	public static M0 errTrumpAlreadySelected;
+	public static M0 errYouCannotSelectTrump;
+	public static M0 errMustSelectTrump;
+	public static M0 errNoTrumpSelectionAllowed;
+	public static M0 errNotLoggedIn;
+	public static M0 errNoGameJoined;
+	public static M0 errGameAlreadyJoined;
+	public static M0 errGameNoLongerExists;
+	public static M0 errMustNotStartForeignGame;
+	public static M0 errGameAlreadyStarted;
+	public static M0 errVersionToNew;
+	public static M0 errVersionToOld;
+	public static M0 errPlayerNotFound;
 	public static M1 errFailureOccurred_message;
+	
+	static {
+		load(R.class);
+	}
 
 }

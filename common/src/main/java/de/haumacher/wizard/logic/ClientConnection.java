@@ -3,8 +3,8 @@
  */
 package de.haumacher.wizard.logic;
 
-import de.haumacher.wizard.msg.Error;
 import de.haumacher.wizard.msg.Msg;
+import de.haumacher.wizard.resources.StaticResources.Resource;
 
 /**
  * Abstraction of the client-facing interface of a player.
@@ -17,10 +17,8 @@ public interface ClientConnection {
 	void sendMessage(Msg msg);
 
 	/**
-	 * Sends an error message to the UI.
+	 * Sends an internationalized error message to the client UI.
 	 */
-	default void sendError(String message) {
-		sendMessage(Error.create().setMessage(message));
-	}
-
+	void sendError(Resource message);
+	
 }

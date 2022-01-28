@@ -100,6 +100,9 @@ message Login extends Cmd {
 	
 	/** The protocol version of the connecting client. This can be used to detect version mismatch of client and server. */
 	int version;
+	
+	/** The locale of the client. The server tries to localize error message in that locale. */
+	string locale;
 }
 
 /** Response message upon successful {@link Login}. */

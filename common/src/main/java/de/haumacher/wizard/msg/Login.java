@@ -25,9 +25,14 @@ public class Login extends Cmd {
 	/** @see #getVersion() */
 	private static final String VERSION = "version";
 
+	/** @see #getLocale() */
+	private static final String LOCALE = "locale";
+
 	private String _name = "";
 
 	private int _version = 0;
+
+	private String _locale = "";
 
 	/**
 	 * Creates a {@link Login} instance.
@@ -78,6 +83,26 @@ public class Login extends Cmd {
 	}
 
 
+	/**
+	 * The locale of the client. The server tries to localize error message in that locale.
+	 */
+	public final String getLocale() {
+		return _locale;
+	}
+
+	/**
+	 * @see #getLocale()
+	 */
+	public Login setLocale(String value) {
+		internalSetLocale(value);
+		return this;
+	}
+	/** Internal setter for {@link #getLocale()} without chain call utility. */
+	protected final void internalSetLocale(String value) {
+		_locale = value;
+	}
+
+
 	@Override
 	public String jsonType() {
 		return LOGIN__TYPE;
@@ -99,6 +124,8 @@ public class Login extends Cmd {
 		out.value(getName());
 		out.name(VERSION);
 		out.value(getVersion());
+		out.name(LOCALE);
+		out.value(getLocale());
 	}
 
 	@Override
@@ -106,6 +133,7 @@ public class Login extends Cmd {
 		switch (field) {
 			case NAME: setName(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			case VERSION: setVersion(in.nextInt()); break;
+			case LOCALE: setLocale(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

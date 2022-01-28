@@ -89,7 +89,7 @@ public class WizardEndpoint {
 			} else {
 				report = ex.getClass().getName() + ": " + report;
 			}
-			_clientHandler.sendError(R.errFailureOccurred_message.format(report));
+			_clientHandler.sendError(R.errFailureOccurred_message.fill(report));
 		}
     }
     
