@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 Bernhard Haumacher et al. All Rights Reserved.
  */
-package de.haumacher.wizard;
+package test.de.haumacher.wizard.logic;
 
 import java.util.Arrays;
 import java.util.Collections;
