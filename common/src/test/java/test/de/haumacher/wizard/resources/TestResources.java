@@ -3,11 +3,11 @@
  */
 package test.de.haumacher.wizard.resources;
 
-import de.haumacher.wizard.R;
+import de.haumacher.wizard.resources.StaticResources;
 import junit.framework.TestCase;
 
 /**
- * Test for {@link R}.
+ * Test for {@link StaticResources}.
  */
 public class TestResources extends TestCase {
 
