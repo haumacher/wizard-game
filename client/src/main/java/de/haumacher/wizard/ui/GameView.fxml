@@ -10,7 +10,7 @@
 
 <VBox fx:id="main" style="-fx-background-color: #4cc148;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.haumacher.wizard.ui.GameView">
    <children>
-      <HBox>
+      <HBox VBox.vgrow="NEVER">
          <children>
             <VBox HBox.hgrow="ALWAYS">
                <children>
@@ -28,7 +28,7 @@
                         </Text>
                      </children>
                   </HBox>
-                  <FlowPane fx:id="statusPane" hgap="10.0" prefHeight="170.0" vgap="10.0">
+                  <FlowPane fx:id="statusPane" hgap="10.0" prefHeight="50.0" vgap="10.0">
                      <VBox.margin>
                         <Insets right="10.0" top="10.0" />
                      </VBox.margin>
@@ -56,9 +56,9 @@
             <Insets top="5.0" />
          </VBox.margin>
       </HBox>
-      <HBox VBox.vgrow="ALWAYS">
+      <HBox VBox.vgrow="NEVER">
          <children>
-            <AnchorPane fx:id="actionPane" HBox.hgrow="ALWAYS">
+            <AnchorPane fx:id="actionPane" prefHeight="250.0" HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets top="10.0" />
                </HBox.margin>
@@ -68,7 +68,7 @@
             </AnchorPane>
          </children>
       </HBox>
-      <HBox prefHeight="150.0">
+      <HBox prefHeight="150.0" VBox.vgrow="ALWAYS">
          <children>
             <VBox prefWidth="400.0" HBox.hgrow="ALWAYS">
                <children>

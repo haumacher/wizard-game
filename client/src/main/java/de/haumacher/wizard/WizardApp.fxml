@@ -11,7 +11,7 @@
 
 <Scene xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <root>
-      <AnchorPane prefHeight="600.0" prefWidth="500.0">
+      <AnchorPane prefHeight="700.0" prefWidth="500.0">
          <children>
             <VBox prefHeight="418.0" prefWidth="451.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
