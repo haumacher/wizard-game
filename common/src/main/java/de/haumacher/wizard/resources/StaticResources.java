@@ -19,14 +19,14 @@ public abstract class StaticResources {
 	/**
 	 * Marker interface for resource values.
 	 */
-	private interface V {
+	private interface M {
 		// Pure base interface.
 	}
 	
 	/**
 	 * A message resource with a single parameter.
 	 */
-	public interface R1 extends V {
+	public interface M1 extends M {
 		/**
 		 * Formats the message with the given arguments.
 		 */
@@ -36,7 +36,7 @@ public abstract class StaticResources {
 	/**
 	 * A message resource with two parameters.
 	 */
-	public interface R2 extends V {
+	public interface M2 extends M {
 		/**
 		 * Formats the message with the given arguments.
 		 */
@@ -46,7 +46,7 @@ public abstract class StaticResources {
 	/**
 	 * A message resource with three parameters.
 	 */
-	public interface R3 extends V {
+	public interface M3 extends M {
 		/**
 		 * Formats the message with the given arguments.
 		 */
@@ -56,7 +56,7 @@ public abstract class StaticResources {
 	/**
 	 * A message resource with four parameters.
 	 */
-	public interface R4 extends V {
+	public interface M4 extends M {
 		/**
 		 * Formats the message with the given arguments.
 		 */
@@ -66,7 +66,7 @@ public abstract class StaticResources {
 	/**
 	 * A message resource with five parameters.
 	 */
-	public interface R5 extends V {
+	public interface M5 extends M {
 		/**
 		 * Formats the message with the given arguments.
 		 */
@@ -76,7 +76,7 @@ public abstract class StaticResources {
 	/**
 	 * A message resource with more than five parameters.
 	 */
-	public interface RX extends V {
+	public interface MX extends M {
 		/**
 		 * Formats the message with the given arguments.
 		 */
@@ -119,9 +119,9 @@ public abstract class StaticResources {
 			if (type == String.class) {
 				value = text;
 			} else {
-				assert V.class.isAssignableFrom(type) : "Resource field must be either string or one of the R types.";
+				assert M.class.isAssignableFrom(type) : "Resource field must be either string or one of the R types.";
 				
-				InvocationHandler handler = type == RX.class ? new VArgsHandler(text) : new MessageHandler(text);
+				InvocationHandler handler = type == MX.class ? new VArgsHandler(text) : new MessageHandler(text);
 				
 				Class<?>[] interfaces = {type};
 				value = Proxy.newProxyInstance(binding.getClassLoader(), interfaces, handler);

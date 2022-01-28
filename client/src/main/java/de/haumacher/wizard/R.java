@@ -14,7 +14,7 @@ public class R extends StaticResources {
 	
 	public static final ResourceBundle BUNDLE = bundle(R.class);
 
-	public static R1 communicationError_msg;
+	public static M1 communicationError_msg;
 	
 	public static String nicknameRequired;
 
@@ -22,15 +22,15 @@ public class R extends StaticResources {
 
 	public static String join;
 
-	public static R2 round_round_maxRound;
+	public static M2 round_round_maxRound;
 
-	public static R1 tricksAnnounced_tricks;
+	public static M1 tricksAnnounced_tricks;
 
 	public static String yourTurn;
 
-	public static R1 playersTurn_player;
+	public static M1 playersTurn_player;
 
-	public static R1 trickWonBy_player;
+	public static M1 trickWonBy_player;
 
 	public static String waitingForConfirm;
 
@@ -40,17 +40,17 @@ public class R extends StaticResources {
 
 	public static String waitingForOthers;
 
-	public static R1 makeYourProphecy_remaining;
+	public static M1 makeYourProphecy_remaining;
 
-	public static R1 makesProphecy_player;
+	public static M1 makesProphecy_player;
 
-	public static R2 ranking_player_points;
+	public static M2 ranking_player_points;
 
 	public static String appName;
 
 	public static String selectTrump;
 
-	public static R1 selectingTrump_player;
+	public static M1 selectingTrump_player;
 
 	public static String valueWizard;
 	
