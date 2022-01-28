@@ -3,11 +3,10 @@
  */
 package de.haumacher.wizard.resources;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -19,69 +18,151 @@ public abstract class StaticResources {
 	/**
 	 * Marker interface for resource values.
 	 */
-	private interface M {
-		// Pure base interface.
+	private static abstract class M {
+		private final String _key;
+		private final String _pattern;
+		
+		/** 
+		 * Creates a {@link StaticResources.M}.
+		 */
+		M(String key, String pattern) {
+			_key = key;
+			_pattern = pattern;
+		}
+
+		public String key() {
+			return _key;
+		}
+		
+		public String pattern() {
+			return _pattern;
+		}
+		
+		String fmt(Object... args) {
+			return MessageFormat.format(_pattern, args);
+		}
 	}
 	
 	/**
 	 * A message resource with a single parameter.
 	 */
-	public interface M1 extends M {
+	public static class M0 extends M {
+		/** Only for internal use, called by reflection. */
+		public M0(String key, String pattern) {
+			super(key, pattern);
+		}
+
+		/**
+		 * Formats the message.
+		 */
+		public String format() {
+			return pattern();
+		}
+	}
+	
+	/**
+	 * A message resource with a single parameter.
+	 */
+	public static class M1 extends M {
+		/** Only for internal use, called by reflection. */
+		public M1(String key, String pattern) {
+			super(key, pattern);
+		}
+		
 		/**
 		 * Formats the message with the given arguments.
 		 */
-		String format(Object arg1);
+		public String format(Object arg1) {
+			return fmt(arg1);
+		}
 	}
 	
 	/**
 	 * A message resource with two parameters.
 	 */
-	public interface M2 extends M {
+	public static class M2 extends M {
+		/** Only for internal use, called by reflection. */
+		public M2(String key, String pattern) {
+			super(key, pattern);
+		}
+
 		/**
 		 * Formats the message with the given arguments.
 		 */
-		String format(Object arg1, Object arg2);
+		public String format(Object arg1, Object arg2) {
+			return fmt(arg1, arg2);
+		}
 	}
 	
 	/**
 	 * A message resource with three parameters.
 	 */
-	public interface M3 extends M {
+	public static class M3 extends M {
+		/** Only for internal use, called by reflection. */
+		public M3(String key, String pattern) {
+			super(key, pattern);
+		}
+
 		/**
 		 * Formats the message with the given arguments.
 		 */
-		String format(Object arg1, Object arg2, Object arg3);
+		public String format(Object arg1, Object arg2, Object arg3) {
+			return fmt(arg1, arg2, arg3);
+		}
 	}
 	
 	/**
 	 * A message resource with four parameters.
 	 */
-	public interface M4 extends M {
+	public static class M4 extends M {
+		/** Only for internal use, called by reflection. */
+		public M4(String key, String pattern) {
+			super(key, pattern);
+		}
+
 		/**
 		 * Formats the message with the given arguments.
 		 */
-		String format(Object arg1, Object arg2, Object arg3, Object arg4);
+		public String format(Object arg1, Object arg2, Object arg3, Object arg4) {
+			return fmt(arg1, arg2, arg3, arg4);
+		}
 	}
 	
 	/**
 	 * A message resource with five parameters.
 	 */
-	public interface M5 extends M {
+	public static class M5 extends M {
+		/** Only for internal use, called by reflection. */
+		public M5(String key, String pattern) {
+			super(key, pattern);
+		}
+
 		/**
 		 * Formats the message with the given arguments.
 		 */
-		String format(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5);
+		public String format(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5) {
+			return fmt(arg1, arg2, arg3, arg4, arg5);
+		}
 	}
 	
 	/**
 	 * A message resource with more than five parameters.
 	 */
-	public interface MX extends M {
+	public static class MX extends M {
+		/** Only for internal use, called by reflection. */
+		public MX(String key, String pattern) {
+			super(key, pattern);
+		}
+
 		/**
 		 * Formats the message with the given arguments.
 		 */
-		String format(Object... args);
+		public String format(Object... args) {
+			return fmt(args);
+		}
 	}
+
+	private static final Class<?>[] SIGNATURE = {String.class, String.class};
 	
 	protected static void load(Class<? extends StaticResources> binding) {
 		load(binding, bundle(binding));
@@ -111,59 +192,23 @@ public abstract class StaticResources {
 				continue;
 			}
 			
-			String name = f.getName();
-			String text = bundle.getString(name);
-
-			Class<?> type = f.getType();
-			Object value;
-			if (type == String.class) {
-				value = text;
-			} else {
-				assert M.class.isAssignableFrom(type) : "Resource field must be either string or one of the R types.";
-				
-				InvocationHandler handler = type == MX.class ? new VArgsHandler(text) : new MessageHandler(text);
-				
-				Class<?>[] interfaces = {type};
-				value = Proxy.newProxyInstance(binding.getClassLoader(), interfaces, handler);
-			}
+			String key = f.getName();
+			String pattern = bundle.getString(key);
 			
 			try {
+				Class<?> type = f.getType();
+				Object value;
+				if (type == String.class) {
+					value = pattern;
+				} else {
+					Constructor<?> constructor = type.getConstructor(SIGNATURE);
+					value = constructor.newInstance(key, pattern);
+				}
+
 				f.set(null, value);
-			} catch (IllegalArgumentException | IllegalAccessException ex) {
+			} catch (IllegalArgumentException | IllegalAccessException | NoSuchMethodException | SecurityException | InstantiationException | InvocationTargetException ex) {
 				System.err.println("Invalid resource field: " + f + ": " + ex.getMessage());
 			}
-		}
-	}
-
-	private static final class MessageHandler implements InvocationHandler {
-		private final String _format;
-
-		/** 
-		 * Creates a {@link MessageHandler}.
-		 */
-		private MessageHandler(String format) {
-			_format = format;
-		}
-
-		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			return MessageFormat.format(_format, args);
-		}
-	}
-
-	private static final class VArgsHandler implements InvocationHandler {
-		private final String _format;
-		
-		/** 
-		 * Creates a {@link MessageHandler}.
-		 */
-		private VArgsHandler(String format) {
-			_format = format;
-		}
-		
-		@Override
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			return MessageFormat.format(_format, (Object[])args[0]);
 		}
 	}
 	

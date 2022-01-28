@@ -11,6 +11,7 @@ import de.haumacher.wizard.resources.StaticResources;
 public class TestR extends StaticResources {
 
 	public static String msg;
+	public static M0 msg0;
 	public static M1 msg1;
 	public static M2 msg2;
 	public static M3 msg3;
