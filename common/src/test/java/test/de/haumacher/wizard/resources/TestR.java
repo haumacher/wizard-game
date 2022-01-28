@@ -19,6 +19,8 @@ public class TestR extends StaticResources {
 	public static M5 msg5;
 	public static MX msgX;
 	
+	public static M1 dynamic;
+	
 	static {
 		load(TestR.class);
 	}

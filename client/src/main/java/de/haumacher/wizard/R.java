@@ -57,6 +57,6 @@ public class R extends StaticResources {
 	public static String valueJester;
 	
 	static {
-		load(R.class, BUNDLE);
+		load(R.class);
 	}
 }

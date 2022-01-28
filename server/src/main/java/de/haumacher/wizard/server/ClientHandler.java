@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
+import de.haumacher.wizard.logic.R;
 import de.haumacher.wizard.logic.WizardGame;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Cmd;
@@ -104,9 +105,9 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	public Void visit(Login self, Void arg) throws IOException {
 		if (self.getVersion() != WizardGame.PROTOCOL_VERSION) {
 			if (self.getVersion() > WizardGame.PROTOCOL_VERSION) {
-				sendError("Die Version deines Programms ist zu neu. Sie ist nicht mit diesem Server kompatibel.");
+				sendError(R.errVersionToNew);
 			} else {
-				sendError("Die Version deines Programms ist zu alt. Sie ist nicht mit diesem Server kompatibel.");
+				sendError(R.errVersionToOld);
 			}
 			return null;
 		}
@@ -131,7 +132,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 		
 		GameClient handle = game.reconnect(self.getPlayerId(), this);
 		if (handle == null) {
-			sendError("Spieler zur Wiederaufnahme nicht gefunden.");
+			sendError(R.errPlayerNotFound);
 			return null;
 		}
 		
@@ -156,11 +157,11 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	}
 
 	private void sendErrorHasGame() {
-		sendError("Du bist schon einem Spiel beigetreten.");
+		sendError(R.errGameAlreadyJoined);
 	}
 
 	private void sendErrorNoSuchGame() {
-		sendError("Das von Dir gewählte Spiel gibt es nicht mehr.");
+		sendError(R.errGameNoLongerExists);
 	}
 
 	@Override
@@ -171,11 +172,11 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	@Override
 	public Void visit(StartGame self, Void arg) throws IOException {
 		if (_game == null) {
-			sendError("Du bist keinem Spiel beigetreten.");
+			sendError(R.errNoGameJoined);
 			return null;
 		}
 		if (!_game.getGameId().equals(self.getGameId())) {
-			sendError("Du kannst nur das Spiel starten, dem Du beigetreten bist.");
+			sendError(R.errMustNotStartForeignGame);
 			return null;
 		}
 		
@@ -199,7 +200,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 			return null;
 		}
 		if (!_game.addPlayer(_handle)) {
-			sendError("Das von Dir gewählte Spiel hat schon begonnen.");
+			sendError(R.errGameAlreadyStarted);
 			return null;
 		}
 		return null;
@@ -249,11 +250,11 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 
 	private Void forwardToGame(GameCmd self) throws IOException {
 		if (!_loggedIn) {
-			sendError("Du bist nicht angemeldet.");
+			sendError(R.errNotLoggedIn);
 			return null;
 		}
 		if (_game == null) {
-			sendError("Du bist keinem Spiel beigetreten.");
+			sendError(R.errNoGameJoined);
 			return null;
 		}
 

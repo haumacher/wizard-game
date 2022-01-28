@@ -8,17 +8,25 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 
 /**
  * Utility base class for loading a resource bundle and binding it to Java constants.
  */
 public abstract class StaticResources {
+	
+	public interface Resource {
+		String key();
+		String format(Locale locale);
+	}
 
 	/**
 	 * Marker interface for resource values.
 	 */
 	private static abstract class M {
+		Function<Locale, ResourceBundle> _bundleLoader;
 		private final String _key;
 		private final String _pattern;
 		
@@ -36,6 +44,25 @@ public abstract class StaticResources {
 		
 		public String pattern() {
 			return _pattern;
+		}
+		
+		public Resource fill(Object...args) {
+			return new Resource() {
+				@Override
+				public String key() {
+					return _key;
+				}
+				
+				@Override
+				public String format(Locale locale) {
+					String pattern = _bundleLoader.apply(locale).getString(_key);
+					if (args.length == 0) {
+						return pattern;
+					} else {
+						return MessageFormat.format(pattern, args);
+					}
+				}
+			};
 		}
 		
 		String fmt(Object... args) {
@@ -165,22 +192,17 @@ public abstract class StaticResources {
 	private static final Class<?>[] SIGNATURE = {String.class, String.class};
 	
 	protected static void load(Class<? extends StaticResources> binding) {
-		load(binding, bundle(binding));
+		load(binding, bundleName(binding));
 	}
 	
-	protected static ResourceBundle bundle(Class<? extends StaticResources> binding) {
-		return bundle(binding.getPackage().getName().replace('.', '/') + '/' + "Messages");
+	private static String bundleName(Class<? extends StaticResources> binding) {
+		return binding.getPackage().getName().replace('.', '/') + '/' + "Messages";
 	}
 
 	protected static void load(Class<? extends StaticResources> binding, String baseName) {
-		load(binding, bundle(baseName));
-	}
+		ResourceBundle bundle = bundle(baseName);
+		Function<Locale, ResourceBundle> loader = locale -> ResourceBundle.getBundle(baseName, locale);
 
-	protected static ResourceBundle bundle(String baseName) {
-		return ResourceBundle.getBundle(baseName);
-	}
-	
-	protected static void load(Class<? extends StaticResources> binding, ResourceBundle bundle) {
 		for (Field f : binding.getFields()) {
 			if (f.isSynthetic()) {
 				continue;
@@ -202,7 +224,9 @@ public abstract class StaticResources {
 					value = pattern;
 				} else {
 					Constructor<?> constructor = type.getConstructor(SIGNATURE);
-					value = constructor.newInstance(key, pattern);
+					M message = (M) constructor.newInstance(key, pattern);
+					message._bundleLoader = loader;
+					value = message;
 				}
 
 				f.set(null, value);
@@ -210,6 +234,14 @@ public abstract class StaticResources {
 				System.err.println("Invalid resource field: " + f + ": " + ex.getMessage());
 			}
 		}
+	}
+
+	protected static ResourceBundle bundle(Class<? extends StaticResources> type) {
+		return bundle(bundleName(type));
+	}
+	
+	private static ResourceBundle bundle(String baseName) {
+		return ResourceBundle.getBundle(baseName);
 	}
 	
 }

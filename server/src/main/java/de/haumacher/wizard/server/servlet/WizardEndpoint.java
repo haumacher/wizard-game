@@ -15,6 +15,7 @@ import javax.websocket.server.ServerEndpoint;
 
 import de.haumacher.msgbuf.io.StringR;
 import de.haumacher.msgbuf.json.JsonReader;
+import de.haumacher.wizard.logic.R;
 import de.haumacher.wizard.msg.Cmd;
 import de.haumacher.wizard.server.ClientHandler;
 
@@ -88,7 +89,7 @@ public class WizardEndpoint {
 			} else {
 				report = ex.getClass().getName() + ": " + report;
 			}
-			_clientHandler.sendError("Es ist ein Fehler aufgetreten: " + report);
+			_clientHandler.sendError(R.errFailureOccurred_message.format(report));
 		}
     }
     

@@ -10,6 +10,7 @@ import de.haumacher.msgbuf.json.JsonToken;
 import de.haumacher.msgbuf.json.JsonWriter;
 import de.haumacher.msgbuf.server.io.ReaderAdapter;
 import de.haumacher.msgbuf.server.io.WriterAdapter;
+import de.haumacher.wizard.logic.R;
 import de.haumacher.wizard.msg.Cmd;
 import de.haumacher.wizard.server.ClientHandler;
 import de.haumacher.wizard.server.WizardServer;
@@ -62,7 +63,7 @@ public class StandaloneClient implements Runnable {
 					} else {
 						message = ex.getClass().getName() + ": " + message;
 					}
-					_clientHandler.sendError("Es ist ein Fehler aufgetreten: " + message);
+					_clientHandler.sendError(R.errFailureOccurred_message.format(message));
 				}
 			}
 			_in.endArray();

@@ -3,6 +3,8 @@
  */
 package test.de.haumacher.wizard.resources;
 
+import java.util.Locale;
+
 import de.haumacher.wizard.resources.StaticResources;
 import junit.framework.TestCase;
 
@@ -36,6 +38,11 @@ public class TestResources extends TestCase {
 		assertEquals("Message({0}, {1}, {2}, {3})", TestR.msg4.pattern());
 		assertEquals("Message({0}, {1}, {2}, {3}, {4})", TestR.msg5.pattern());
 		assertEquals("Message({0}, {1}, {2}, {3}, {4}, {5})", TestR.msgX.pattern());
+	}
+	
+	public void testDynamic() {
+		assertEquals("Default(42)", TestR.dynamic.fill(42).format(Locale.ENGLISH));
+		assertEquals("Deutsch(42)", TestR.dynamic.fill(42).format(Locale.GERMAN));
 	}
 	
 }

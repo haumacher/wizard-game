@@ -355,20 +355,19 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	public Void visit(SelectTrump self, GameClient arg)  {
 		synchronized (this) {
 			if (_trumpSuit != null) {
-				arg.sendError("Es ist bereits eine Trumpffarbe gewählt.");
+				arg.sendError(R.errTrumpAlreadySelected);
 				return null;
 			}
 			if (!arg.getId().equals(_trumpSelectorId)) {
-				arg.sendError("Du darfst nicht die Trumpffarbe wählen.");
+				arg.sendError(R.errYouCannotSelectTrump);
 				return null;
 			}
 			if (self.getTrumpSuit() == null) {
-				arg.sendError("Es muss eine Trumpffarbe gewählt werden.");
+				arg.sendError(R.errMustSelectTrump);
 				return null;
 			}
 			if (!isCustomTrumpSelection()) {
-				arg.sendError(
-						"In dieser Runde kann kein Trumpf gewählt werden.");
+				arg.sendError(R.errNoTrumpSelectionAllowed);
 				return null;
 			}
 			
@@ -406,13 +405,12 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		synchronized (this) {
 			boolean bidOpen = _bidCount >= _players.size();
 			if (bidOpen) {
-				arg.sendError("Es sind schon alle Gebote abgegeben.");
+				arg.sendError(R.errAllBidsPlaced);
 				return null;
 			}
 			PlayerState playerState = getPlayerState(_bidOffset + _bidCount);
 			if (!playerState.getPlayer().getId().equals(arg.getId())) {
-				arg.sendError(
-						"Du bist nicht an der Reihe um ein Gebot abzugeben.");
+				arg.sendError(R.errNotYourTurnToBid);
 				return null;
 			}
 			int currentBid = self.getCnt();
@@ -459,16 +457,16 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		PlayerState playerState;
 		synchronized (this) {
 			if (_bidCount < _players.size()) {
-				arg.sendError("Es sind noch nicht alle Gebote angegeben.");
+				arg.sendError(R.errNotAllBidsPlaced);
 				return null;
 			}
 			playerState = getPlayerState(_turnOffset + _turn.size());
 			if (!playerState.getPlayer().getId().equals(arg.getId())) {
-				arg.sendError("Du bist nicht an der Reihe.");
+				arg.sendError(R.errNotYourTurn);
 				return null;
 			}
 			if (!_barrier.isEmpty()) {
-				arg.sendError("Es müssen zuerst alle Spieler bestätigen.");
+				arg.sendError(R.errAllPlayersMustConfirm);
 				return null;
 			}
 		}
@@ -479,7 +477,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		Optional<Card> searchResult = 
 			deck.stream().filter(c -> c.getSuit() == putCard.getSuit() && c.getValue() == putCard.getValue()).findFirst();
 		if (!searchResult.isPresent()) {
-			arg.sendError("Du hast eine Karte gespielt, die Du gar nicht besitzt.");
+			arg.sendError(R.errWrongCard);
 			return null;
 		}
 		Card playedCard = searchResult.get();
@@ -487,7 +485,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		Suit leadSuit = leadSuit(_turn);
 		if (leadSuit != null && playedCard.getSuit() != null && playedCard.getSuit() != leadSuit) {
 			if (deck.stream().filter(c -> c.getSuit() == leadSuit).findFirst().isPresent()) {
-				arg.sendError("Du musst Farbe bekennen.");
+				arg.sendError(R.errMustFollowSuit);
 				return null;
 			}
 		}
@@ -525,7 +523,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		synchronized (this) {
 			GameClient client = _barrier.remove(arg.getId());
 			if (client == null) {
-				arg.sendError("Du hast den Stich schon bestätigt.");
+				arg.sendError(R.errAlreadyConfirmed);
 				return null;
 			}
 			lastConfirmer = _barrier.isEmpty();
@@ -615,7 +613,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		synchronized (this) {
 			GameClient client = _barrier.remove(arg.getId());
 			if (client == null) {
-				arg.sendError("Du hast die Runde schon bestätigt.");
+				arg.sendError(R.errAlreadyConfirmed);
 				return null;
 			}
 			lastConfirmer = _barrier.isEmpty();
