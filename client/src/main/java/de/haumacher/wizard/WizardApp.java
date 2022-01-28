@@ -64,6 +64,8 @@ public class WizardApp extends Application implements WizardUI {
 		_stage.setTitle(R.appName);
 		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-32.png")));
 		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-64.png")));
+		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-128.png")));
+		_stage.getIcons().add(new Image(getClass().getResourceAsStream("wizard-icon-256.png")));
 		
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("WizardApp.fxml"), R.BUNDLE);
 		loader.setController(this);
