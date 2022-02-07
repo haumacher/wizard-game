@@ -4,7 +4,7 @@ package de.haumacher.wizard.msg;
  * First message that must be sent after connecting to a game server.
  *
  * <p>
- * On success, a {@link LoggedIn} message is sent back.
+ * On success, a {@link Welcome} message is sent back.
  * </p>
  */
 public class Login extends Cmd {
