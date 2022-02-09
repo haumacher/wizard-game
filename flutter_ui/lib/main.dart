@@ -1,25 +1,100 @@
 import 'dart:html';
 import 'dart:math';
+import 'dart:core';
 import 'dart:ui';
-import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_ui/msg.dart';
 import 'package:flutter_ui/msg.dart' as msg;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_ui/svg.dart';
 
 void main() {
+  showTrickTestPage();
+}
+
+void showTrickTestPage() {
   runApp(MaterialApp(
       title: 'Zauberer',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: TrickView()
-  )
-  );
+      home: Scaffold(
+        appBar: AppBar(title: const Text("Place your cards")),
+        body:
+          LayoutBuilder(builder: (context, constraints) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: constraints.maxWidth, minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child:
+                  Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(padding: const EdgeInsets.all(16),
+                          child:
+                          PlayerStateView(
+                            [
+                              Player(id: "1", name: "Haui"),
+                              Player(id: "2", name: "Egon"),
+                              Player(id: "3", name: "Der große Zauberer"),
+                              Player(id: "4", name: "Player A"),
+                              Player(id: "5", name: "Player B"),
+                              Player(id: "6", name: "Player C"),
+                            ],
+                            const {"1", "2", "3", "6"},
+                            {
+                              "1": PlayerInfo(points: 250, bid: 4, tricks: 3),
+                              "2": PlayerInfo(points: 20, bid: 2, tricks: 5),
+                              "3": PlayerInfo(points: 180, bid: 0, tricks: 0),
+                              "4": PlayerInfo(points: 20, bid: 2, tricks: 0),
+                              "5": PlayerInfo(points: 20, bid: 0, tricks: 4),
+                              "6": PlayerInfo(points: 20, bid: 4, tricks: 4),
+                            }),
+                        ),
+                        Expanded(
+                            child:
+                            Center(
+                                child:
+                                TrickView([
+                                  TrickCard(msg.Card(value: Value.c10, suit: Suit.heart), Player(name: "Player A")),
+                                  TrickCard(msg.Card(value: Value.c1, suit: Suit.club), Player(name: "Player B")),
+                                  TrickCard(msg.Card(value: Value.c13, suit: Suit.spade), Player(name: "Player C")),
+                                  TrickCard(msg.Card(value: Value.c9, suit: Suit.diamond), Player(name: "Egon")),
+                                  TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "Bert")),
+                                  TrickCard(msg.Card(value: Value.n, suit: null), Player(name: "Der große Zauberer")),
+                                ])
+                            )),
+                        Padding(padding: const EdgeInsets.all(16),
+                            child:
+                            CardListView([
+                              msg.Card(value: Value.z, suit: null),
+                              msg.Card(value: Value.c13, suit: Suit.club),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c13, suit: Suit.heart),
+                              msg.Card(value: Value.c10, suit: Suit.heart),
+                              msg.Card(value: Value.c13, suit: Suit.spade),
+                              msg.Card(value: Value.c9, suit: Suit.diamond),
+                              msg.Card(value: Value.c8, suit: Suit.diamond),
+                              msg.Card(value: Value.c2, suit: Suit.diamond),
+                              msg.Card(value: Value.c1, suit: Suit.diamond),
+                              msg.Card(value: Value.n, suit: null),
+                            ])),
+                      ])
+                )));
+          })
+        )
+      ));
   // runApp(WizardApp());
 }
 
@@ -497,7 +572,7 @@ class WizardApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage()
+      home: const HomePage()
     );
   }
 }
@@ -529,7 +604,7 @@ class HomePage extends StatelessWidget {
                       var result = Navigator.push(
                           context,
                           MaterialPageRoute<ConnectionData>(
-                              builder: (context) => LoginView()));
+                              builder: (context) => const LoginView()));
                       result.then((data) {
                         if (data != null) {
                           connection.login(data.serverAddress, data.nickName);
@@ -562,9 +637,11 @@ class HomePage extends StatelessWidget {
                           ? const Center(child: Text("No open games."))
                           : ListView(
                           children: openGames.values.map((g) => GameEntryWidget(g)).toList()),
-                      floatingActionButton: FloatingActionButton(child: Icon(Icons.add), onPressed: () {
-                        connection.sendCommand(CreateGame());
-                      }));
+                      floatingActionButton: FloatingActionButton(
+                        child: const Icon(Icons.add),
+                        onPressed: () {
+                          connection.sendCommand(CreateGame());
+                        }));
                 });
           case ConnectionState.waitingForStart:
             ObservableGame? game = connection.currentGame;
@@ -602,7 +679,7 @@ class HomePage extends StatelessWidget {
                       ));
                 });
           case ConnectionState.playing:
-            return WizardWidget();
+            return const WizardWidget();
           default:
             return Center(child: Text("ERROR: " + state.name));
         }
@@ -732,9 +809,9 @@ class MyBidView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("Place your bid"),
+                const Text("Place your bid"),
                 Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     child: Wrap(
                         direction: Axis.horizontal,
                         children: options()))])));
@@ -745,12 +822,12 @@ class MyBidView extends StatelessWidget {
     for (var x = 0; x <= round ; x++) {
       result.add(
         Padding(
-          padding: EdgeInsets.all(5),
+          padding: const EdgeInsets.all(5),
           child:
             ElevatedButton(
               child: Text(
                 x.toString(),
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               ),
               style: ElevatedButton.styleFrom(
                 fixedSize: const Size(60, 60),
@@ -765,18 +842,125 @@ class MyBidView extends StatelessWidget {
   }
 }
 
+class TrickCard {
+  msg.Card card;
+  Player player;
+
+  TrickCard(this.card, this.player);
+}
+
 class TrickView extends StatelessWidget {
+
+  final List<TrickCard> cards;
+
+  const TrickView(this.cards, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Place your cards")),
-      body: Center(
-          child: CardView(msg.Card(suit: Suit.heart, value: Value.c13))
-      ),
+    return Wrap(
+      spacing: 5,
+      runSpacing: 10,
+      children:
+        cards.map((card) =>
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CardView(card.card),
+              Padding(padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                child: Text(card.player.name),
+              )
+          ])).toList()
+  );
+  }
+}
+
+class CardListView extends StatelessWidget {
+
+  final List<msg.Card> cards;
+
+  const CardListView(this.cards, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 5,
+      runSpacing: 5,
+      children:
+        cards.map((card) => CardView(card)).toList()
+    );
+  }
+}
+
+class PlayerStateView extends StatelessWidget {
+  final List<Player> players;
+  final Set<String> activePlayerIds;
+  final Map<String, PlayerInfo> state;
+
+  const PlayerStateView(this.players, this.activePlayerIds, this.state, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      direction: Axis.horizontal,
+      alignment: WrapAlignment.center,
+      spacing: 5,
+      runSpacing: 10,
+      children:
+        players.map(playerStateView).toList(),
     );
   }
 
+  Widget playerStateView(Player player) {
+    var info = state[player.id]!;
+    var active = activePlayerIds.contains(player.id);
+
+    return
+      DecoratedBox(
+        decoration: active ?
+          BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(10)) :
+          const BoxDecoration(),
+        child:
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child:
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                    child:
+                      Text(player.name + " (" + info.points.toString() + ")")),
+                  trickView(info)
+                ])
+            ));
+  }
+
+  Widget trickView(PlayerInfo info) {
+    var markers = max(info.bid, info.tricks);
+    if (markers == 0) {
+      return const Text("--");
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var n = 0; n < markers; n++)
+          Padding(padding: EdgeInsets.fromLTRB(n > 0 && n % 3 == 0 ? 2 : 0, 0, 0, 0),
+            child:
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                left: n % 3 > 0 ? const BorderSide(style: BorderStyle.none) : const BorderSide(width: 2),
+                top: const BorderSide(width: 2),
+                right: const BorderSide(width: 2),
+                bottom: const BorderSide(width: 2),
+              ),
+              color: n >= info.bid ? Colors.red : n >= info.tricks ? Colors.white : Colors.green,
+            ),
+            child: SizedBox(width: n % 3 > 0 ? 8 : 10, height: 16),
+          ))
+      ],
+    );
+  }
 }
 
 class CardView extends StatelessWidget {
@@ -792,112 +976,85 @@ class CardView extends StatelessWidget {
               color: Colors.black,
               width: 2,
             ),
-            borderRadius: BorderRadius.all(Radius.circular(8))
+            borderRadius: const BorderRadius.all(Radius.circular(8))
         ),
         child:
-          Padding(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child:
               Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                      child: Text("13", style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold))),
-                    CustomPaint(painter: SuitDiamond(), size: Size(70, 70))
+                    Padding(padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+                      child:
+                        Text(valueText(card.value),
+                          style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold))),
+                    CustomPaint(painter: suitPainter, size: const Size(50, 50))
                   ]
               )
           )
     );
   }
-}
 
-class SuitHeart extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint();
-    paint.color = Color(0xffdd2c0b);
-
-    ScaledPath path = ScaledPath(size);
-    path.moveTo(24.83093,49.946898);
-    path.cubicTo(20.838961,40.169796, 8.5336001,27.700032, 3.6375781,20.368633);
-    path.cubicTo(2.4137414,18.304694, 1.7653807,15.950477, 1.7599623,13.55099);
-    path.cubicTo(1.7602127,6.1355301, 7.7771213,-0.14851479, 15.187532,0.12511163);
-    path.cubicTo(19.464577,0.28309523, 24.09139,5.1826486, 25.174548,7.3794898);
-    path.cubicTo(26.087272,5.8642246, 29.183628,0.43681997, 34.556047,0.12511163);
-    path.cubicTo(41.958399,-0.30436895, 47.981659,6.136206, 47.981907,13.55099);
-    path.relativeCubicTo(-0.0036,3.259597, -1.193393,6.406448, -3.346673,8.853537);
-    path.cubicTo(35.357321,32.568454, 29.93524,40.392439, 24.83093,49.946898);
-    path.close();
-
-    canvas.drawPath(path.path, paint);
+  CustomPainter get suitPainter {
+    switch (card.suit) {
+      case null: return valuePainter(card.value);
+      case Suit.diamond: return SuitDiamond();
+      case Suit.heart: return SuitHeart();
+      case Suit.spade: return SuitSpade();
+      case Suit.club: return SuitClub();
+    }
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
-class SuitClub extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint();
-    paint.color = Color(0xff002ccd);
-
-    ScaledPath path = ScaledPath(size);
-    path.moveTo(24.818217,0.10278802);
-    path.relativeCubicTo(-2.611116,0, -4.763189,1.22415728, -6.413414,2.46202558);
-    path.relativeCubicTo(-2.258243,1.7228674, -3.68206,4.0893193, -3.763869,7.4859124);
-    path.relativeCubicTo(-0.11074,4.597438, 1.463891,6.662971, 3.804339,8.437001);
-    path.cubicTo(13.942045,14.60858, 8.7526072,14.586656, 5.2326169,16.791962);
-    path.cubicTo(2.0930668,18.758917, 0.35772586,22.586214, 0.43402016,25.643117);
-    path.cubicTo(0.58692202,31.769708, 6.3028203,36.842906, 13.015325,36.370813);
-    path.relativeCubicTo(4.113289,-0.0014, 7.926135,-1.716747, 10.263617,-4.536875);
-    path.relativeCubicTo(-0.260171,2.78135, -0.495906,5.539687, -0.956477,8.293995);
-    path.relativeCubicTo(-0.650745,3.024732, -1.461633,6.010046, -2.474169,8.662294);
-    path.relativeCubicTo(-0.169166,0.387983, -0.346725,0.7764, -0.535582,1.165584);
-    path.relativeCubicTo(3.326956,-0.476144, 7.829552,-0.479121, 11.054171,0);
-    path.relativeCubicTo(-0.192139,-0.395974, -0.373402,-0.791125, -0.545017,-1.185821);
-    path.relativeCubicTo(-0.912975,-2.384058, -1.672958,-5.037653, -2.306891,-7.744932);
-    path.relativeCubicTo(-0.572472,-3.073821, -0.829204,-6.147927, -1.119713,-9.251826);
-    path.relativeCubicTo(2.332882,2.855863, 6.169753,4.596346, 10.312187,4.597581);
-    path.relativeCubicTo(6.712491,0.472098, 12.428316,-4.601098, 12.581296,-10.727696);
-    path.relativeCubicTo(0.07631,-3.056911, -1.659026,-6.884187, -4.798588,-8.851155);
-    path.relativeCubicTo(-3.519983,-2.205293, -8.709399,-2.183403, -13.212661,1.695765);
-    path.relativeCubicTo(2.340466,-1.774051, 3.915024,-3.839555, 3.804337,-8.437001);
-    path.cubicTo(35.000019,6.6541459, 33.576232,4.287694, 31.317968,2.5648136);
-    path.cubicTo(29.065436,1.1622488, 27.429337,0.10278802, 24.818217,0.10278802);
-    path.close();
-
-    canvas.drawPath(path.path, paint);
+  static String valueText(Value value) {
+    switch (value) {
+      case Value.z: return "Z";
+      case Value.n: return "N";
+      default: return value.name.substring(1);
+    }
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+  static CustomPainter valuePainter(Value value) {
+    switch (value) {
+      case Value.z: return SuitWizard();
+      case Value.n: return SuitJester();
+      default: return SuitNone();
+    }
   }
 }
 
-class SuitDiamond extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint();
-    paint.color = Color(0xffddbb0b);
+class SuitNone extends SVGPathPainter {
+  static final Trace trace = Trace.fromString("");
+  SuitNone() : super(colorPaint(Colors.black), trace);
+}
 
-    ScaledPath path = ScaledPath(size);
-    path.moveTo(24.917204,0.07341574);
-    path.cubicTo(30.624333,8.9487281, 36.608578,17.761107, 49.832074,24.929874);
-    path.cubicTo(40.384097,30.811458, 31.705253,38.296387, 24.975641,49.84474);
-    path.cubicTo(18.777163,39.870015, 11.184989,31.012944, 0.06077093,24.98828);
-    path.cubicTo(10.700803,18.537719, 18.986282,10.232773, 24.917204,0.07341574);
-    path.close();
+class SuitClub extends SVGPathPainter {
+  static final Trace trace = Trace.fromString("m 24.818217,0.10278802 c -2.611116,0 -4.763189,1.22415728 -6.413414,2.46202558 -2.258243,1.7228674 -3.68206,4.0893193 -3.763869,7.4859124 -0.11074,4.597438 1.463891,6.662971 3.804339,8.437001 C 13.942045,14.60858 8.7526072,14.586656 5.2326169,16.791962 2.0930668,18.758917 0.35772586,22.586214 0.43402016,25.643117 0.58692202,31.769708 6.3028203,36.842906 13.015325,36.370813 c 4.113289,-0.0014 7.926135,-1.716747 10.263617,-4.536875 -0.260171,2.78135 -0.495906,5.539687 -0.956477,8.293995 -0.650745,3.024732 -1.461633,6.010046 -2.474169,8.662294 -0.169166,0.387983 -0.346725,0.7764 -0.535582,1.165584 3.326956,-0.476144 7.829552,-0.479121 11.054171,0 -0.192139,-0.395974 -0.373402,-0.791125 -0.545017,-1.185821 -0.912975,-2.384058 -1.672958,-5.037653 -2.306891,-7.744932 -0.572472,-3.073821 -0.829204,-6.147927 -1.119713,-9.251826 2.332882,2.855863 6.169753,4.596346 10.312187,4.597581 6.712491,0.472098 12.428316,-4.601098 12.581296,-10.727696 0.07631,-3.056911 -1.659026,-6.884187 -4.798588,-8.851155 -3.519983,-2.205293 -8.709399,-2.183403 -13.212661,1.695765 2.340466,-1.774051 3.915024,-3.839555 3.804337,-8.437001 C 35.000019,6.6541459 33.576232,4.287694 31.317968,2.5648136 29.065436,1.1622488 27.429337,0.10278802 24.818217,0.10278802 Z");
+  SuitClub() : super(colorPaint(const Color(0xff002ccd)), trace);
+}
 
-    canvas.drawPath(path.path, paint);
-  }
+class SuitSpade extends SVGPathPainter {
+  static final Trace trace = Trace.fromString("M 25.151149,0.09518411 C 20.559348,8.0558012 10.601109,17.121738 6.9217582,22.629778 5.9484207,24.202221 5.4333289,25.994733 5.4290154,27.822844 5.4292152,33.47241 10.213921,38.260526 16.107538,38.05207 c 2.226898,-0.07867 5.93154,-1.70326 7.528073,-3.287248 -0.737791,5.679864 -2.358523,11.375024 -5.944135,15.324382 H 32.98233 c -3.45529,-3.99645 -4.949857,-9.535254 -5.937423,-15.296219 1.275543,1.49423 4.58553,3.113055 7.212891,3.259085 5.887206,0.327219 10.678325,-4.580182 10.678517,-10.229226 -0.0029,-2.483408 -0.94971,-4.880474 -2.662253,-6.744814 C 35.066865,12.140854 29.290188,6.8216619 25.151149,0.09518411 Z");
+  SuitSpade() : super(colorPaint(const Color(0xff00810b)), trace);
+}
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
+class SuitHeart extends SVGPathPainter {
+  static final Trace trace = Trace.fromString("M 24.83093,49.946898 C 20.838961,40.169796 8.5336001,27.700032 3.6375781,20.368633 2.4137414,18.304694 1.7653807,15.950477 1.7599623,13.55099 1.7602127,6.1355301 7.7771213,-0.14851479 15.187532,0.12511163 19.464577,0.28309523 24.09139,5.1826486 25.174548,7.3794898 26.087272,5.8642246 29.183628,0.43681997 34.556047,0.12511163 41.958399,-0.30436895 47.981659,6.136206 47.981907,13.55099 c -0.0036,3.259597 -1.193393,6.406448 -3.346673,8.853537 C 35.357321,32.568454 29.93524,40.392439 24.83093,49.946898 Z");
+  SuitHeart() : super(colorPaint(const Color(0xffdd2c0b)), trace);
+}
+
+class SuitDiamond extends SVGPathPainter {
+  static final Trace trace = Trace.fromString("M 24.917204,0.07341574 C 30.624333,8.9487281 36.608578,17.761107 49.832074,24.929874 40.384097,30.811458 31.705253,38.296387 24.975641,49.84474 18.777163,39.870015 11.184989,31.012944 0.06077093,24.98828 10.700803,18.537719 18.986282,10.232773 24.917204,0.07341574 Z");
+  SuitDiamond() : super(colorPaint(const Color(0xffddbb0b)), trace);
+}
+
+class SuitWizard extends SVGPathPainter {
+  static final Trace trace = Trace.fromString("M 43.739075,0.80459084 30.278431,23.510008 26.414548,3.6203742 10.518686,27.74013 4.4988124,23.006065 C 4.3088064,22.834658 4.1091493,22.672499 3.8883804,22.526803 L 3.3870511,26.058225 0.1192992,49.35716 19.255645,38.78893 22.375312,37.062841 16.14113,32.161213 22.748061,22.137165 26.857443,43.269754 49.868051,4.4372995 Z");
+  SuitWizard() : super(colorPaint(const Color(0xff000000)), trace);
+}
+
+class SuitJester extends SVGPathPainter {
+  static final Trace trace = Trace.fromString("M 49.889882,12.497489 A 11.655525,11.655525 0 0 1 38.234354,24.153041 11.655525,11.655525 0 0 1 26.578826,12.497489 11.655525,11.655525 0 0 1 38.234354,0.84198583 11.655525,11.655525 0 0 1 49.889882,12.497489 Z M 23.22196,25.458455 a 8.2054899,8.2054899 0 0 1 -8.20549,8.20549 8.2054899,8.2054899 0 0 1 -8.2054896,-8.20549 8.2054899,8.2054899 0 0 1 8.2054896,-8.20549 8.2054899,8.2054899 0 0 1 8.20549,8.20549 z M 10.727322,43.827567 A 5.3149192,5.3149192 0 0 1 5.4123939,49.142493 5.3149192,5.3149192 0 0 1 0.09746859,43.827567 5.3149192,5.3149192 0 0 1 5.4123939,38.512642 5.3149192,5.3149192 0 0 1 10.727322,43.827567 Z");
+  SuitJester() : super(colorPaint(const Color(0xffa6a6ae)), trace);
 }
 
 class ScaledPath {
@@ -937,7 +1094,7 @@ class ScaledPath {
 /// Route displaying a form requesting a nick name and a server address.
 /// Returns a [ConnectionData] object back to the opener.
 class LoginView extends StatefulWidget {
-  LoginView({Key? key}) : super(key: key);
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
