@@ -1,16 +1,7 @@
-# flutter_ui
+# Wizard client written in Flutter/Dart
 
-Wizard mobile edition
+The Wizard mobile edition. Allows to connect to the same Java server as the native JavaFX client. From the Flutter
+source, a web version, an Android app and an iOS app can be built. 
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The [library for cross-platform communication](lib/msg.dart) is generated from a single `msgbuf` 
+[protocol definition](../common/src/main/java/de/haumacher/wizard/msg/msg.proto).
