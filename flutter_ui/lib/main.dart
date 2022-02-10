@@ -10,92 +10,98 @@ import 'package:flutter_ui/msg.dart' as msg;
 import 'package:flutter_ui/svg.dart';
 
 void main() {
-  showTrickTestPage();
+  runApp(WizardApp());
+  // showTrickTestPage();
 }
 
 void showTrickTestPage() {
   runApp(MaterialApp(
-      title: 'Zauberer',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(title: const Text("Place your cards")),
-        body:
-          LayoutBuilder(builder: (context, constraints) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: constraints.maxWidth, minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child:
-                  Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(padding: const EdgeInsets.all(16),
-                          child:
-                          PlayerStateView(
-                            [
-                              Player(id: "1", name: "Haui"),
-                              Player(id: "2", name: "Egon"),
-                              Player(id: "3", name: "Der große Zauberer"),
-                              Player(id: "4", name: "Player A"),
-                              Player(id: "5", name: "Player B"),
-                              Player(id: "6", name: "Player C"),
-                            ],
-                            const {"1", "2", "3", "6"},
-                            {
-                              "1": PlayerInfo(points: 250, bid: 4, tricks: 3),
-                              "2": PlayerInfo(points: 20, bid: 2, tricks: 5),
-                              "3": PlayerInfo(points: 180, bid: 0, tricks: 0),
-                              "4": PlayerInfo(points: 20, bid: 2, tricks: 0),
-                              "5": PlayerInfo(points: 20, bid: 0, tricks: 4),
-                              "6": PlayerInfo(points: 20, bid: 4, tricks: 4),
-                            }),
-                        ),
-                        Expanded(
-                            child:
-                            Center(
-                                child:
-                                TrickView([
-                                  TrickCard(msg.Card(value: Value.c10, suit: Suit.heart), Player(name: "Player A")),
-                                  TrickCard(msg.Card(value: Value.c1, suit: Suit.club), Player(name: "Player B")),
-                                  TrickCard(msg.Card(value: Value.c13, suit: Suit.spade), Player(name: "Player C")),
-                                  TrickCard(msg.Card(value: Value.c9, suit: Suit.diamond), Player(name: "Egon")),
-                                  TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "Bert")),
-                                  TrickCard(msg.Card(value: Value.n, suit: null), Player(name: "Der große Zauberer")),
-                                ])
-                            )),
-                        Padding(padding: const EdgeInsets.all(16),
-                            child:
-                            CardListView([
-                              msg.Card(value: Value.z, suit: null),
-                              msg.Card(value: Value.c13, suit: Suit.club),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c13, suit: Suit.heart),
-                              msg.Card(value: Value.c10, suit: Suit.heart),
-                              msg.Card(value: Value.c13, suit: Suit.spade),
-                              msg.Card(value: Value.c9, suit: Suit.diamond),
-                              msg.Card(value: Value.c8, suit: Suit.diamond),
-                              msg.Card(value: Value.c2, suit: Suit.diamond),
-                              msg.Card(value: Value.c1, suit: Suit.diamond),
-                              msg.Card(value: Value.n, suit: null),
-                            ])),
-                      ])
-                )));
-          })
-        )
-      ));
-  // runApp(WizardApp());
+    title: 'Zauberer',
+    theme: ThemeData(
+      primarySwatch: Colors.blue,
+    ),
+    home: Scaffold(
+      appBar: AppBar(title: const Text("Place your cards")),
+      body: ExpandDisplay(
+        children: [
+          Padding(padding: const EdgeInsets.all(16),
+            child:
+            PlayerStateView(
+              players: [
+                Player(id: "1", name: "Haui"),
+                Player(id: "2", name: "Egon"),
+                Player(id: "3", name: "Der große Zauberer"),
+                Player(id: "4", name: "Player A"),
+                Player(id: "5", name: "Player B"),
+                Player(id: "6", name: "Player C"),
+              ],
+              activePlayerIds: ValueNotifier(const {"1", "2", "3", "6"}),
+              state: {
+                "1": PlayerInfo(points: 250, bid: 4, tricks: 3),
+                "2": PlayerInfo(points: 20, bid: 2, tricks: 5),
+                "3": PlayerInfo(points: 180, bid: 0, tricks: 0),
+                "4": PlayerInfo(points: 20, bid: 2, tricks: 0),
+                "5": PlayerInfo(points: 20, bid: 0, tricks: 4),
+                "6": PlayerInfo(points: 20, bid: 4, tricks: 4),
+              }),
+          ),
+          Expanded(child:
+            Center(child:
+              TrickView([
+                TrickCard(msg.Card(value: Value.c10, suit: Suit.heart), Player(name: "Player A")),
+                TrickCard(msg.Card(value: Value.c1, suit: Suit.club), Player(name: "Player B")),
+                TrickCard(msg.Card(value: Value.c13, suit: Suit.spade), Player(name: "Player C")),
+                TrickCard(msg.Card(value: Value.c9, suit: Suit.diamond), Player(name: "Egon")),
+                TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "Bert")),
+                TrickCard(msg.Card(value: Value.n, suit: null), Player(name: "Der große Zauberer")),
+              ])
+            )),
+          Padding(padding: const EdgeInsets.all(16),
+            child: CardListView([
+              msg.Card(value: Value.z, suit: null),
+              msg.Card(value: Value.c13, suit: Suit.club),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c13, suit: Suit.heart),
+              msg.Card(value: Value.c10, suit: Suit.heart),
+              msg.Card(value: Value.c13, suit: Suit.spade),
+              msg.Card(value: Value.c9, suit: Suit.diamond),
+              msg.Card(value: Value.c8, suit: Suit.diamond),
+              msg.Card(value: Value.c2, suit: Suit.diamond),
+              msg.Card(value: Value.c1, suit: Suit.diamond),
+              msg.Card(value: Value.n, suit: null),
+              ])),
+        ]
+      ))));
+}
+
+class ExpandDisplay extends StatelessWidget {
+  final List<Widget> children;
+  const ExpandDisplay({Key? key, required this.children}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth, minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: children)
+            )));
+    });
+  }
 }
 
 /// Observable list of open games displayed in the [GameListWidget].
@@ -103,9 +109,11 @@ class GameList extends ChangeNotifier {
 
   Map<String, ObservableGame> openGames = {};
 
-  void addGame(Game newGame) {
-    openGames[newGame.gameId] = ObservableGame(newGame);
+  ObservableGame addGame(Game newGame) {
+    var result = ObservableGame(newGame);
+    openGames[newGame.gameId] = result;
     notifyListeners();
+    return result;
   }
 
   void removeGame(String gameId) {
@@ -292,11 +300,18 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   @override
   void visitGameCreated(GameCreated self, void arg) {
     gameList.addGame(self.game!);
+    
+    // A join announce is sent later on, so it is not required to set the 
+    // current game, if the game's owner is the current player.
   }
 
   @override
   void visitGameDeleted(GameDeleted self, void arg) {
     gameList.removeGame(self.gameId);
+
+    if (gameId == self.gameId) {
+      leaveGame();
+    }
   }
 
   @override
@@ -313,24 +328,31 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   void visitJoinAnnounce(JoinAnnounce self, void arg) {
     ObservableGame? game = gameList.join(self.gameId, self.player!);
     if (playerId == self.player?.id && game != null) {
-      state.value = ConnectionState.waitingForStart;
-      currentGame = game;
-
-      notifyListeners();
+      enterGame(game);
     }
+  }
+
+  void enterGame(ObservableGame game) {
+    state.value = ConnectionState.waitingForStart;
+    currentGame = game;
+    
+    notifyListeners();
   }
 
   @override
   void visitLeaveAnnounce(LeaveAnnounce self, void arg) {
     gameList.leave(self.gameId, self.playerId);
     if (playerId == self.playerId) {
-      state.value = ConnectionState.searchingGame;
-
-      currentGame = null;
-
-      sendCommand(ListGames());
-      notifyListeners();
+      leaveGame();
     }
+  }
+
+  void leaveGame() {
+    state.value = ConnectionState.searchingGame;
+    currentGame = null;
+    
+    sendCommand(ListGames());
+    notifyListeners();
   }
 
   @override
@@ -444,7 +466,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   List<PlayerScore> result = [];
 
-  final ValueNotifier<Player?> activePlayer = ValueNotifier(null);
+  final ValueNotifier<Set<String>> activePlayerIds = ValueNotifier({});
 
   Map<String, int> playersBid = {};
   List<PlayedCard> currentTrick = [];
@@ -548,7 +570,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   }
 
   void setActivePlayer(String activePlayerId) {
-    activePlayer.value = roundInfo.players.where((p) => p.id == activePlayerId).first;
+    activePlayerIds.value = {activePlayerId};
     imActive.value = playerId == activePlayerId;
   }
 
@@ -558,6 +580,10 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   void initConfirmations() {
     pendingConfirmations = roundInfo.players.map((e) => e.id).toSet();
+  }
+
+  Player player(String playerId) {
+    return roundInfo.players.where((element) => element.id == playerId).first;
   }
 }
 
@@ -601,8 +627,7 @@ class HomePage extends StatelessWidget {
                   child: ElevatedButton(
                     child: const Text("Login"),
                     onPressed: () {
-                      var result = Navigator.push(
-                          context,
+                      var result = Navigator.push(context,
                           MaterialPageRoute<ConnectionData>(
                               builder: (context) => const LoginView()));
                       result.then((data) {
@@ -633,53 +658,22 @@ class HomePage extends StatelessWidget {
                   var openGames = gameList.openGames;
                   return Scaffold(
                       appBar: AppBar(title: const Text("Join a game")),
-                      body: openGames.isEmpty
-                          ? const Center(child: Text("No open games."))
-                          : ListView(
-                          children: openGames.values.map((g) => GameEntryWidget(g)).toList()),
+                      body: openGames.isEmpty ?
+                          const Center(child: Text("No open games.")) :
+                          ListView(
+                            children: openGames.values.map((g) =>
+                              Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                child: GameEntryWidget(g))
+                            ).toList()),
                       floatingActionButton: FloatingActionButton(
                         child: const Icon(Icons.add),
                         onPressed: () {
+                          pushGameView(context);
                           connection.sendCommand(CreateGame());
                         }));
                 });
           case ConnectionState.waitingForStart:
-            ObservableGame? game = connection.currentGame;
-            return game == null ?
-              const Center(child: Text("ERROR: Game not set."))  :
-              ChangeObserverWidget<ObservableGame>(
-                observable: game,
-                builder: (context, game) {
-                  if (kDebugMode) {
-                    print("Building GameLobbyState");
-                  }
-                  var players = game.players;
-                  var body = players.isEmpty ?
-                    const Center(child: Text("No players in this game.")) :
-                    ListView(
-                      children: players.map((player) =>
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue)),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Text(player.name)]))).toList());
-
-                  return Scaffold(
-                      appBar: AppBar(
-                        title: const Text("Waiting for players"),
-                      ),
-                      body: body,
-                      floatingActionButton:
-                      FloatingActionButton.extended(
-                          label: const Text("Start"),
-                          icon: const Icon(Icons.play_arrow),
-                          onPressed: () => connection.sendCommand(StartGame(gameId: game.game.gameId)),
-                      ));
-                });
-          case ConnectionState.playing:
-            return const WizardWidget();
+            return showWaitingForStart();
           default:
             return Center(child: Text("ERROR: " + state.name));
         }
@@ -709,27 +703,114 @@ class GameEntryState extends ChangeNotifierState<GameEntryWidget, ObservableGame
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-        decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
-        child: Row(mainAxisSize: MainAxisSize.max, children: [
-          Text(observable.players.map((e) => e.name).join(", ")),
-          JoinButton(observable.game.gameId)
-        ],));
+      decoration: BoxDecoration(
+        color: Colors.cyan,
+        borderRadius: BorderRadius.circular(5)),
+
+      child:
+        Padding(padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(child:
+                Text(observable.players.map((e) => e.name).join(", "))),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(40, 40),
+                  shape: const CircleBorder(),
+                ),
+                onPressed: () {
+                  var gameId = observable.game.gameId;
+                  pushGameView(context);
+                  connection.sendCommand(JoinGame(gameId: gameId));
+                },
+                child: const Icon(Icons.keyboard_arrow_right))
+            ])));
   }
 }
 
-/// Button in a [GameEntryState] that joins the displayed game.
-class JoinButton extends StatelessWidget {
-  /// The [Game] to join through this button.
-  final String gameId;
+void pushGameView(BuildContext context) {
+  var routeToGame = MaterialPageRoute(builder: (context) => const PlayingView());
+  routeToGame.popped.then((_) {
+    var gameId = connection.gameId;
+    if (gameId != null) {
+      connection.sendCommand(LeaveGame(gameId: gameId));
+    }
+  });
+  Navigator.push(context, routeToGame);
+}
 
-  const JoinButton(this.gameId, {Key? key}) : super(key: key);
+class PlayingView extends StatelessWidget {
+  const PlayingView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-        onPressed: () => connection.sendCommand(JoinGame(gameId: gameId)),
-        icon: const Icon(Icons.keyboard_arrow_right));
+    return ValueListenableBuilder<ConnectionState>(
+      valueListenable: connection.state,
+      builder: (context, state, child) {
+        if (kDebugMode) {
+          print("Building PlayingView: " + state.name);
+        }
+
+        switch (state) {
+          case ConnectionState.searchingGame:
+            return showWaitingForStart();
+          case ConnectionState.waitingForStart:
+            ObservableGame? game = connection.currentGame;
+            if (game == null) return showWaitingForStart();
+            return ChangeObserverWidget<ObservableGame>(observable: game,
+                builder: (context, game) {
+                  if (kDebugMode) {
+                    print("Building GameLobbyState");
+                  }
+                  var players = game.players;
+
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: const Text("Waiting for players"),
+                    ),
+                    body: players.isEmpty ?
+                    const Center(child: Text("No players in this game.")) :
+                    ListView(
+                      children: [
+                        for (var n = 0; n < players.length; n++)
+                          Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                            child: DecoratedBox(
+                              decoration: const BoxDecoration(
+                                color: Colors.orangeAccent,
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Padding(padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                                      child:
+                                      Text((n + 1).toString() + ". " + players[n].name))
+                                ])))
+                      ]
+                    ),
+                    floatingActionButton:
+                    FloatingActionButton.extended(
+                      label: const Text("Start"),
+                      icon: const Icon(Icons.play_arrow),
+                      onPressed: () => connection.sendCommand(StartGame(gameId: game.game.gameId)),
+                    ));
+                });
+          case ConnectionState.playing:
+            return const WizardWidget();
+          default:
+            return Text("Error: " + state.name);
+        }
+      });
   }
+}
+
+Scaffold showWaitingForStart() {
+  return Scaffold(
+      appBar: AppBar(
+        title: const Text("Waiting for players"),
+      ),
+      body: const Center(child: Text("Joining game...")));
 }
 
 class WizardWidget extends StatelessWidget {
@@ -737,14 +818,6 @@ class WizardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Wizards in action"),
-        ),
-        body: createBody(context));
-  }
-
-  Widget createBody(BuildContext context) {
     return ValueListenableBuilder<WizardPhase>(
       valueListenable: connection.wizardModel!.phase,
       builder: (context, phase, child) {
@@ -752,44 +825,57 @@ class WizardWidget extends StatelessWidget {
           print("Building WizardWidget: " + phase.name);
         }
 
-        switch (phase) {
-          case WizardPhase.idle:
-          case WizardPhase.created:
-            return const Center(child: Text("Waiting for cards..."));
-          case WizardPhase.cardsGiven:
-            return const Center(child: Text("Waiting for bid request..."));
-
-          case WizardPhase.trumpSelection:
-          case WizardPhase.bidding:
-            return ValueListenableBuilder<bool>(
-              valueListenable: connection.wizardModel!.imActive,
-              builder: (context, imActive, child) {
-                return imActive ?
-                  MyBidView(connection.wizardModel!.roundInfo.round) :
-                  const WaitingForBidView();
-              },
-            );
-          case WizardPhase.leading:
-          case WizardPhase.trickConfirmation:
-          case WizardPhase.roundConfirmation:
-          case WizardPhase.resultConfirmation:
-
-          default:
-            return Center(child: Text("ERROR: " + phase.name));
-        }
+        var roundInfo = connection.wizardModel!.roundInfo;
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Round " + roundInfo.round.toString() + " of " + roundInfo.maxRound.toString()),
+          ),
+          body: createBody(context, phase));
       });
+  }
+
+  Widget createBody(BuildContext context, WizardPhase phase) {
+    switch (phase) {
+      case WizardPhase.idle:
+      case WizardPhase.created:
+        return const Center(child: Text("Waiting for cards..."));
+      case WizardPhase.cardsGiven:
+        return const Center(child: Text("Waiting for bid request..."));
+
+      case WizardPhase.trumpSelection:
+      case WizardPhase.bidding:
+        return ValueListenableBuilder<bool>(
+          valueListenable: connection.wizardModel!.imActive,
+          builder: (context, imActive, child) {
+            return imActive ?
+              MyBidView(connection.wizardModel!.roundInfo.round) :
+              const WaitingForBidView();
+          },
+        );
+      case WizardPhase.leading:
+      case WizardPhase.trickConfirmation:
+      case WizardPhase.roundConfirmation:
+      case WizardPhase.resultConfirmation:
+
+      default:
+        return Center(child: Text("ERROR: " + phase.name));
+    }
   }
 }
 
 class WaitingForBidView extends StatelessWidget {
-  const WaitingForBidView({Key? key}) : super(key: key);
+  const WaitingForBidView({Key? key}) : super(key: key); 
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Player?>(
-      valueListenable: connection.wizardModel!.activePlayer,
-      builder: (context, player, child) {
-        return Center(child: Text("Waiting for " + player!.name + "'s bid."));
+    var wizardModel = connection.wizardModel;
+    
+    return ValueListenableBuilder<Set<String>>(
+      valueListenable: wizardModel!.activePlayerIds,
+      builder: (context, playerIds, child) {
+        return Center(
+          child: Text(
+            "Waiting for " + wizardModel.player(playerIds.first).name + "'s bid."));
       });
   }
 }
@@ -800,21 +886,16 @@ class MyBidView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Dein Gebot bitte!"),
-        ),
-        body:
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text("Place your bid"),
-                Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Wrap(
-                        direction: Axis.horizontal,
-                        children: options()))])));
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text("Place your bid"),
+          Padding(
+              padding: const EdgeInsets.all(15),
+              child: Wrap(
+                  direction: Axis.horizontal,
+                  children: options()))]));
   }
 
   List<Widget> options() {
@@ -893,10 +974,10 @@ class CardListView extends StatelessWidget {
 
 class PlayerStateView extends StatelessWidget {
   final List<Player> players;
-  final Set<String> activePlayerIds;
+  final ValueNotifier<Set<String>> activePlayerIds;
   final Map<String, PlayerInfo> state;
 
-  const PlayerStateView(this.players, this.activePlayerIds, this.state, {Key? key}) : super(key: key);
+  const PlayerStateView({required this.players, required this.activePlayerIds, required this.state, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -912,27 +993,28 @@ class PlayerStateView extends StatelessWidget {
 
   Widget playerStateView(Player player) {
     var info = state[player.id]!;
-    var active = activePlayerIds.contains(player.id);
 
-    return
-      DecoratedBox(
-        decoration: active ?
-          BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(10)) :
-          const BoxDecoration(),
-        child:
-          Padding(
+    return ChangeObserverWidget<ValueNotifier<Set<String>>>(
+      observable: activePlayerIds,
+      builder: (context, activePlayers) {
+        return DecoratedBox(
+          decoration: activePlayers.value.contains(player.id) ?
+            BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(10)) :
+            const BoxDecoration(),
+          child: Padding(
             padding: const EdgeInsets.all(8),
             child:
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                    child:
-                      Text(player.name + " (" + info.points.toString() + ")")),
-                  trickView(info)
-                ])
-            ));
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                  child:
+                  Text(player.name + " (" + info.points.toString() + ")")),
+                trickView(info)
+              ])
+          ));
+      });
   }
 
   Widget trickView(PlayerInfo info) {
