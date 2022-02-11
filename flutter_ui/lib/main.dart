@@ -1,8 +1,9 @@
-import 'dart:html';
+import 'dart:io';
 import 'dart:math';
 import 'dart:core';
 import 'dart:ui';
 
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ui/msg.dart';
@@ -212,15 +213,15 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
   ObservableGame? currentGame;
 
-  /// The [WebSocket] connection communicating with the game server.
-  WebSocket? _socket;
+  /// The [WebSocketChannel] communicating with the game server.
+  WebSocketChannel? _socket;
 
   void Function()? _connectCallback;
 
   String get serverAddress => _serverAddress;
 
   void login(String serverAddress, String nickName) {
-    _socket?.close();
+    _socket?.sink.close();
     _socket = null;
 
     if (_serverAddress != serverAddress) {
@@ -230,25 +231,24 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
     _serverAddress = serverAddress;
     _nickName = nickName;
 
-    var socket = WebSocket(_serverAddress);
-    socket.onOpen.listen(_onOpen);
-    socket.onMessage.listen(_onMessage);
-    socket.onClose.listen(_onClose);
+    var socket = WebSocketChannel.connect(Uri.parse(_serverAddress));
+    socket.stream.listen(_onMessage, onDone: _onClose);
+    // socket.onOpen.listen(_onOpen);
     _socket = socket;
 
     state.value = ConnectionState.connecting;
-    notifyListeners();
+    _onOpen();
   }
 
   void close() {
-    _socket?.close();
+    _socket?.sink.close();
     _socket = null;
 
     state.value = ConnectionState.idle;
     notifyListeners();
   }
 
-  void _onOpen(Event evt) {
+  void _onOpen() {
     state.value = ConnectionState.connected;
     notifyListeners();
 
@@ -264,17 +264,16 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
     if (kDebugMode) {
       print("< " + data);
     }
-    _socket!.sendString(data);
+    _socket!.sink.add(data);
   }
 
-  void _onClose(Event evt) {
+  void _onClose() {
     _socket = null;
     state.value = playerId == null ? ConnectionState.idle : ConnectionState.disconnected;
     notifyListeners();
   }
 
-  void _onMessage(MessageEvent evt) {
-    String data = evt.data;
+  void _onMessage(data) {
     if (kDebugMode) {
       print("> " + data);
     }
@@ -451,7 +450,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   final ValueNotifier<WizardPhase> phase = ValueNotifier(WizardPhase.idle);
 
-  late StartRound roundInfo;
+  StartRound? roundInfo;
 
   final ValueNotifier<bool> imActive = ValueNotifier(false);
 
@@ -579,11 +578,11 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   }
 
   void initConfirmations() {
-    pendingConfirmations = roundInfo.players.map((e) => e.id).toSet();
+    pendingConfirmations = roundInfo!.players.map((e) => e.id).toSet();
   }
 
   Player player(String playerId) {
-    return roundInfo.players.where((element) => element.id == playerId).first;
+    return roundInfo!.players.where((element) => element.id == playerId).first;
   }
 }
 
@@ -828,7 +827,9 @@ class WizardWidget extends StatelessWidget {
         var roundInfo = connection.wizardModel!.roundInfo;
         return Scaffold(
           appBar: AppBar(
-            title: Text("Round " + roundInfo.round.toString() + " of " + roundInfo.maxRound.toString()),
+            title: roundInfo == null ?
+              const Text("Waiting for start...") :
+              Text("Round " + roundInfo.round.toString() + " of " + roundInfo.maxRound.toString()),
           ),
           body: createBody(context, phase));
       });
@@ -848,7 +849,7 @@ class WizardWidget extends StatelessWidget {
           valueListenable: connection.wizardModel!.imActive,
           builder: (context, imActive, child) {
             return imActive ?
-              MyBidView(connection.wizardModel!.roundInfo.round) :
+              MyBidView(connection.wizardModel!.roundInfo!.round) :
               const WaitingForBidView();
           },
         );
@@ -864,7 +865,7 @@ class WizardWidget extends StatelessWidget {
 }
 
 class WaitingForBidView extends StatelessWidget {
-  const WaitingForBidView({Key? key}) : super(key: key); 
+  const WaitingForBidView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
