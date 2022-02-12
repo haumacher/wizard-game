@@ -25,7 +25,7 @@ class Coordinate {
   static Coordinate fromString(String spec) {
     var match = RegExp("^([-0-9\\.]+)[,\\s]+([-0-9\\.]+)\$").firstMatch(spec);
     var xSpec = match!.group(1);
-    var ySpec = match!.group(2);
+    var ySpec = match.group(2);
     return Coordinate(double.parse(xSpec!), double.parse(ySpec!));
   }
 }
