@@ -23,65 +23,67 @@ void showTrickTestPage() {
     ),
     home: Scaffold(
       appBar: AppBar(title: const Text("Place your cards")),
+      backgroundColor: const Color(0xff158215),
       body: ExpandDisplay(
         children: [
           Padding(padding: const EdgeInsets.all(16),
             child:
             PlayerStateView(
-              players: [
-                Player(id: "1", name: "Haui"),
-                Player(id: "2", name: "Egon"),
-                Player(id: "3", name: "Der große Zauberer"),
-                Player(id: "4", name: "Player A"),
-                Player(id: "5", name: "Player B"),
-                Player(id: "6", name: "Player C"),
-              ],
-              activePlayerIds: ValueNotifier(const {"1", "2", "3", "6"}),
-              state: {
-                "1": PlayerInfo(points: 250, bid: 4, tricks: 3),
-                "2": PlayerInfo(points: 20, bid: 2, tricks: 5),
-                "3": PlayerInfo(points: 180, bid: 0, tricks: 0),
-                "4": PlayerInfo(points: 20, bid: 2, tricks: 0),
-                "5": PlayerInfo(points: 20, bid: 0, tricks: 4),
-                "6": PlayerInfo(points: 20, bid: 4, tricks: 4),
-              }),
+              ActivityState("1")
+              ..startRound([
+                Player(id: "1", name: "Player A"),
+                Player(id: "2", name: "Player B"),
+                Player(id: "3", name: "Player C"),
+                Player(id: "4", name: "You"),
+              ])
+              ..setActivePlayers(const {"4"})
+              ..finishRound({
+                "1": 50,
+                "2": 90,
+                "3": 70,
+                "4": 120,
+              })
+              ..bid("1", 1)
+              ..bid("2", 2)
+              ..bid("3", 0)
+              ..bid("4", 3)
+              ..setTricks("1", 2)
+              ..setTricks("2", 1)
+              ..setTricks("3", 0)
+              ..setTricks("4", 2)
+            )
           ),
           Expanded(child:
             Center(child:
-              TrickView([
-                TrickCard(msg.Card(value: Value.c10, suit: Suit.heart), Player(name: "Player A")),
-                TrickCard(msg.Card(value: Value.c1, suit: Suit.club), Player(name: "Player B")),
-                TrickCard(msg.Card(value: Value.c13, suit: Suit.spade), Player(name: "Player C")),
-                TrickCard(msg.Card(value: Value.c9, suit: Suit.diamond), Player(name: "Egon")),
-                TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "Bert")),
-                TrickCard(msg.Card(value: Value.n, suit: null), Player(name: "Der große Zauberer")),
-              ])
-            )),
+              TrickView(
+                ObservableList<TrickCard>()
+                  ..add(TrickCard(msg.Card(value: Value.c11, suit: Suit.heart), Player(name: "Player A")))
+                  ..add(TrickCard(msg.Card(value: Value.c13, suit: Suit.heart), Player(name: "Player B")))
+                  ..add(TrickCard(msg.Card(value: Value.c5, suit: Suit.spade), Player(name: "Player C")))
+                  ..add(TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "You"))),
+                child:
+                  trickText(text: "You make the trick!", onPressed: (){}),
+                ))
+          ),
           Padding(padding: const EdgeInsets.all(16),
-            child: CardListView([
-              msg.Card(value: Value.z, suit: null),
-              msg.Card(value: Value.c13, suit: Suit.club),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c13, suit: Suit.heart),
-              msg.Card(value: Value.c10, suit: Suit.heart),
-              msg.Card(value: Value.c13, suit: Suit.spade),
-              msg.Card(value: Value.c9, suit: Suit.diamond),
-              msg.Card(value: Value.c8, suit: Suit.diamond),
-              msg.Card(value: Value.c2, suit: Suit.diamond),
-              msg.Card(value: Value.c1, suit: Suit.diamond),
-              msg.Card(value: Value.n, suit: null),
-              ])),
+            child: CardListView(
+              ObservableList<msg.Card>()
+                ..add(msg.Card(value: Value.z, suit: null))
+                ..add(msg.Card(value: Value.c13, suit: Suit.club))
+                ..add(msg.Card(value: Value.c11, suit: Suit.spade))
+                ..add(msg.Card(value: Value.c12, suit: Suit.heart))
+                ..add(msg.Card(value: Value.c9, suit: Suit.heart))
+                ..add(msg.Card(value: Value.c10, suit: Suit.diamond))
+                ..add(msg.Card(value: Value.n, suit: null))
+              )),
         ]
       ))));
+}
+
+extension CardEquality on msg.Card {
+  bool eq(msg.Card other) {
+    return value == other.value && suit == other.suit;
+  }
 }
 
 class ExpandDisplay extends StatelessWidget {
@@ -242,10 +244,6 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
   void close() {
     _socket?.sink.close();
-    _socket = null;
-
-    state.value = ConnectionState.idle;
-    notifyListeners();
   }
 
   void _onOpen() {
@@ -268,6 +266,10 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   }
 
   void _onClose() {
+    if (kDebugMode) {
+      print("Connection closed.");
+    }
+
     _socket = null;
     state.value = playerId == null ? ConnectionState.idle : ConnectionState.disconnected;
     notifyListeners();
@@ -450,9 +452,11 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   final ValueNotifier<WizardPhase> phase = ValueNotifier(WizardPhase.idle);
 
+  final ValueNotifier<msg.Card?> trumpCard = ValueNotifier(null);
+  
+  final ObservableList<msg.Card> myCards = ObservableList();
+  
   StartRound? roundInfo;
-
-  final ValueNotifier<bool> imActive = ValueNotifier(false);
 
   Suit? trump;
 
@@ -461,20 +465,21 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   /// The player that won the [currentTrick].
   Player? turnWinner;
 
-  Set<String> pendingConfirmations = {};
-
   List<PlayerScore> result = [];
 
-  final ValueNotifier<Set<String>> activePlayerIds = ValueNotifier({});
+  final ActivityState activityState;
 
-  Map<String, int> playersBid = {};
-  List<PlayedCard> currentTrick = [];
+  ObservableList<TrickCard> currentTrick = ObservableList();
 
-  WizardModel(this.playerId, this.game);
+  FinishRound? roundResult;
 
-  void init(String newId) {
-    playerId = newId;
-  }
+  bool startLead = false;
+
+  WizardModel(String _playerId, this.game) :
+    playerId = _playerId,
+    activityState = ActivityState(_playerId);
+
+  int get pointsEarned => roundResult!.points[playerId]!;
 
   @override
   void visitAnnounce(Announce self, void arg) {
@@ -484,6 +489,8 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   @override
   void visitStartRound(StartRound self, void arg) {
     roundInfo = self;
+    activityState.startRound(self.players);
+    myCards.set(self.cards);
     
     setState(WizardPhase.cardsGiven);
   }
@@ -501,8 +508,6 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   @override
   void visitStartBids(StartBids self, void arg) {
-    playersBid = {};
-    currentTrick = [];
     expectedBids = 0;
     setState(WizardPhase.bidding);
   }
@@ -516,29 +521,43 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   @override
   void visitBid(Bid self, String playerId) {
-    playersBid[playerId] = self.cnt;
-    notifyListeners();
+    activityState.bid(playerId, self.cnt);
   }
 
   @override
   void visitStartLead(StartLead self, void arg) {
-    setState(WizardPhase.leading);
+    startLead = true;
   }
 
   @override
   void visitRequestLead(RequestLead self, void arg) {
+    if (startLead) {
+      currentTrick.clear();
+      startLead = false;
+    }
+
+    setState(WizardPhase.leading);
     setActivePlayer(self.playerId);
     notifyListeners();
   }
 
   @override
   void visitLead(Lead self, String playerId) {
-    currentTrick.add(PlayedCard(playerId: playerId, card: self.card!));
+    var playedCard = self.card!;
+
+    if (playerId == this.playerId) {
+      myCards.removeFirst((card) => card.eq(playedCard));
+    }
+    currentTrick.add(TrickCard(playedCard, activityState.getPlayer(playerId)));
     notifyListeners();
   }
 
   @override
   void visitFinishTurn(FinishTurn self, void arg) {
+    // Workaround for not announcing a new trick in the protocol.
+    startLead = true;
+
+    activityState.incTrick(self.winner!.id);
     turnWinner = self.winner;
     initConfirmations();
     setState(WizardPhase.trickConfirmation);
@@ -546,19 +565,22 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   @override
   void visitConfirmTrick(ConfirmTrick self, String playerId) {
-    pendingConfirmations.remove(playerId);
+    activityState.removeActivePlayer(playerId);
     notifyListeners();
   }
 
   @override
   void visitFinishRound(FinishRound self, void arg) {
+    roundResult = self;
+
+    activityState.finishRound(self.points);
     initConfirmations();
     setState(WizardPhase.roundConfirmation);
   }
 
   @override
   void visitConfirmRound(ConfirmRound self, String playerId) {
-    pendingConfirmations.remove(playerId);
+    activityState.removeActivePlayer(playerId);
     notifyListeners();
   }
 
@@ -569,8 +591,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   }
 
   void setActivePlayer(String activePlayerId) {
-    activePlayerIds.value = {activePlayerId};
-    imActive.value = playerId == activePlayerId;
+    activityState.setActivePlayer(activePlayerId);
   }
 
   void setState(WizardPhase newState) {
@@ -578,13 +599,137 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   }
 
   void initConfirmations() {
-    pendingConfirmations = roundInfo!.players.map((e) => e.id).toSet();
+    activityState.setActivePlayers(roundInfo!.players.map((e) => e.id).toSet());
   }
 
   Player player(String playerId) {
     return roundInfo!.players.where((element) => element.id == playerId).first;
   }
 }
+
+class ActivityState extends ChangeNotifier {
+  final String playerId;
+
+  List<Player> _players = [];
+  Set<String> _activePlayerIds = {};
+  final Map<String, PlayerInfo> _infos = {};
+
+  ActivityState(this.playerId);
+
+  List<Player> get players => _players;
+
+  /// Whether this app's player is expected to act.
+  ValueNotifier<bool> imActive = ValueNotifier(false);
+
+  bool isActive(String playerId) => _activePlayerIds.contains(playerId);
+
+  /// The player who is expected to act.
+  /// Must only be called in situations where a single player is active.
+  Player? get activePlayer => _activePlayerIds.isEmpty ? null : getPlayer(_activePlayerIds.first);
+
+  PlayerInfo getInfo(String playerId) {
+    return _infos[playerId]!;
+  }
+
+  void startRound(List<Player> players) {
+    _players = players;
+    players.forEach(_initInfo);
+    _infos.values.forEach(_clearTricks);
+    notifyListeners();
+  }
+
+  void _initInfo(Player player) {
+    _infos.putIfAbsent(player.id, () => PlayerInfo());
+  }
+  
+  void _clearTricks(PlayerInfo info) {
+    info.bid = 0;
+    info.tricks = 0;
+  }
+
+  void setActivePlayer(String activePlayerId) {
+    _activePlayerIds = {activePlayerId};
+    updateActivity();
+  }
+
+  void setActivePlayers(Set<String> playerIds) {
+    _activePlayerIds = playerIds;
+    updateActivity();
+  }
+
+  void removeActivePlayer(String playerId) {
+    _activePlayerIds.remove(playerId);
+    updateActivity();
+  }
+
+  void updateActivity() {
+    imActive.value = isActive(playerId);
+    notifyListeners();
+  }
+
+  void bid(String playerId, int bid) {
+    getInfo(playerId).bid = bid;
+    notifyListeners();
+  }
+
+  void setTricks(String playerId, int tricks) {
+    getInfo(playerId).tricks = tricks;
+    notifyListeners();
+  }
+
+  void incTrick(String playerId) {
+    getInfo(playerId).tricks++;
+    notifyListeners();
+  }
+
+  void finishRound(Map<String, int> pointsByPlayer) {
+    pointsByPlayer.forEach(_updatePoints);
+    notifyListeners();
+  }
+
+  void updatePoints(String playerId, int points) {
+    _updatePoints(playerId, points);
+    notifyListeners();
+  }
+
+  void _updatePoints(String playerId, int points) {
+    getInfo(playerId).points = points;
+  }
+
+  Player getPlayer(String playerId) =>
+      _players.firstWhere((player) => player.id == playerId);
+
+}
+
+class ObservableList<T> extends ChangeNotifier {
+  List<T> _elements = [];
+
+  List<T> get elements => _elements;
+
+  void clear() {
+    _elements.clear();
+    notifyListeners();
+  }
+
+  void add(T element) {
+    _elements.add(element);
+    notifyListeners();
+  }
+
+  void set(List<T> elements) {
+    _elements = elements;
+    notifyListeners();
+  }
+
+  void removeFirst(bool Function(T) test) {
+    var index = _elements.indexWhere(test);
+    if (index >= 0) {
+      _elements.removeAt(index);
+      notifyListeners();
+    }
+  }
+}
+
 
 /// Main entry point of the app.
 class WizardApp extends StatelessWidget {
@@ -651,8 +796,8 @@ class HomePage extends StatelessWidget {
                 ),
                 body: const Center(child: Text("Logging in...")));
           case ConnectionState.searchingGame:
-            return ChangeObserverWidget<GameList>(
-                observable: connection.gameList,
+            return ChangeObserver<GameList>(
+                state: connection.gameList,
                 builder: (context, gameList) {
                   var openGames = gameList.openGames;
                   return Scaffold(
@@ -757,7 +902,7 @@ class PlayingView extends StatelessWidget {
           case ConnectionState.waitingForStart:
             ObservableGame? game = connection.currentGame;
             if (game == null) return showWaitingForStart();
-            return ChangeObserverWidget<ObservableGame>(observable: game,
+            return ChangeObserver<ObservableGame>(state: game,
                 builder: (context, game) {
                   if (kDebugMode) {
                     print("Building GameLobbyState");
@@ -819,20 +964,37 @@ class WizardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<WizardPhase>(
       valueListenable: connection.wizardModel!.phase,
-      builder: (context, phase, child) {
-        if (kDebugMode) {
-          print("Building WizardWidget: " + phase.name);
-        }
+      builder: (context, phase, child)
+    {
+      if (kDebugMode) {
+        print("Building WizardWidget: " + phase.name);
+      }
 
-        var roundInfo = connection.wizardModel!.roundInfo;
-        return Scaffold(
+      var roundInfo = connection.wizardModel!.roundInfo;
+      return Scaffold(
           appBar: AppBar(
             title: roundInfo == null ?
-              const Text("Waiting for start...") :
-              Text("Round " + roundInfo.round.toString() + " of " + roundInfo.maxRound.toString()),
+            const Text("Waiting for start...") :
+            Text("Round " + roundInfo.round.toString() + " of " +
+                roundInfo.maxRound.toString()),
           ),
-          body: createBody(context, phase));
-      });
+          body: ExpandDisplay(
+              children: [
+                Padding(padding: const EdgeInsets.all(16),
+                  child: PlayerStateView(connection.wizardModel!.activityState)
+                ),
+                Expanded(child: Center(
+                    child: createBody(context, phase)
+                )),
+                Padding(padding: const EdgeInsets.all(16),
+                    child: CardListView(connection.wizardModel!.myCards,
+                      onTap: (card) {
+                        connection.sendCommand(msg.Lead(card: card));
+                      },
+                    )),
+              ]));
+    });
+// createBody(context, phase));
   }
 
   Widget createBody(BuildContext context, WizardPhase phase) {
@@ -844,19 +1006,87 @@ class WizardWidget extends StatelessWidget {
         return const Center(child: Text("Waiting for bid request..."));
 
       case WizardPhase.trumpSelection:
+        return ValueListenableBuilder<bool>(
+          valueListenable: connection.wizardModel!.activityState.imActive,
+          builder: (context, imActive, child) {
+            return imActive ?
+              TrumpSelectionView() :
+              WaitingForView((player) => "$player selects the trump color...");
+          });
+
       case WizardPhase.bidding:
         return ValueListenableBuilder<bool>(
-          valueListenable: connection.wizardModel!.imActive,
+          valueListenable: connection.wizardModel!.activityState.imActive,
           builder: (context, imActive, child) {
             return imActive ?
               MyBidView(connection.wizardModel!.roundInfo!.round) :
-              const WaitingForBidView();
-          },
-        );
+              WaitingForView((player) => "Waiting for $player's bid.");
+          });
+
       case WizardPhase.leading:
+        return LeadingView();
+        
       case WizardPhase.trickConfirmation:
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TrickView(connection.wizardModel!.currentTrick,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: connection.wizardModel!.activityState.imActive,
+                  builder: (context, amActive, child) {
+                    return amActive ?
+                      trickText(
+                        text: connection.wizardModel!.turnWinner!.name + " makes the trick!",
+                        onPressed: () {
+                          connection.sendCommand(msg.ConfirmTrick());
+                        }) :
+                      trickText(text: "Waiting for other players...");
+                  },
+                ) 
+              ),
+            ]));
+
       case WizardPhase.roundConfirmation:
+        return Center(
+          child: ValueListenableBuilder<bool>(
+            valueListenable: connection.wizardModel!.activityState.imActive,
+            builder: (context, amActive, child) {
+              return amActive ?
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("You get " + connection.wizardModel!.pointsEarned.toString() + " points!"),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          connection.sendCommand(msg.ConfirmRound());
+                        },
+                        child: const Text("Ok")))
+                  ],
+                ) :
+                Text("Waiting for other players...");
+            }));
+
       case WizardPhase.resultConfirmation:
+        var result = connection.wizardModel!.result;
+        int rank = 1;
+        int lastScore = result[0].points;
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+          children: [
+            Table(children: [
+              for (var score in result)
+                TableRow(children: [
+                  Text((score.points == lastScore ? rank : ++rank).toString()),
+                  Text(score.player!.name),
+                  Text((lastScore = score.points).toString()),
+                ])
+            ]),
+            const Text("You can now leave the game and start a new one.")
+          ]));
 
       default:
         return Center(child: Text("ERROR: " + phase.name));
@@ -864,19 +1094,80 @@ class WizardWidget extends StatelessWidget {
   }
 }
 
-class WaitingForBidView extends StatelessWidget {
-  const WaitingForBidView({Key? key}) : super(key: key);
+Widget trickText({String? text, void Function()? onPressed}) {
+  return trickTitle(child: text == null ? null : Text(text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), onPressed: onPressed);
+}
+
+Widget trickTitle({Widget? child, void Function()? onPressed}) {
+  return Column(children: [
+    Visibility(
+        maintainSize: true,
+        maintainAnimation: true,
+        maintainState: true,
+        visible: child != null,
+        child: child ?? Text("")),
+    Padding(
+        padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+        child: Visibility(
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: onPressed != null,
+            child: ElevatedButton(
+              child: const Text("Ok"),
+              onPressed: onPressed,
+            )
+        ))
+  ]);
+}
+
+class TrumpSelectionView extends StatelessWidget {
+  const TrumpSelectionView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CardListView(ObservableList<msg.Card>()..set([
+      msg.Card(suit: Suit.diamond, value: Value.z),
+      msg.Card(suit: Suit.heart, value: Value.z),
+      msg.Card(suit: Suit.spade, value: Value.z),
+      msg.Card(suit: Suit.club, value: Value.z),
+    ]), onTap: (card) {
+      connection.sendCommand(msg.SelectTrump(trumpSuit: card.suit!));
+    });
+  }
+}
+
+class LeadingView extends StatelessWidget {
+  const LeadingView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TrickView(connection.wizardModel!.currentTrick,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: connection.wizardModel!.activityState.imActive,
+        builder: (context, imActive, child) {
+          return imActive ?
+            trickText(text: "It's your turn!") :
+            trickTitle(child: WaitingForView((player) => "Waiting for $player's card."));
+        })
+    );
+  }
+}
+
+class WaitingForView extends StatelessWidget {
+  final String Function(String) messageForPlayer;
+
+  const WaitingForView(this.messageForPlayer, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var wizardModel = connection.wizardModel;
     
-    return ValueListenableBuilder<Set<String>>(
-      valueListenable: wizardModel!.activePlayerIds,
-      builder: (context, playerIds, child) {
-        return Center(
-          child: Text(
-            "Waiting for " + wizardModel.player(playerIds.first).name + "'s bid."));
+    return ChangeObserver<ActivityState>(
+      state: wizardModel!.activityState,
+      builder: (context, activityState) {
+        var activePlayer = activityState.activePlayer;
+        return activePlayer == null ? const Text("") : Text(messageForPlayer(activePlayer.name));
       });
   }
 }
@@ -887,8 +1178,7 @@ class MyBidView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
+    return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text("Place your bid"),
@@ -896,7 +1186,7 @@ class MyBidView extends StatelessWidget {
               padding: const EdgeInsets.all(15),
               child: Wrap(
                   direction: Axis.horizontal,
-                  children: options()))]));
+                  children: options()))]);
   }
 
   List<Widget> options() {
@@ -933,89 +1223,103 @@ class TrickCard {
 
 class TrickView extends StatelessWidget {
 
-  final List<TrickCard> cards;
+  final ObservableList<TrickCard> trick;
+  final Widget? child;
 
-  const TrickView(this.cards, {Key? key}) : super(key: key);
+  const TrickView(this.trick, {this.child, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 5,
-      runSpacing: 10,
-      children:
-        cards.map((card) =>
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          buildTrick(context),
+          if (child != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+              child: child,
+            )
+        ]));
+  }
+
+  Widget buildTrick(BuildContext context) {
+    return ChangeObserver<ObservableList<TrickCard>>(state: trick, builder: (context, trick) {
+      return Wrap(
+        spacing: 5,
+        runSpacing: 10,
+        children:
+        trick.elements.map((card) =>
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CardView(card.card),
               Padding(padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                child: Text(card.player.name),
+                child: Text(card.player.name, style: TextStyle(color: Colors.white)),
               )
-          ])).toList()
-  );
+            ])).toList()
+      );
+    });
   }
 }
 
 class CardListView extends StatelessWidget {
+  final ObservableList<msg.Card> cards;
+  final void Function(msg.Card)? onTap;
 
-  final List<msg.Card> cards;
-
-  const CardListView(this.cards, {Key? key}) : super(key: key);
+  const CardListView(this.cards, {this.onTap, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 5,
-      runSpacing: 5,
-      children:
-        cards.map((card) => CardView(card)).toList()
-    );
+    return ChangeObserver<ObservableList<msg.Card>>(state: cards, builder: (context, cards) {
+      return Wrap(
+          spacing: 5,
+          runSpacing: 5,
+          children:
+          cards.elements.map((card) => CardView(card, onTap: onTap)).toList()
+      );
+    });
   }
 }
 
 class PlayerStateView extends StatelessWidget {
-  final List<Player> players;
-  final ValueNotifier<Set<String>> activePlayerIds;
-  final Map<String, PlayerInfo> state;
+  final ActivityState state;
 
-  const PlayerStateView({required this.players, required this.activePlayerIds, required this.state, Key? key}) : super(key: key);
+  const PlayerStateView(this.state, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      direction: Axis.horizontal,
-      alignment: WrapAlignment.center,
-      spacing: 5,
-      runSpacing: 10,
-      children:
-        players.map(playerStateView).toList(),
-    );
+    return ChangeObserver<ActivityState>(state: state, builder: (context, state) {
+      return Wrap(
+        direction: Axis.horizontal,
+        alignment: WrapAlignment.center,
+        spacing: 5,
+        runSpacing: 10,
+        children:
+        state.players.map(playerStateView).toList(),
+      );
+    });
   }
 
   Widget playerStateView(Player player) {
-    var info = state[player.id]!;
-
-    return ChangeObserverWidget<ValueNotifier<Set<String>>>(
-      observable: activePlayerIds,
-      builder: (context, activePlayers) {
-        return DecoratedBox(
-          decoration: activePlayers.value.contains(player.id) ?
-            BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(10)) :
-            const BoxDecoration(),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child:
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                  child:
-                  Text(player.name + " (" + info.points.toString() + ")")),
-                trickView(info)
-              ])
-          ));
-      });
+    var info = state.getInfo(player.id);
+    return DecoratedBox(
+      decoration: state.isActive(player.id) ?
+        BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(10)) :
+        BoxDecoration(color: Color(0xff6cac6c), borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child:
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+              child:
+              Text(player.name + " (" + info.points.toString() + ")")),
+            trickView(info)
+          ])
+      ));
   }
 
   Widget trickView(PlayerInfo info) {
@@ -1048,18 +1352,32 @@ class PlayerStateView extends StatelessWidget {
 
 class CardView extends StatelessWidget {
   final msg.Card card;
+  final void Function(msg.Card)? onTap;
 
-  const CardView(this.card, {Key? key}) : super(key: key);
+  const CardView(this.card, {Key? key, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var handler = onTap;
+
+    if (handler == null) {
+      return contents(context);
+    }
+
+    return GestureDetector(
+        onTap: () => handler(card),
+        child: contents(context));
+  }
+
+  Widget contents(BuildContext context) {
     return Container(
         decoration: BoxDecoration(
             border: Border.all(
               color: Colors.black,
               width: 2,
             ),
-            borderRadius: const BorderRadius.all(Radius.circular(8))
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            color: Colors.white,
         ),
         child:
           Padding(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -1225,8 +1543,7 @@ class LoginViewState extends State<LoginView> {
                 },
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                 child: ElevatedButton(
                   child: const Text("Connect"),
                   onPressed: () {
@@ -1254,20 +1571,20 @@ class ConnectionData {
   ConnectionData(this.nickName, this.serverAddress);
 }
 
-class ChangeObserverWidget<S extends ChangeNotifier> extends StatefulWidget {
-  final S observable;
+class ChangeObserver<S extends ChangeNotifier> extends StatefulWidget {
+  final S state;
   final Widget Function(BuildContext, S) builder;
 
-  const ChangeObserverWidget({Key? key, required this.observable, required this.builder}) : super(key: key);
+  const ChangeObserver({Key? key, required this.state, required this.builder}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _ChangeObserverState<ChangeObserverWidget<S>, S>();
+    return _ChangeObserverState<ChangeObserver<S>, S>();
   }
 
 }
 
-class _ChangeObserverState<T extends ChangeObserverWidget<S>, S extends ChangeNotifier> extends State<T> {
+class _ChangeObserverState<T extends ChangeObserver<S>, S extends ChangeNotifier> extends State<T> {
   late S observable;
   late Widget Function(BuildContext, S) builder;
 
@@ -1275,7 +1592,7 @@ class _ChangeObserverState<T extends ChangeObserverWidget<S>, S extends ChangeNo
   void initState() {
     super.initState();
 
-    observable = widget.observable;
+    observable = widget.state;
     builder = widget.builder;
 
     observable.addListener(_onChange);
