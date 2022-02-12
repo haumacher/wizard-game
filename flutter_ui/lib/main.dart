@@ -344,11 +344,21 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   void visitLeaveAnnounce(LeaveAnnounce self, void arg) {
     gameList.leave(self.gameId, self.playerId);
     if (playerId == self.playerId) {
-      leaveGame();
+      onLeaveGame();
     }
   }
 
   void leaveGame() {
+    var currentGameId = gameId;
+    if (currentGameId != null) {
+      sendCommand(LeaveGame(gameId: currentGameId));
+    }
+
+    // Note: The leave request is not echoed by the server.
+    onLeaveGame();
+  }
+
+  void onLeaveGame() {
     state.value = ConnectionState.searchingGame;
     currentGame = null;
     
@@ -890,10 +900,7 @@ class GameEntryState extends ChangeNotifierState<GameEntryWidget, ObservableGame
 void pushGameView(BuildContext context) {
   var routeToGame = MaterialPageRoute(builder: (context) => const PlayingView());
   routeToGame.popped.then((_) {
-    var gameId = connection.gameId;
-    if (gameId != null) {
-      connection.sendCommand(LeaveGame(gameId: gameId));
-    }
+    connection.leaveGame();
   });
   Navigator.push(context, routeToGame);
 }
