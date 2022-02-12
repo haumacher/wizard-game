@@ -978,6 +978,7 @@ class WizardWidget extends StatelessWidget {
             Text("Round " + roundInfo.round.toString() + " of " +
                 roundInfo.maxRound.toString()),
           ),
+          backgroundColor: const Color(0xff158215),
           body: ExpandDisplay(
               children: [
                 Padding(padding: const EdgeInsets.all(16),
@@ -1056,7 +1057,7 @@ class WizardWidget extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("You get " + connection.wizardModel!.pointsEarned.toString() + " points!"),
+                    Text("You get " + connection.wizardModel!.pointsEarned.toString() + " points!", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                     Padding(
                       padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
                       child: ElevatedButton(
@@ -1066,7 +1067,7 @@ class WizardWidget extends StatelessWidget {
                         child: const Text("Ok")))
                   ],
                 ) :
-                Text("Waiting for other players...");
+                Text("Waiting for other players...", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
             }));
 
       case WizardPhase.resultConfirmation:
@@ -1095,7 +1096,8 @@ class WizardWidget extends StatelessWidget {
 }
 
 Widget trickText({String? text, void Function()? onPressed}) {
-  return trickTitle(child: text == null ? null : Text(text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), onPressed: onPressed);
+  return trickTitle(child: text == null ? null :
+    Text(text, style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)), onPressed: onPressed);
 }
 
 Widget trickTitle({Widget? child, void Function()? onPressed}) {
@@ -1105,7 +1107,7 @@ Widget trickTitle({Widget? child, void Function()? onPressed}) {
         maintainAnimation: true,
         maintainState: true,
         visible: child != null,
-        child: child ?? Text("")),
+        child: child ?? Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold))),
     Padding(
         padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
         child: Visibility(
@@ -1167,7 +1169,7 @@ class WaitingForView extends StatelessWidget {
       state: wizardModel!.activityState,
       builder: (context, activityState) {
         var activePlayer = activityState.activePlayer;
-        return activePlayer == null ? const Text("") : Text(messageForPlayer(activePlayer.name));
+        return activePlayer == null ? const Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)): Text(messageForPlayer(activePlayer.name), style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
       });
   }
 }
@@ -1181,7 +1183,7 @@ class MyBidView extends StatelessWidget {
     return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("Place your bid"),
+          const Text("Place your bid!", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
           Padding(
               padding: const EdgeInsets.all(15),
               child: Wrap(
