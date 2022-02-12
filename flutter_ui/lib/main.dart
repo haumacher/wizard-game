@@ -35,7 +35,7 @@ void showTrickTestPage() {
                 Player(id: "2", name: "Player B"),
                 Player(id: "3", name: "Player C"),
                 Player(id: "4", name: "You"),
-              ])
+              ], "1")
               ..setActivePlayers(const {"4"})
               ..finishRound({
                 "1": 50,
@@ -489,7 +489,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   @override
   void visitStartRound(StartRound self, void arg) {
     roundInfo = self;
-    activityState.startRound(self.players);
+    activityState.startRound(self.players, self.startPlayer);
     trumpCard.value = self.trumpCard;
     myCards.set(self.cards);
     
@@ -616,6 +616,8 @@ class ActivityState extends ChangeNotifier {
   Set<String> _activePlayerIds = {};
   final Map<String, PlayerInfo> _infos = {};
 
+  String? _startPlayer;
+
   ActivityState(this.playerId);
 
   List<Player> get players => _players;
@@ -625,6 +627,8 @@ class ActivityState extends ChangeNotifier {
 
   bool isActive(String playerId) => _activePlayerIds.contains(playerId);
 
+  bool isStartPlayer(Player player) => player.id == _startPlayer;
+
   /// The player who is expected to act.
   /// Must only be called in situations where a single player is active.
   Player? get activePlayer => _activePlayerIds.isEmpty ? null : getPlayer(_activePlayerIds.first);
@@ -633,7 +637,8 @@ class ActivityState extends ChangeNotifier {
     return _infos[playerId]!;
   }
 
-  void startRound(List<Player> players) {
+  void startRound(List<Player> players, String startPlayer) {
+    _startPlayer = startPlayer;
     _players = players;
     players.forEach(_initInfo);
     _infos.values.forEach(_clearTricks);
@@ -1338,10 +1343,13 @@ class PlayerStateView extends StatelessWidget {
 
   Widget playerStateView(Player player) {
     var info = state.getInfo(player.id);
+    var border = state.isStartPlayer(player) ?
+      Border.all(color: Colors.deepOrangeAccent, width: 2) :
+      Border.all(style: BorderStyle.none);
     return DecoratedBox(
       decoration: state.isActive(player.id) ?
-        BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(10)) :
-        BoxDecoration(color: Color(0xff6cac6c), borderRadius: BorderRadius.circular(10)),
+        BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(10), border: border) :
+        BoxDecoration(color: const Color(0xff6cac6c), borderRadius: BorderRadius.circular(10), border: border),
       child: Padding(
         padding: const EdgeInsets.all(8),
         child:
