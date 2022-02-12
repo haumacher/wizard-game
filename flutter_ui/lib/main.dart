@@ -490,6 +490,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   void visitStartRound(StartRound self, void arg) {
     roundInfo = self;
     activityState.startRound(self.players);
+    trumpCard.value = self.trumpCard;
     myCards.set(self.cards);
     
     setState(WizardPhase.cardsGiven);
@@ -504,6 +505,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   @override
   void visitSelectTrump(SelectTrump self, String playerId) {
     trump = self.trumpSuit;
+    trumpCard.value = msg.Card(value: Value.z, suit: self.trumpSuit);
   }
 
   @override
@@ -838,6 +840,13 @@ class GameEntryWidget extends StatefulWidget {
   }
 }
 
+extension PlayerName on Player {
+  String get displayName => amI(id) ? "You" : name;
+}
+
+/// Whether the player of this app is the player with the given ID.
+bool amI(String id) => id == connection.playerId;
+
 /// State of [GameEntryWidget] painting its contents whenever the players of a game change.
 class GameEntryState extends ChangeNotifierState<GameEntryWidget, ObservableGame> {
 
@@ -857,7 +866,7 @@ class GameEntryState extends ChangeNotifierState<GameEntryWidget, ObservableGame
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(child:
-                Text(observable.players.map((e) => e.name).join(", "))),
+                Text(observable.players.map((e) => e.displayName).join(", "))),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   fixedSize: const Size(40, 40),
@@ -929,7 +938,7 @@ class PlayingView extends StatelessWidget {
                                 children: [
                                   Padding(padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                                       child:
-                                      Text((n + 1).toString() + ". " + players[n].name))
+                                      Text((n + 1).toString() + ". " + players[n].displayName))
                                 ])))
                       ]
                     ),
@@ -981,9 +990,20 @@ class WizardWidget extends StatelessWidget {
           backgroundColor: const Color(0xff158215),
           body: ExpandDisplay(
               children: [
-                Padding(padding: const EdgeInsets.all(16),
-                  child: PlayerStateView(connection.wizardModel!.activityState)
-                ),
+                Row(children: [
+                  Expanded(child:
+                    Padding(padding: const EdgeInsets.all(16),
+                      child: PlayerStateView(connection.wizardModel!.activityState)
+                    )),
+                  ValueListenableBuilder<msg.Card?>(
+                    valueListenable: connection.wizardModel!.trumpCard,
+                    builder: (context, trumpCard, child) {
+                      return trumpCard == null ?
+                        const SizedBox.shrink() :
+                        Padding(padding: const EdgeInsets.fromLTRB(0, 16, 16, 16),
+                          child: CardView(trumpCard, size: 30));
+                      })
+                ]),
                 Expanded(child: Center(
                     child: createBody(context, phase)
                 )),
@@ -1038,7 +1058,9 @@ class WizardWidget extends StatelessWidget {
                   builder: (context, amActive, child) {
                     return amActive ?
                       trickText(
-                        text: connection.wizardModel!.turnWinner!.name + " makes the trick!",
+                        text: amI(connection.wizardModel!.turnWinner!.id) ?
+                          "You make the trick!" :
+                          connection.wizardModel!.turnWinner!.displayName + " makes the trick!",
                         onPressed: () {
                           connection.sendCommand(msg.ConfirmTrick());
                         }) :
@@ -1082,7 +1104,7 @@ class WizardWidget extends StatelessWidget {
               for (var score in result)
                 TableRow(children: [
                   Text((score.points == lastScore ? rank : ++rank).toString()),
-                  Text(score.player!.name),
+                  Text(score.player!.displayName),
                   Text((lastScore = score.points).toString()),
                 ])
             ]),
@@ -1128,14 +1150,23 @@ class TrumpSelectionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CardListView(ObservableList<msg.Card>()..set([
-      msg.Card(suit: Suit.diamond, value: Value.z),
-      msg.Card(suit: Suit.heart, value: Value.z),
-      msg.Card(suit: Suit.spade, value: Value.z),
-      msg.Card(suit: Suit.club, value: Value.z),
-    ]), onTap: (card) {
-      connection.sendCommand(msg.SelectTrump(trumpSuit: card.suit!));
-    });
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CardListView(ObservableList<msg.Card>()..set([
+          msg.Card(suit: Suit.diamond, value: Value.z),
+          msg.Card(suit: Suit.heart, value: Value.z),
+          msg.Card(suit: Suit.spade, value: Value.z),
+          msg.Card(suit: Suit.club, value: Value.z),
+        ]), onTap: (card) {
+          connection.sendCommand(msg.SelectTrump(trumpSuit: card.suit!));
+        }),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+          child:
+            trickText(text: "Select the trump color!")
+        )
+      ]);
   }
 }
 
@@ -1169,7 +1200,9 @@ class WaitingForView extends StatelessWidget {
       state: wizardModel!.activityState,
       builder: (context, activityState) {
         var activePlayer = activityState.activePlayer;
-        return activePlayer == null ? const Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)): Text(messageForPlayer(activePlayer.name), style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
+        return activePlayer == null ? 
+          const Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)) : 
+          Text(messageForPlayer(activePlayer.displayName), style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
       });
   }
 }
@@ -1257,7 +1290,7 @@ class TrickView extends StatelessWidget {
             children: [
               CardView(card.card),
               Padding(padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                child: Text(card.player.name, style: TextStyle(color: Colors.white)),
+                child: Text(card.player.displayName, style: TextStyle(color: Colors.white)),
               )
             ])).toList()
       );
@@ -1318,7 +1351,7 @@ class PlayerStateView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
               child:
-              Text(player.name + " (" + info.points.toString() + ")")),
+              Text(player.displayName + " (" + info.points.toString() + ")")),
             trickView(info)
           ])
       ));
@@ -1354,9 +1387,10 @@ class PlayerStateView extends StatelessWidget {
 
 class CardView extends StatelessWidget {
   final msg.Card card;
+  final double size;
   final void Function(msg.Card)? onTap;
 
-  const CardView(this.card, {Key? key, this.onTap}) : super(key: key);
+  const CardView(this.card, {this.size = 50, Key? key, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1390,8 +1424,8 @@ class CardView extends StatelessWidget {
                     Padding(padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
                       child:
                         Text(valueText(card.value),
-                          style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold))),
-                    CustomPaint(painter: suitPainter, size: const Size(50, 50))
+                          style: TextStyle(fontSize: 25 * size / 50, fontWeight: FontWeight.bold))),
+                    CustomPaint(painter: suitPainter, size: Size(size, size))
                   ]
               )
           )
