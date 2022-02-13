@@ -32,6 +32,10 @@ import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
 import de.haumacher.wizard.msg.Welcome;
 import de.haumacher.wizard.resources.StaticResources.Resource;
+import de.haumacher.wizard.server.db.DBException;
+import de.haumacher.wizard.server.db.UserDB;
+import de.haumacher.wizard.server.db.UserDBService;
+import de.haumacher.wizard.server.db.model.UserInfo;
 
 /**
  * Server-side logic for a single player.
@@ -116,9 +120,19 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 			}
 			return null;
 		}
+		
+		UserDB db = UserDBService.getInstance();
+		UserInfo userInfo;
+		try {
+			userInfo = db.login(self.getUid(), self.getSecret());
+		} catch (DBException ex) {
+			sendError(R.errInvalidCredentials);
+			return null;
+		}
+		
 		_loggedIn = true;
-		_locale = new Locale(self.getLocale());
-		_handle.getData().setName(self.getName());
+		_locale = new Locale(userInfo.getLanguage());
+		_handle.getData().setName(userInfo.getNickname());
 		sendMessage(Welcome.create().setPlayerId(getId()));
 		return null;
 	}

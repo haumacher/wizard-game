@@ -1,0 +1,74 @@
+package de.haumacher.wizard.server.db.model;
+
+/** Base class for commands for account management. */
+abstract message LoginCmd {
+
+}
+
+/**
+ * Command requesting the creation of a new account. Result is either {@link CreateAccountResult} on success, or {@link Error} on error.
+ */
+message CreateAccount extends LoginCmd {
+	/** The nickname for the newly created account. */
+	string nickname;
+	
+	/** The language the server should talk to the user. */
+	string language;
+}
+
+/**
+ * Result of {@link CreateAccount}, if successful.
+ */
+message CreateAccountResult {
+	/** The user ID of the newly created account. */
+	string uid;
+	
+	/** The login credentials to use for the newly created account. */
+	string secret;
+}
+
+/** Description of a user account */
+message UserInfo {
+	/** The nickname for the user. */
+	string nickname;
+	
+	/** The language the server should talk to the user. */
+	string language;
+}
+
+/** Command to assign an email to an existing account. An e-mail is send to the provided address with a verification token that must be provided to {@link VerifyEmail} in a following request. */
+message AddEmail extends LoginCmd {
+	/** The user ID, see {@link CreateAccountResult#uid}. */
+	string uid;
+
+	/** The user's login credentials, see {@link CreateAccountResult#secret}. */
+	string secret;
+	
+	/** The e-mail address to assign to the user's account. */
+	string email;
+}
+
+/** Command that verifies the e-mail address added to an account with {@link AddEmail}. */
+message VerifyEmail extends LoginCmd {
+	/** The user ID, see {@link CreateAccountResult#uid}. */
+	string uid;
+
+	/** The user's login credentials, see {@link CreateAccountResult#secret}. */
+	string secret;
+	
+	/** The verification token that was sent to the e-mail address. */
+	string token;
+}
+
+/** Generic response. */
+message Success {
+	/** Generic message. */
+	string `message`;
+}
+
+/** Generic error response. */
+message Failure {
+	/** Generic error message. */
+	string `message`;
+}
+

@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -23,10 +25,93 @@
 			<version>7.0</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.1.210</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq</artifactId>
+			<version>3.16.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-meta</artifactId>
+			<version>3.16.4</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<!-- Code generator plugin for DB abstraction layer -->
+				<groupId>org.jooq</groupId>
+				<artifactId>jooq-codegen-maven</artifactId>
+				<version>3.16.4</version>
+
+				<executions>
+					<execution>
+						<id>jooq-codegen</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<!-- Configure the database connection here -->
+					<jdbc>
+						<driver>org.h2.Driver</driver>
+						<url>jdbc:h2:tcp://homepi:9092/./work/wizard-db</url>
+						<user>wizard</user>
+						<password>LMGSOJyBjzkLQJ0Z</password>
+					</jdbc>
+
+					<generator>
+						<!-- The default code generator. You can override this one, to generate 
+							your own code style. Supported generators: - org.jooq.codegen.JavaGenerator 
+							- org.jooq.codegen.KotlinGenerator - org.jooq.codegen.ScalaGenerator Defaults 
+							to org.jooq.codegen.JavaGenerator -->
+						<name>org.jooq.codegen.JavaGenerator</name>
+
+						<database>
+							<!-- The database type. The format here is: org.jooq.meta.[database].[database]Database -->
+							<name>org.jooq.meta.h2.H2Database</name>
+
+							<!-- The database schema (or in the absence of schema support, in 
+								your RDBMS this can be the owner, user, database name) to be generated -->
+							<inputSchema>PUBLIC</inputSchema>
+
+							<!-- All elements that are generated from your schema (A Java regular 
+								expression. Use the pipe to separate several expressions) Watch out for case-sensitivity. 
+								Depending on your database, this might be important! -->
+							<includes>.*</includes>
+
+							<!-- All elements that are excluded from your schema (A Java regular 
+								expression. Use the pipe to separate several expressions). Excludes match 
+								before includes, i.e. excludes have a higher priority -->
+							<excludes></excludes>
+						</database>
+
+						<target>
+							<!-- The destination package of your generated classes (within the 
+								destination directory) -->
+							<packageName>de.haumacher.wizard.server.db.h2.schema</packageName>
+
+							<!-- The destination directory of your generated classes. Using Maven 
+								directory layout here -->
+							<directory>/home/bhu/git/wizard-game/server/src/main/java</directory>
+						</target>
+					</generator>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -42,7 +127,8 @@
 							<shadedClassifierName>full</shadedClassifierName>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>de.haumacher.wizard.server.standalone.StandaloneServer</mainClass>
 								</transformer>
 							</transformers>
@@ -74,7 +160,7 @@
 					<ignorePackaging>true</ignorePackaging>
 					<url>${wizard.server.deployUrl}</url>
 					<server>wizard-server</server>
-					<path>/wizard-game</path>
+					<path>/zauberer</path>
 				</configuration>
 			</plugin>
 		</plugins>
