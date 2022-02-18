@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>Datenschutz für Zauberer</title>
+</head>
+
+<body style="margin-left: 10%; margin-right: 10%; margin-top: 50px;">
+	<div
+		style="float: right; margin-left: 10px; margin-right: 10px; margin-bottom: 10px;">
+		<img width="96" height="96" src="images/zauberer.png" />
+	</div>
+
+	<h1>Datenschutz für Zauberer</h1>
+
+	<p>Das Spiel Zauberer ist ein Online-Spiel nach den Regeln des
+		legendären Kartenspiels "Wizard". Während des Spiels arbeiten dabei
+		mehrere technische Komponenten zusammen.</p>
+
+	<h2>1. Beteiligte Komponenten</h2>
+
+	<p>Jeder teilnehmende Spieler hat auf seinem Endgerät eine
+		Applikation, welche die Spieloberfläche anzeigt. Alle diese
+		Applikationen kommunizieren mit einem zentralen Server, welcher die
+		Spiellogik implementiert und die Einhaltung der Spielregeln überprüft.
+	</p>
+
+	<h2>2. Ausgetauschte Daten</h2>
+
+	<p>Der Datenaustausch während des Spiel erfolgt lediglich zwischen
+		dem Endgerät des Spielers und dem zentralen Server. Die Kommunikation
+		erfolgt in verschlüsselter Form über eine HTTPS-Verbindung nach
+		aktuellem Stand der Technik.</p>
+
+	<h3>a) Datenaustauch mit anderen Spielern</h3>
+
+	<p>Jeder Spieler wählt bei der Anmeldung ein Pseudonym, mit dem er
+		den anderen Mitspielern angezeigt wird. Neben dem Pseudonym wird nur
+		eine zufällig gewürfelter Identifier an andere Teilnehmer des Spiels
+		kommuniziert, um die Aktionen des Spielers eindeutig zuordnen zu
+		können. Während eines Spiels werden alle Spielaktionen eines Spielers
+		an die Endgeräte aller anderen an diesem Spiel beteiligten Mitspieler
+		gesendet.</p>
+
+	<h3>b) Datenaustauch mit dem Spiele-Server</h3>
+
+	<p>In der Kommunikation mit dem Spieleserver tauscht jeder
+		Teilnehmer neben seiner Spieler-ID und dem von ihm gewählten Pseudonym
+		nur die für die Kommunikation unerlässliche Daten wie die IP-Adresses
+		seines Endgerätes und ein bei der Anmeldung ebenfalls zufällig
+		generiertes Passwort aus.</p>
+
+	<h2>3. Gespeicherte Daten</h2>
+
+	<h3>a) Account-Passwort</h3>
+
+	<p>Das Passwort des Spielers wird auf seinem Endgerät gespeichert,
+		um bei erneutem Öffnen des Spiels, den Spieler automatisch anmelden zu
+		können. Das Passwort wird über einen kryptographisch sicheren
+		Zufallszahlengenerator erzeugt und verhindert, dass andere Spieler
+		allein mit Kenntnis der Spieler-ID eines Mitspielers dessen Account
+		übernehmen können.</p>
+
+	<p>Auf dem Spieleserver wird lediglich ein Hash-Wert des Passworts
+		gespeichert, sodass selbst bei Zugriff auf den Server-Daten die
+		Anmeldeinformationen nicht entwendet werden können.</p>
+
+	<h3>b) E-Mail-Addresse des Spielers</h3>
+
+	<p>Um seinem Account auf ein anderes Endgerät zu übertragen oder
+		diesen nach Zurücksetzten der Applikationsdaten wiederherstellen zu
+		können, kann der Spieler eine E-Mail-Adresse mit seinem Account
+		verknüpfen. Hierüber ist es möglich, ein neues Passwort für den
+		Account zu erstellen. In desem Fall wird an die verknüpfte
+		E-Mail-Adresse ein zufälliger Code geschickt, mit dem der Spieler 
+		seinem Account wiederherstellen kann.</p>
+
+	<p>Von der mit einem Account verknüpften E-Mail-Adresse wird dabei
+		lediglich ein Hash-Wert auf dem Spiele-Server gespeichert, so dass
+		selbst bei Kompromitierung des Servers keine E-Mail-Adressen von
+		Spielern gestohlen werden können. Will ein Spieler einen Account über
+		seine E-Mail-Adresse wiederherstellen, muss er diese erneut eingeben.
+		Nur wenn der Hash-Wert dieser Eingabe mit dem auf dem Server
+		gespeicherten Hash-Wert übereinstimmt, ist eine Wiederherstellung
+		möglich. Eine eingegebene E-Mail-Adresse wird so ausschließlich für
+		die einmalige Zusendung eines Codes für die Accountverknüpfung oder
+		Wiederherstellung verwendet.</p>
+
+	<h3>c) Logdateien</h3>
+
+	<p>Während ein Endgerät mit dem Spiele-Server verbunden ist, werden
+		Logdateien geschrieben, um bei technischen Problemen eine Analyse
+		vornehmen zu können. Die Logdateien verbleiben ausschließlich zu
+		Zwecken der Fehleranalyse für eine beschränkte Zeitspanne auf dem
+		Spieleserver.</p>
+
+	<h2>4. Kontakt</h2>
+
+	<p>
+		Bei Fragen zum Datenschutz beim Zaubern richtest Du deine Anfrage
+		bitte an
+		<code>play at haumacher.de</code>
+		.
+	</p>
+
+</body>
+</html>

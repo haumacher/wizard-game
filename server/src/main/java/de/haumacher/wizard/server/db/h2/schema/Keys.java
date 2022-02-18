@@ -29,12 +29,9 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<EmailTokenRecord> EMAIL_TOKEN_PK = Internal.createUniqueKey(EmailToken.EMAIL_TOKEN, DSL.name("EMAIL_TOKEN_PK"), new TableField[] { EmailToken.EMAIL_TOKEN.EMAIL }, true);
+    public static final UniqueKey<EmailTokenRecord> EMAIL_TOKEN_PK = Internal.createUniqueKey(EmailToken.EMAIL_TOKEN, DSL.name("EMAIL_TOKEN_PK"), new TableField[] { EmailToken.EMAIL_TOKEN.UID }, true);
     public static final UniqueKey<UserSessionRecord> USER_SESSION_PK = Internal.createUniqueKey(UserSession.USER_SESSION, DSL.name("USER_SESSION_PK"), new TableField[] { UserSession.USER_SESSION.UID }, true);
-    public static final UniqueKey<UsersRecord> USERS_EMAIL = Internal.createUniqueKey(Users.USERS, DSL.name("USERS_EMAIL"), new TableField[] { Users.USERS.EMAIL }, true);
-    public static final UniqueKey<UsersRecord> USERS_NICK = Internal.createUniqueKey(Users.USERS, DSL.name("USERS_NICK"), new TableField[] { Users.USERS.NICKNAME }, true);
     public static final UniqueKey<UsersRecord> USERS_PK = Internal.createUniqueKey(Users.USERS, DSL.name("USERS_PK"), new TableField[] { Users.USERS.UID }, true);
-    public static final UniqueKey<UsersRecord> USERS_UN = Internal.createUniqueKey(Users.USERS, DSL.name("USERS_UN"), new TableField[] { Users.USERS.NICKNAME }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions

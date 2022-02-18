@@ -18,7 +18,7 @@ public interface UserDB {
 	/**
 	 * Request lost login credentials.
 	 * 
-	 * @return A verification token that must be provided to {@link #fetchSecret(String, String)} later on.
+	 * @return A verification token that must be provided to {@link #newSecret(String, String)} later on.
 	 */
 	String requestSecret(String email) throws DBException;
 
@@ -31,7 +31,7 @@ public interface UserDB {
 	 *        The authentication token created in {@link #requestSecret(String)}.
 	 * @return The login credentials for the account associated with the given email address.
 	 */
-	CreateAccountResult fetchSecret(String email, String token) throws DBException;
+	CreateAccountResult newSecret(String email, String token) throws DBException;
 
 	/**
 	 * Adds an (unverified) email for the given user.

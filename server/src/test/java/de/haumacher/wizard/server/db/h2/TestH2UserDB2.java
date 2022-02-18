@@ -85,7 +85,7 @@ public class TestH2UserDB2 extends TestCase {
 		_db.verifyEmail(account1.getUid(), account1.getSecret(), token);
 		
 		String token2 = _db.requestSecret("haui@haumacher.de");
-		CreateAccountResult account2 = _db.fetchSecret("haui@haumacher.de", token2);
+		CreateAccountResult account2 = _db.newSecret("haui@haumacher.de", token2);
 		
 		UserInfo info2 = _db.login(account1.getUid(), account2.getSecret());
 		assertEquals(info2.getNickname(), info1.getNickname());

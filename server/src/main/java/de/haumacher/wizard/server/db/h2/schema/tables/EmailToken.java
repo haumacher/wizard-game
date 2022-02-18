@@ -12,7 +12,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row3;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -45,9 +45,14 @@ public class EmailToken extends TableImpl<EmailTokenRecord> {
     }
 
     /**
+     * The column <code>PUBLIC.EMAIL_TOKEN.UID</code>.
+     */
+    public final TableField<EmailTokenRecord, String> UID = createField(DSL.name("UID"), SQLDataType.VARCHAR(64).nullable(false), this, "");
+
+    /**
      * The column <code>PUBLIC.EMAIL_TOKEN.EMAIL</code>.
      */
-    public final TableField<EmailTokenRecord, String> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARCHAR(256).nullable(false), this, "");
+    public final TableField<EmailTokenRecord, byte[]> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARBINARY(128).nullable(false), this, "");
 
     /**
      * The column <code>PUBLIC.EMAIL_TOKEN.HASH</code>.
@@ -129,11 +134,11 @@ public class EmailToken extends TableImpl<EmailTokenRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row3 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row3<String, byte[], Long> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public Row4<String, byte[], byte[], Long> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

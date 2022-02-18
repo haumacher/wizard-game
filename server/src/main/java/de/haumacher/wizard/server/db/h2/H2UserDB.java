@@ -47,7 +47,7 @@ public class H2UserDB  implements UserDB {
 
 	@Override
 	public CreateAccountResult createUser(String nickname, String language) throws DBException {
-		Record result = _context.select().from(USERS).where(USERS.NICKNAME.eq(nickname)).fetchOne();
+		Record result = _context.select().from(USERS).where(USERS.NICKNAME.eq(nickname)).fetchAny();
 		if (result != null) {
 			// Fail fast.
 			throw new DBException("Nickname already exists");
@@ -93,7 +93,7 @@ public class H2UserDB  implements UserDB {
 		Record result = _context.select()
 			.from(USER_SESSION)
 			.where(USER_SESSION.UID.eq(uid))
-			.fetchOne();
+			.fetchAny();
 
 		if (result == null) {
 			throw new DBException("User does not exist.");
@@ -115,7 +115,7 @@ public class H2UserDB  implements UserDB {
 			;
 	}
 	
-	private String getEmail(String uid) {
+	private byte[] getEmail(String uid) {
 		Record info = _context.select().from(USERS).where(USERS.UID.eq(uid)).fetchOne();
 		return info.getValue(USERS.EMAIL);
 	}
@@ -125,51 +125,64 @@ public class H2UserDB  implements UserDB {
 		checkCredentials(uid, secret);
 		
 		String token = generateToken();
-		byte[] hash = hash(token);
+		byte[] tokenHash = hash(token);
 		long notAfter = System.currentTimeMillis() + ONE_HOUR;
 		
-//		_context.begin(
+		byte[] emailHash = hashEMail(email);
+
+		//		_context.begin(
 			_context.deleteFrom(EMAIL_TOKEN)
-				.where(EMAIL_TOKEN.EMAIL.eq(email)).execute();
+				.where(EMAIL_TOKEN.UID.eq(uid)).execute();
 			_context.update(USERS)
-				.set(USERS.EMAIL, email)
+				.set(USERS.EMAIL, emailHash)
 				.set(USERS.VERIFIED, false)
 				.where(USERS.UID.eq(uid)).execute();
 			_context.insertInto(EMAIL_TOKEN)
-				.columns(EMAIL_TOKEN.EMAIL, EMAIL_TOKEN.HASH, EMAIL_TOKEN.NOT_AFTER)
-				.values(email, hash, notAfter).execute();
+				.columns(EMAIL_TOKEN.UID, EMAIL_TOKEN.EMAIL, EMAIL_TOKEN.HASH, EMAIL_TOKEN.NOT_AFTER)
+				.values(uid, emailHash, tokenHash, notAfter).execute();
 //		).execute();
 		
 		return token;
+	}
+
+	private byte[] hashEMail(String email) {
+		return hash(email.trim().toLowerCase());
 	}
 	
 	@Override
 	public void verifyEmail(String uid, String secret, String token) throws DBException {
 		checkCredentials(uid, secret);
-		
-		String email = getEmail(uid);
-		if (email == null || email.isEmpty()) {
-			throw new DBException("Email not registered.");
-		}
 
-		checkToken(email, token);
+		checkToken(uid, token);
 
 //		_context.begin(
-			_context.deleteFrom(EMAIL_TOKEN).where(EMAIL_TOKEN.EMAIL.eq(email)).execute();
+			_context.deleteFrom(EMAIL_TOKEN).where(EMAIL_TOKEN.UID.eq(uid)).execute();
 			_context.update(USERS).set(USERS.VERIFIED, true).where(USERS.UID.eq(uid)).execute();
 //		).execute();
 	}
 
-	private void checkToken(String email, String token) throws DBException {
+	private void checkToken(String uid, String token) throws DBException {
 		Record result = _context.select()
 			.from(EMAIL_TOKEN)
-			.where(EMAIL_TOKEN.EMAIL.eq(email))
-			.fetchOne();
-		if (result == null) {
+			.where(EMAIL_TOKEN.UID.eq(uid))
+			.fetchAny();
+		checkToken(token, result);
+	}
+
+	private void checkToken(byte[] emailHash, String token) throws DBException {
+		Record result = _context.select()
+				.from(EMAIL_TOKEN)
+				.where(EMAIL_TOKEN.EMAIL.eq(emailHash))
+				.fetchAny();
+		checkToken(token, result);
+	}
+	
+	private void checkToken(String token, Record tokenResult) throws DBException {
+		if (tokenResult == null) {
 			throw new DBException("No token found.");
 		}
 		
-		byte[] expected = result.getValue(EMAIL_TOKEN.HASH);
+		byte[] expected = tokenResult.getValue(EMAIL_TOKEN.HASH);
 		byte[] hash = hash(token);
 		boolean ok = Arrays.equals(hash, expected);
 		if (!ok) {
@@ -179,7 +192,8 @@ public class H2UserDB  implements UserDB {
 	
 	@Override
 	public String requestSecret(String email) throws DBException {
-		Record tokenRecord = _context.select().from(EMAIL_TOKEN).where(EMAIL_TOKEN.EMAIL.eq(email)).fetchAny();
+		byte[] emailHash = hashEMail(email);
+		Record tokenRecord = _context.select().from(EMAIL_TOKEN).where(EMAIL_TOKEN.EMAIL.eq(emailHash)).fetchAny();
 		if (tokenRecord != null) {
 			long notAfter = tokenRecord.getValue(EMAIL_TOKEN.NOT_AFTER);
 			long now = System.currentTimeMillis();
@@ -187,21 +201,21 @@ public class H2UserDB  implements UserDB {
 				long minutes = (notAfter - now) / ONE_MINUTE;
 				throw new DBException("Login request already sent, try again in " + minutes + " minutes.");
 			}
-			_context.deleteFrom(EMAIL_TOKEN).where(EMAIL_TOKEN.EMAIL.eq(email));
+			_context.deleteFrom(EMAIL_TOKEN).where(EMAIL_TOKEN.EMAIL.eq(emailHash));
 		}
 		
-		Record userRecord = _context.select().from(USERS).where(USERS.EMAIL.eq(email)).fetchAny();
+		Record userRecord = _context.select().from(USERS).where(USERS.EMAIL.eq(emailHash)).fetchAny();
 		if (userRecord == null) {
 			throw new DBException("E-mail not registered.");
 		}
 		
 		String token = generateToken();
-		byte[] hash = hash(token);
+		byte[] tokenHash = hash(token);
 		long notAfter = System.currentTimeMillis() + ONE_HOUR;
 		
 		_context.insertInto(EMAIL_TOKEN)
-			.columns(EMAIL_TOKEN.EMAIL, EMAIL_TOKEN.HASH, EMAIL_TOKEN.NOT_AFTER)
-			.values(email, hash, notAfter)
+			.columns(EMAIL_TOKEN.UID, EMAIL_TOKEN.EMAIL, EMAIL_TOKEN.HASH, EMAIL_TOKEN.NOT_AFTER)
+			.values(userRecord.getValue(USERS.UID), emailHash, tokenHash, notAfter)
 			.execute();
 		
 		return token;
@@ -217,16 +231,17 @@ public class H2UserDB  implements UserDB {
 	}
 
 	@Override
-	public CreateAccountResult fetchSecret(String email, String token) throws DBException {
-		checkToken(email, token);
+	public CreateAccountResult newSecret(String email, String token) throws DBException {
+		byte[] emailHash = hashEMail(email);
+		checkToken(emailHash, token);
 		
-		Record info = _context.select().from(USERS).where(USERS.EMAIL.eq(email)).fetchOne();
+		Record info = _context.select().from(USERS).where(USERS.EMAIL.eq(emailHash)).fetchAny();
 		if (info == null) {
 			throw new DBException("E-mail not registered.");
 		}
 		
 		String uid = info.getValue(USERS.UID);
-		Record result = _context.select().from(USER_SESSION).where(USER_SESSION.UID.eq(uid)).fetchOne();
+		Record result = _context.select().from(USER_SESSION).where(USER_SESSION.UID.eq(uid)).fetchAny();
 		if (result == null) {
 			throw new DBException("Session not found.");
 		}

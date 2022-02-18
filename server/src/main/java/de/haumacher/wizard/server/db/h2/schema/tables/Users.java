@@ -4,6 +4,7 @@
 package de.haumacher.wizard.server.db.h2.schema.tables;
 
 
+import de.haumacher.wizard.server.db.h2.schema.Indexes;
 import de.haumacher.wizard.server.db.h2.schema.Keys;
 import de.haumacher.wizard.server.db.h2.schema.Public;
 import de.haumacher.wizard.server.db.h2.schema.tables.records.UsersRecord;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row7;
@@ -60,7 +62,7 @@ public class Users extends TableImpl<UsersRecord> {
     /**
      * The column <code>PUBLIC.USERS.EMAIL</code>.
      */
-    public final TableField<UsersRecord, String> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARCHAR(256), this, "");
+    public final TableField<UsersRecord, byte[]> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARBINARY(128).nullable(false), this, "");
 
     /**
      * The column <code>PUBLIC.USERS.LANGUAGE</code>.
@@ -121,13 +123,13 @@ public class Users extends TableImpl<UsersRecord> {
     }
 
     @Override
-    public UniqueKey<UsersRecord> getPrimaryKey() {
-        return Keys.USERS_PK;
+    public List<Index> getIndexes() {
+        return Arrays.asList(Indexes.USERS_EMAIL_INDEX, Indexes.USERS_NICKNAME_INDEX);
     }
 
     @Override
-    public List<UniqueKey<UsersRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.USERS_NICK, Keys.USERS_UN, Keys.USERS_EMAIL);
+    public UniqueKey<UsersRecord> getPrimaryKey() {
+        return Keys.USERS_PK;
     }
 
     @Override
@@ -161,7 +163,7 @@ public class Users extends TableImpl<UsersRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<String, String, String, String, Long, Boolean, Long> fieldsRow() {
+    public Row7<String, String, byte[], String, Long, Boolean, Long> fieldsRow() {
         return (Row7) super.fieldsRow();
     }
 }
