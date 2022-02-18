@@ -32,7 +32,7 @@ public class TestMailService extends TestCase {
 		MailService service = new MailService(user, password, properties);
 		service.startUp();
 		
-		service.sendActivationMail(receiver, "12345678");
+		service.sendActivationMail(receiver, "4711", "12345678");
 		
 		service.shutdown();
 	}

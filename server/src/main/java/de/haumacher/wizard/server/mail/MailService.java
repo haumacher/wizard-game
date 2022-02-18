@@ -10,14 +10,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Properties;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.URLDataSource;
 import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -52,45 +48,27 @@ public class MailService {
 		_properties = properties;
 	}
 	
-	public void sendActivationMail(String receiver, String code)
+	public void sendActivationMail(String receiver, String uid, String code)
 			throws MessagingException, IOException, AddressException {
-		String imageId = "zauberer_id";
-		String image = "cid:" + imageId;
+		String image = "https://play.haumacher.de/zauberer/images/zauberer.png";
 		
-		String link = "https://play.haumacher.de/zauberer/activate?uid=4711&token=" + code;
+		String link = "https://play.haumacher.de/zauberer/activate?uid=" + uid + "&token=" + code;
 		Message msg = createMessage();
 		msg.setSubject("Zauberer account creation");
 		
 	    MimeMultipart alternativePart = new MimeMultipart("alternative");
 	    {
 	    	{
-	    		MimeBodyPart htmlPart = new MimeBodyPart();
-	    		{
-	    			Multipart relatedPart = new MimeMultipart("related");
-	    			{
-	    				MimeBodyPart sourcePart = new MimeBodyPart();
-	    				sourcePart.setText(read("/templates/mail-template.html", link, code, image), "utf-8", "html");
-	    				relatedPart.addBodyPart(sourcePart);
-	    			}
-
-	    			{
-	    		    	MimeBodyPart imagePart = new MimeBodyPart();
-	    		    	DataSource source = new URLDataSource(getClass().getResource("/META-INF/resources/images/zauberer.png"));
-	    		    	imagePart.setDataHandler(new DataHandler(source));
-	    		    	imagePart.setHeader("Content-Disposition", "inline");
-	    		    	imagePart.setHeader("Content-Type", "image/png");
-	    		    	imagePart.setFileName("zauberer.png"); 
-	    		    	imagePart.setContentID(imageId);
-	    		    	relatedPart.addBodyPart(imagePart);		
-	    			}
-	    			htmlPart.setContent(relatedPart);
-	    		}
-	    		alternativePart.addBodyPart(htmlPart);
+    			MimeBodyPart sourcePart = new MimeBodyPart();
+    			sourcePart.setText(read("/templates/mail-template.html", link, code, image), "utf-8", "html");
+	    		alternativePart.addBodyPart(sourcePart);
 	    	}
-	    	
-	    	MimeBodyPart text = new MimeBodyPart();
-	    	text.setText(read("/templates/mail-template.txt", link, code, image), "utf-8");
-	    	alternativePart.addBodyPart(text);
+
+	    	{
+	    		MimeBodyPart text = new MimeBodyPart();
+	    		text.setText(read("/templates/mail-template.txt", link, code, image), "utf-8");
+	    		alternativePart.addBodyPart(text);
+	    	}
 	    }
 		
 		msg.setContent(alternativePart);
