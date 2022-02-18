@@ -30,6 +30,7 @@ public class R extends StaticResources {
 	public static M0 errGameAlreadyStarted;
 	public static M0 errVersionToNew;
 	public static M0 errVersionToOld;
+	public static M0 errInvalidCredentials;
 	public static M0 errPlayerNotFound;
 	public static M1 errFailureOccurred_message;
 	

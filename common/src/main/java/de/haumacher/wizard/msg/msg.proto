@@ -96,14 +96,14 @@ message Error extends ResultMsg {
  * </p> 
  */
 message Login extends Cmd {
-	/** The nick name of the player. */
-	string name;
-	
 	/** The protocol version of the connecting client. This can be used to detect version mismatch of client and server. */
 	int version;
+
+	/** The UID of the player. */
+	string uid;
 	
-	/** The locale of the client. The server tries to localize error message in that locale. */
-	string locale;
+	/** The user's login secret. */
+	string secret;
 }
 
 /** Response message upon successful {@link Login}. */

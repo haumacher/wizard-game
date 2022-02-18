@@ -19,20 +19,20 @@ public class Login extends Cmd {
 	/** Identifier for the {@link Login} type in JSON format. */
 	public static final String LOGIN__TYPE = "Login";
 
-	/** @see #getName() */
-	private static final String NAME = "name";
-
 	/** @see #getVersion() */
 	private static final String VERSION = "version";
 
-	/** @see #getLocale() */
-	private static final String LOCALE = "locale";
+	/** @see #getUid() */
+	private static final String UID = "uid";
 
-	private String _name = "";
+	/** @see #getSecret() */
+	private static final String SECRET = "secret";
 
 	private int _version = 0;
 
-	private String _locale = "";
+	private String _uid = "";
+
+	private String _secret = "";
 
 	/**
 	 * Creates a {@link Login} instance.
@@ -42,26 +42,6 @@ public class Login extends Cmd {
 	protected Login() {
 		super();
 	}
-
-	/**
-	 * The nick name of the player.
-	 */
-	public final String getName() {
-		return _name;
-	}
-
-	/**
-	 * @see #getName()
-	 */
-	public Login setName(String value) {
-		internalSetName(value);
-		return this;
-	}
-	/** Internal setter for {@link #getName()} without chain call utility. */
-	protected final void internalSetName(String value) {
-		_name = value;
-	}
-
 
 	/**
 	 * The protocol version of the connecting client. This can be used to detect version mismatch of client and server.
@@ -84,22 +64,42 @@ public class Login extends Cmd {
 
 
 	/**
-	 * The locale of the client. The server tries to localize error message in that locale.
+	 * The UID of the player.
 	 */
-	public final String getLocale() {
-		return _locale;
+	public final String getUid() {
+		return _uid;
 	}
 
 	/**
-	 * @see #getLocale()
+	 * @see #getUid()
 	 */
-	public Login setLocale(String value) {
-		internalSetLocale(value);
+	public Login setUid(String value) {
+		internalSetUid(value);
 		return this;
 	}
-	/** Internal setter for {@link #getLocale()} without chain call utility. */
-	protected final void internalSetLocale(String value) {
-		_locale = value;
+	/** Internal setter for {@link #getUid()} without chain call utility. */
+	protected final void internalSetUid(String value) {
+		_uid = value;
+	}
+
+
+	/**
+	 * The user's login secret.
+	 */
+	public final String getSecret() {
+		return _secret;
+	}
+
+	/**
+	 * @see #getSecret()
+	 */
+	public Login setSecret(String value) {
+		internalSetSecret(value);
+		return this;
+	}
+	/** Internal setter for {@link #getSecret()} without chain call utility. */
+	protected final void internalSetSecret(String value) {
+		_secret = value;
 	}
 
 
@@ -120,20 +120,20 @@ public class Login extends Cmd {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(NAME);
-		out.value(getName());
 		out.name(VERSION);
 		out.value(getVersion());
-		out.name(LOCALE);
-		out.value(getLocale());
+		out.name(UID);
+		out.value(getUid());
+		out.name(SECRET);
+		out.value(getSecret());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case NAME: setName(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			case VERSION: setVersion(in.nextInt()); break;
-			case LOCALE: setLocale(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case UID: setUid(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case SECRET: setSecret(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

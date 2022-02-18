@@ -4,7 +4,6 @@
 package de.haumacher.wizard;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import de.haumacher.wizard.controller.Controller;
 import de.haumacher.wizard.controller.WizardController;
@@ -99,9 +98,9 @@ public class WizardApp extends Application implements WizardUI {
 				openConnection();
 				_connection.sendCommand(
 					Login.create()
-						.setLocale(Locale.getDefault().getLanguage())
-						.setName(_data.getNickName())
-						.setVersion(WizardGame.PROTOCOL_VERSION));
+						.setVersion(WizardGame.PROTOCOL_VERSION)
+						.setUid("TODO")
+						.setSecret("TODO"));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				_connection = null;

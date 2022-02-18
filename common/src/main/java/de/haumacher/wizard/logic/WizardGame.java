@@ -52,7 +52,7 @@ import de.haumacher.wizard.msg.Value;
  */
 public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException> {
 	
-	public static final int PROTOCOL_VERSION = 3;
+	public static final int PROTOCOL_VERSION = 4;
 	
 	static final List<Card> CARDS;
 
