@@ -1,0 +1,11 @@
+Dear Zauberer,
+
+you requested creation of an account for the Zauberer online card game. To verify your e-mail, please 
+enter the following code into your Zauberer app, or click on the link behind the code:
+
+        {code}
+
+If you did not request a Zauberer account, please ignore this e-mail.
+
+Best regards
+Your Zauberer gaming server

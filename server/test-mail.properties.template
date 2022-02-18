@@ -1,0 +1,14 @@
+test.user=
+test.password=
+test.receiver=
+
+mail.debug=true
+mail.mime.address.strict=false
+mail.transport.protocol=smtps
+
+mail.smtps.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.ssl.enable=true
+mail.smtps.host=
+mail.smtp.from=
+mail.smtps.user= 

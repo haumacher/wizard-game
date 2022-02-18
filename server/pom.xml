@@ -11,6 +11,10 @@
 
 	<artifactId>wizard-server</artifactId>
 	<name>wizard-server</name>
+	
+	<properties>
+		<skipJooq>true</skipJooq>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -20,10 +24,16 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>7.0</version>
-			<scope>provided</scope>
+		    <groupId>javax</groupId>
+		    <artifactId>javaee-api</artifactId>
+		    <version>8.0.1</version>
+		    <scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<version>1.6.2</version>
+		    <artifactId>javax.mail</artifactId>
 		</dependency>
 
 		<dependency>
@@ -43,7 +53,6 @@
 			<artifactId>jooq-meta</artifactId>
 			<version>3.16.4</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -65,6 +74,8 @@
 				</executions>
 
 				<configuration>
+					<skip>${skipJooq}</skip>
+				
 					<!-- Configure the database connection here -->
 					<jdbc>
 						<driver>org.h2.Driver</driver>
@@ -150,6 +161,10 @@
 						</goals>
 					</execution>
 				</executions>
+				
+				<configuration>
+					<archiveClasses>true</archiveClasses>
+				</configuration>
 			</plugin>
 
 			<plugin>

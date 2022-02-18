@@ -30,8 +30,8 @@ import de.haumacher.wizard.server.db.model.VerifyEmail;
 /**
  * Account management servlet.
  */
-@WebServlet(loadOnStartup = 1, value = "/login")
-public class LoginServlet extends HttpServlet implements LoginCmd.Visitor<Void, HttpServletResponse, IOException> {
+@WebServlet(loadOnStartup = 1, value = "/account")
+public class AccountServlet extends HttpServlet implements LoginCmd.Visitor<Void, HttpServletResponse, IOException> {
 
 	private static final String TEXT_JSON = "text/json";
 

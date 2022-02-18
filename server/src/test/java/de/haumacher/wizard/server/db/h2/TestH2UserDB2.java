@@ -36,7 +36,7 @@ public class TestH2UserDB2 extends TestCase {
 		
 		StringBuilder builder = new StringBuilder();
 		try (Statement statement = _connection.createStatement()) {
-			try (InputStream in = getClass().getResourceAsStream("setup.sql")) {
+			try (InputStream in = getClass().getResourceAsStream("/setup/setup.sql")) {
 				try (Reader r = new InputStreamReader(in, "utf-8")) {
 					try (BufferedReader reader = new BufferedReader(r)) {
 						while (true) {
