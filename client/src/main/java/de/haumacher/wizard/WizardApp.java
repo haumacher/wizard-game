@@ -11,7 +11,6 @@ import de.haumacher.wizard.controller.WizardUI;
 import de.haumacher.wizard.io.PlainConnection;
 import de.haumacher.wizard.io.WebsocketConnection;
 import de.haumacher.wizard.io.WizardConnectionSPI;
-import de.haumacher.wizard.logic.WizardGame;
 import de.haumacher.wizard.msg.CreateGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.Login;
@@ -91,6 +90,8 @@ public class WizardApp extends Application implements WizardUI {
 			dialog.setServerAddr("wss://play.haumacher.de/wizard-game/ws");
 		}
 		
+		// TODO: Send Hello message.
+		
 		dialog.show(data -> {
 			_data = data;
 			try {
@@ -98,7 +99,6 @@ public class WizardApp extends Application implements WizardUI {
 				openConnection();
 				_connection.sendCommand(
 					Login.create()
-						.setVersion(WizardGame.PROTOCOL_VERSION)
 						.setUid("TODO")
 						.setSecret("TODO"));
 			} catch (Exception ex) {

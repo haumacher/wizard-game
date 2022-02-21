@@ -47,7 +47,12 @@ public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 			case JoinAnnounce.JOIN_ANNOUNCE__TYPE: result = de.haumacher.wizard.msg.JoinAnnounce.readJoinAnnounce(in); break;
 			case LeaveAnnounce.LEAVE_ANNOUNCE__TYPE: result = de.haumacher.wizard.msg.LeaveAnnounce.readLeaveAnnounce(in); break;
 			case Error.ERROR__TYPE: result = de.haumacher.wizard.msg.Error.readError(in); break;
+			case HelloResult.HELLO_RESULT__TYPE: result = de.haumacher.wizard.msg.HelloResult.readHelloResult(in); break;
+			case CreateAccountResult.CREATE_ACCOUNT_RESULT__TYPE: result = de.haumacher.wizard.msg.CreateAccountResult.readCreateAccountResult(in); break;
+			case AddEmailSuccess.ADD_EMAIL_SUCCESS__TYPE: result = de.haumacher.wizard.msg.AddEmailSuccess.readAddEmailSuccess(in); break;
+			case VerifyEmailSuccess.VERIFY_EMAIL_SUCCESS__TYPE: result = de.haumacher.wizard.msg.VerifyEmailSuccess.readVerifyEmailSuccess(in); break;
 			case Welcome.WELCOME__TYPE: result = de.haumacher.wizard.msg.Welcome.readWelcome(in); break;
+			case LoginFailed.LOGIN_FAILED__TYPE: result = de.haumacher.wizard.msg.LoginFailed.readLoginFailed(in); break;
 			case ListGamesResult.LIST_GAMES_RESULT__TYPE: result = de.haumacher.wizard.msg.ListGamesResult.readListGamesResult(in); break;
 			case StartRound.START_ROUND__TYPE: result = de.haumacher.wizard.msg.StartRound.readStartRound(in); break;
 			case RequestTrumpSelection.REQUEST_TRUMP_SELECTION__TYPE: result = de.haumacher.wizard.msg.RequestTrumpSelection.readRequestTrumpSelection(in); break;

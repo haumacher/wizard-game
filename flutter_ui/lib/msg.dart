@@ -327,9 +327,7 @@ class Card extends _JsonObject {
 }
 
 /// Visitor interface for Cmd.
-abstract class CmdVisitor<R, A> implements GameCmdVisitor<R, A> {
-	R visitLogin(Login self, A arg);
-	R visitReconnect(Reconnect self, A arg);
+abstract class CmdVisitor<R, A> implements LoginCmdVisitor<R, A>, GameCmdVisitor<R, A> {
 	R visitListGames(ListGames self, A arg);
 	R visitJoinGame(JoinGame self, A arg);
 	R visitCreateGame(CreateGame self, A arg);
@@ -357,13 +355,17 @@ abstract class Cmd extends _JsonObject {
 		}
 
 		switch (json.expectString()) {
-			case "Login": result = Login(); break;
-			case "Reconnect": result = Reconnect(); break;
 			case "ListGames": result = ListGames(); break;
 			case "JoinGame": result = JoinGame(); break;
 			case "CreateGame": result = CreateGame(); break;
 			case "StartGame": result = StartGame(); break;
 			case "LeaveGame": result = LeaveGame(); break;
+			case "Hello": result = Hello(); break;
+			case "CreateAccount": result = CreateAccount(); break;
+			case "AddEmail": result = AddEmail(); break;
+			case "VerifyEmail": result = VerifyEmail(); break;
+			case "Login": result = Login(); break;
+			case "Reconnect": result = Reconnect(); break;
 			case "SelectTrump": result = SelectTrump(); break;
 			case "Bid": result = Bid(); break;
 			case "Lead": result = Lead(); break;
@@ -425,7 +427,12 @@ abstract class Msg extends _JsonObject {
 			case "JoinAnnounce": result = JoinAnnounce(); break;
 			case "LeaveAnnounce": result = LeaveAnnounce(); break;
 			case "Error": result = Error(); break;
+			case "HelloResult": result = HelloResult(); break;
+			case "CreateAccountResult": result = CreateAccountResult(); break;
+			case "AddEmailSuccess": result = AddEmailSuccess(); break;
+			case "VerifyEmailSuccess": result = VerifyEmailSuccess(); break;
 			case "Welcome": result = Welcome(); break;
+			case "LoginFailed": result = LoginFailed(); break;
 			case "ListGamesResult": result = ListGamesResult(); break;
 			case "StartRound": result = StartRound(); break;
 			case "RequestTrumpSelection": result = RequestTrumpSelection(); break;
@@ -461,7 +468,12 @@ abstract class Msg extends _JsonObject {
 /// Visitor interface for ResultMsg.
 abstract class ResultMsgVisitor<R, A> {
 	R visitError(Error self, A arg);
+	R visitHelloResult(HelloResult self, A arg);
+	R visitCreateAccountResult(CreateAccountResult self, A arg);
+	R visitAddEmailSuccess(AddEmailSuccess self, A arg);
+	R visitVerifyEmailSuccess(VerifyEmailSuccess self, A arg);
 	R visitWelcome(Welcome self, A arg);
+	R visitLoginFailed(LoginFailed self, A arg);
 	R visitListGamesResult(ListGamesResult self, A arg);
 }
 
@@ -486,7 +498,12 @@ abstract class ResultMsg extends Msg {
 
 		switch (json.expectString()) {
 			case "Error": result = Error(); break;
+			case "HelloResult": result = HelloResult(); break;
+			case "CreateAccountResult": result = CreateAccountResult(); break;
+			case "AddEmailSuccess": result = AddEmailSuccess(); break;
+			case "VerifyEmailSuccess": result = VerifyEmailSuccess(); break;
 			case "Welcome": result = Welcome(); break;
+			case "LoginFailed": result = LoginFailed(); break;
 			case "ListGamesResult": result = ListGamesResult(); break;
 			default: result = null;
 		}
@@ -561,26 +578,503 @@ class Error extends ResultMsg {
 
 }
 
+/// Visitor interface for LoginCmd.
+abstract class LoginCmdVisitor<R, A> {
+	R visitHello(Hello self, A arg);
+	R visitCreateAccount(CreateAccount self, A arg);
+	R visitAddEmail(AddEmail self, A arg);
+	R visitVerifyEmail(VerifyEmail self, A arg);
+	R visitLogin(Login self, A arg);
+	R visitReconnect(Reconnect self, A arg);
+}
+
+///  Base class for commands for account management.
+abstract class LoginCmd extends Cmd {
+	/// Creates a LoginCmd.
+	LoginCmd();
+
+	/// Parses a LoginCmd from a string source.
+	static LoginCmd? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a LoginCmd instance from the given reader.
+	static LoginCmd? read(JsonReader json) {
+		LoginCmd? result;
+
+		json.expectArray();
+		if (!json.hasNext()) {
+			return null;
+		}
+
+		switch (json.expectString()) {
+			case "Hello": result = Hello(); break;
+			case "CreateAccount": result = CreateAccount(); break;
+			case "AddEmail": result = AddEmail(); break;
+			case "VerifyEmail": result = VerifyEmail(); break;
+			case "Login": result = Login(); break;
+			case "Reconnect": result = Reconnect(); break;
+			default: result = null;
+		}
+
+		if (!json.hasNext() || json.tryNull()) {
+			return null;
+		}
+
+		if (result == null) {
+			json.skipAnyValue();
+		} else {
+			result._readContent(json);
+		}
+		json.endArray();
+
+		return result;
+	}
+
+	R visitLoginCmd<R, A>(LoginCmdVisitor<R, A> v, A arg);
+
+	@override
+	R visitCmd<R, A>(CmdVisitor<R, A> v, A arg) => visitLoginCmd(v, arg);
+
+}
+
+///  The first method sent after opening a connection.
+class Hello extends LoginCmd {
+	///  The protocol version of the connecting client. This can be used to detect version mismatch of client and server.
+	int version;
+
+	///  The language the server should talk to the user.
+	String language;
+
+	/// Creates a Hello.
+	Hello({
+			this.version = 0, 
+			this.language = "", 
+	});
+
+	/// Parses a Hello from a string source.
+	static Hello? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a Hello instance from the given reader.
+	static Hello read(JsonReader json) {
+		Hello result = Hello();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "Hello";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "version": {
+				version = json.expectInt();
+				break;
+			}
+			case "language": {
+				language = json.expectString();
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("version");
+		json.addNumber(version);
+
+		json.addKey("language");
+		json.addString(language);
+	}
+
+	@override
+	R visitLoginCmd<R, A>(LoginCmdVisitor<R, A> v, A arg) => v.visitHello(this, arg);
+
+}
+
+///  Answer to {@link Hello}.
+class HelloResult extends ResultMsg {
+	///  Whether protocol version matches and login can continue.
+	bool ok;
+
+	///  The protocol version of the server.
+	int version;
+
+	///  Description of the problem, if not ok.
+	String msg;
+
+	/// Creates a HelloResult.
+	HelloResult({
+			this.ok = false, 
+			this.version = 0, 
+			this.msg = "", 
+	});
+
+	/// Parses a HelloResult from a string source.
+	static HelloResult? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a HelloResult instance from the given reader.
+	static HelloResult read(JsonReader json) {
+		HelloResult result = HelloResult();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "HelloResult";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "ok": {
+				ok = json.expectBool();
+				break;
+			}
+			case "version": {
+				version = json.expectInt();
+				break;
+			}
+			case "msg": {
+				msg = json.expectString();
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("ok");
+		json.addBool(ok);
+
+		json.addKey("version");
+		json.addNumber(version);
+
+		json.addKey("msg");
+		json.addString(msg);
+	}
+
+	@override
+	R visitResultMsg<R, A>(ResultMsgVisitor<R, A> v, A arg) => v.visitHelloResult(this, arg);
+
+}
+
+///  Command requesting the creation of a new account. Result is either {@link CreateAccountResult} on success, or {@link Error} on error.
+class CreateAccount extends LoginCmd {
+	///  The nickname for the newly created account.
+	String nickname;
+
+	/// Creates a CreateAccount.
+	CreateAccount({
+			this.nickname = "", 
+	});
+
+	/// Parses a CreateAccount from a string source.
+	static CreateAccount? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a CreateAccount instance from the given reader.
+	static CreateAccount read(JsonReader json) {
+		CreateAccount result = CreateAccount();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "CreateAccount";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "nickname": {
+				nickname = json.expectString();
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("nickname");
+		json.addString(nickname);
+	}
+
+	@override
+	R visitLoginCmd<R, A>(LoginCmdVisitor<R, A> v, A arg) => v.visitCreateAccount(this, arg);
+
+}
+
+///  Result of {@link CreateAccount}, if successful.
+class CreateAccountResult extends ResultMsg {
+	///  The user ID of the newly created account.
+	String uid;
+
+	///  The login credentials to use for the newly created account.
+	String secret;
+
+	/// Creates a CreateAccountResult.
+	CreateAccountResult({
+			this.uid = "", 
+			this.secret = "", 
+	});
+
+	/// Parses a CreateAccountResult from a string source.
+	static CreateAccountResult? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a CreateAccountResult instance from the given reader.
+	static CreateAccountResult read(JsonReader json) {
+		CreateAccountResult result = CreateAccountResult();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "CreateAccountResult";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "uid": {
+				uid = json.expectString();
+				break;
+			}
+			case "secret": {
+				secret = json.expectString();
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("uid");
+		json.addString(uid);
+
+		json.addKey("secret");
+		json.addString(secret);
+	}
+
+	@override
+	R visitResultMsg<R, A>(ResultMsgVisitor<R, A> v, A arg) => v.visitCreateAccountResult(this, arg);
+
+}
+
+///  Command to assign an email to an existing account. An e-mail is send to the provided address with a verification token that must be provided to {@link VerifyEmail} in a following request.
+class AddEmail extends LoginCmd {
+	///  The user ID, see {@link CreateAccountResult#uid}.
+	String uid;
+
+	///  The user's login credentials, see {@link CreateAccountResult#secret}.
+	String secret;
+
+	///  The e-mail address to assign to the user's account.
+	String email;
+
+	/// Creates a AddEmail.
+	AddEmail({
+			this.uid = "", 
+			this.secret = "", 
+			this.email = "", 
+	});
+
+	/// Parses a AddEmail from a string source.
+	static AddEmail? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a AddEmail instance from the given reader.
+	static AddEmail read(JsonReader json) {
+		AddEmail result = AddEmail();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "AddEmail";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "uid": {
+				uid = json.expectString();
+				break;
+			}
+			case "secret": {
+				secret = json.expectString();
+				break;
+			}
+			case "email": {
+				email = json.expectString();
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("uid");
+		json.addString(uid);
+
+		json.addKey("secret");
+		json.addString(secret);
+
+		json.addKey("email");
+		json.addString(email);
+	}
+
+	@override
+	R visitLoginCmd<R, A>(LoginCmdVisitor<R, A> v, A arg) => v.visitAddEmail(this, arg);
+
+}
+
+///  Acknowledges adding the e-mail.
+class AddEmailSuccess extends ResultMsg {
+	/// Creates a AddEmailSuccess.
+	AddEmailSuccess();
+
+	/// Parses a AddEmailSuccess from a string source.
+	static AddEmailSuccess? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a AddEmailSuccess instance from the given reader.
+	static AddEmailSuccess read(JsonReader json) {
+		AddEmailSuccess result = AddEmailSuccess();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "AddEmailSuccess";
+
+	@override
+	R visitResultMsg<R, A>(ResultMsgVisitor<R, A> v, A arg) => v.visitAddEmailSuccess(this, arg);
+
+}
+
+///  Command that verifies the e-mail address added to an account with {@link AddEmail}.
+class VerifyEmail extends LoginCmd {
+	///  The user ID, see {@link CreateAccountResult#uid}.
+	String uid;
+
+	///  The verification token that was sent to the e-mail address.
+	String token;
+
+	/// Creates a VerifyEmail.
+	VerifyEmail({
+			this.uid = "", 
+			this.token = "", 
+	});
+
+	/// Parses a VerifyEmail from a string source.
+	static VerifyEmail? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a VerifyEmail instance from the given reader.
+	static VerifyEmail read(JsonReader json) {
+		VerifyEmail result = VerifyEmail();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "VerifyEmail";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "uid": {
+				uid = json.expectString();
+				break;
+			}
+			case "token": {
+				token = json.expectString();
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("uid");
+		json.addString(uid);
+
+		json.addKey("token");
+		json.addString(token);
+	}
+
+	@override
+	R visitLoginCmd<R, A>(LoginCmdVisitor<R, A> v, A arg) => v.visitVerifyEmail(this, arg);
+
+}
+
+///  Acknowledges the e-mail verification.
+class VerifyEmailSuccess extends ResultMsg {
+	/// Creates a VerifyEmailSuccess.
+	VerifyEmailSuccess();
+
+	/// Parses a VerifyEmailSuccess from a string source.
+	static VerifyEmailSuccess? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a VerifyEmailSuccess instance from the given reader.
+	static VerifyEmailSuccess read(JsonReader json) {
+		VerifyEmailSuccess result = VerifyEmailSuccess();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "VerifyEmailSuccess";
+
+	@override
+	R visitResultMsg<R, A>(ResultMsgVisitor<R, A> v, A arg) => v.visitVerifyEmailSuccess(this, arg);
+
+}
+
 ///  First message that must be sent after connecting to a game server.
 /// 
 ///  <p>
 ///  On success, a {@link Welcome} message is sent back.
 ///  </p>
-class Login extends Cmd {
-	///  The nick name of the player.
-	String name;
+class Login extends LoginCmd {
+	///  The UID of the player.
+	String uid;
 
-	///  The protocol version of the connecting client. This can be used to detect version mismatch of client and server.
-	int version;
-
-	///  The locale of the client. The server tries to localize error message in that locale.
-	String locale;
+	///  The user's login secret.
+	String secret;
 
 	/// Creates a Login.
 	Login({
-			this.name = "", 
-			this.version = 0, 
-			this.locale = "", 
+			this.uid = "", 
+			this.secret = "", 
 	});
 
 	/// Parses a Login from a string source.
@@ -601,16 +1095,12 @@ class Login extends Cmd {
 	@override
 	void _readProperty(String key, JsonReader json) {
 		switch (key) {
-			case "name": {
-				name = json.expectString();
+			case "uid": {
+				uid = json.expectString();
 				break;
 			}
-			case "version": {
-				version = json.expectInt();
-				break;
-			}
-			case "locale": {
-				locale = json.expectString();
+			case "secret": {
+				secret = json.expectString();
 				break;
 			}
 			default: super._readProperty(key, json);
@@ -621,18 +1111,15 @@ class Login extends Cmd {
 	void _writeProperties(JsonSink json) {
 		super._writeProperties(json);
 
-		json.addKey("name");
-		json.addString(name);
+		json.addKey("uid");
+		json.addString(uid);
 
-		json.addKey("version");
-		json.addNumber(version);
-
-		json.addKey("locale");
-		json.addString(locale);
+		json.addKey("secret");
+		json.addString(secret);
 	}
 
 	@override
-	R visitCmd<R, A>(CmdVisitor<R, A> v, A arg) => v.visitLogin(this, arg);
+	R visitLoginCmd<R, A>(LoginCmdVisitor<R, A> v, A arg) => v.visitLogin(this, arg);
 
 }
 
@@ -685,8 +1172,57 @@ class Welcome extends ResultMsg {
 
 }
 
+///  Sent, when {@link Login} is not successful.
+class LoginFailed extends ResultMsg {
+	///  Further description of the problem
+	String msg;
+
+	/// Creates a LoginFailed.
+	LoginFailed({
+			this.msg = "", 
+	});
+
+	/// Parses a LoginFailed from a string source.
+	static LoginFailed? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a LoginFailed instance from the given reader.
+	static LoginFailed read(JsonReader json) {
+		LoginFailed result = LoginFailed();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "LoginFailed";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "msg": {
+				msg = json.expectString();
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("msg");
+		json.addString(msg);
+	}
+
+	@override
+	R visitResultMsg<R, A>(ResultMsgVisitor<R, A> v, A arg) => v.visitLoginFailed(this, arg);
+
+}
+
 ///  Takes over a lost connection that was established before.
-class Reconnect extends Cmd {
+class Reconnect extends LoginCmd {
 	///  The ID that was assigned to the player in a former {@link Welcome} message.
 	String playerId;
 
@@ -741,7 +1277,7 @@ class Reconnect extends Cmd {
 	}
 
 	@override
-	R visitCmd<R, A>(CmdVisitor<R, A> v, A arg) => v.visitReconnect(this, arg);
+	R visitLoginCmd<R, A>(LoginCmdVisitor<R, A> v, A arg) => v.visitReconnect(this, arg);
 
 }
 

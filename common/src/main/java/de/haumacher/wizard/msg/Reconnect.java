@@ -3,7 +3,7 @@ package de.haumacher.wizard.msg;
 /**
  * Takes over a lost connection that was established before.
  */
-public class Reconnect extends Cmd {
+public class Reconnect extends LoginCmd {
 
 	/**
 	 * Creates a {@link Reconnect} instance.
@@ -107,7 +107,7 @@ public class Reconnect extends Cmd {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(Cmd.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(LoginCmd.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

@@ -8,34 +8,45 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
+
 import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.logic.R;
 import de.haumacher.wizard.logic.WizardGame;
+import de.haumacher.wizard.msg.AddEmail;
+import de.haumacher.wizard.msg.AddEmailSuccess;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Cmd;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
+import de.haumacher.wizard.msg.CreateAccount;
+import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.msg.CreateGame;
 import de.haumacher.wizard.msg.Error;
 import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameStarted;
+import de.haumacher.wizard.msg.Hello;
+import de.haumacher.wizard.msg.HelloResult;
 import de.haumacher.wizard.msg.JoinGame;
 import de.haumacher.wizard.msg.Lead;
 import de.haumacher.wizard.msg.LeaveGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.ListGamesResult;
 import de.haumacher.wizard.msg.Login;
+import de.haumacher.wizard.msg.LoginFailed;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.Reconnect;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
+import de.haumacher.wizard.msg.VerifyEmail;
+import de.haumacher.wizard.msg.VerifyEmailSuccess;
 import de.haumacher.wizard.msg.Welcome;
 import de.haumacher.wizard.resources.StaticResources.Resource;
 import de.haumacher.wizard.server.db.DBException;
 import de.haumacher.wizard.server.db.UserDB;
 import de.haumacher.wizard.server.db.UserDBService;
-import de.haumacher.wizard.server.db.model.UserInfo;
+import de.haumacher.wizard.server.mail.MailServiceStarter;
 
 /**
  * Server-side logic for a single player.
@@ -111,28 +122,96 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	}
 
 	@Override
-	public Void visit(Login self, Void arg) throws IOException {
+	public Void visit(Hello self, Void arg) throws IOException {
+		if (!self.getLanguage().isBlank()) {
+			_locale = new Locale(self.getLanguage().trim());
+		}
+		
+		boolean ok;
+		String message;
 		if (self.getVersion() != WizardGame.PROTOCOL_VERSION) {
 			if (self.getVersion() > WizardGame.PROTOCOL_VERSION) {
-				sendError(R.errVersionToNew);
+				message = R.errVersionToNew.format();
 			} else {
-				sendError(R.errVersionToOld);
+				message = R.errVersionToOld.format();
 			}
+			ok = false;
+		} else {
+			message = R.connectionAccepted.format();
+			ok = true;
+		}
+		
+		sendMessage(HelloResult.create().setOk(ok).setMsg(message).setVersion(WizardGame.PROTOCOL_VERSION));
+		return null;
+	}
+
+	@Override
+	public Void visit(CreateAccount self, Void arg) throws IOException {
+		UserDB db = UserDBService.getInstance();
+		
+		CreateAccountResult userCreated;
+		try {
+			userCreated = db.createUser(self.getNickname());
+		} catch (DBException ex) {
+			sendError(R.errAccountCreationFailed_msg.fill(ex.getMessage()));
 			return null;
 		}
 		
+		sendMessage(userCreated);
+		return null;
+	}
+
+	@Override
+	public Void visit(AddEmail self, Void arg) throws IOException {
 		UserDB db = UserDBService.getInstance();
-		UserInfo userInfo;
+		
+		String token;
 		try {
-			userInfo = db.login(self.getUid(), self.getSecret());
+			token = db.addEmail(self.getUid(), self.getSecret(), self.getEmail());
 		} catch (DBException ex) {
-			sendError(R.errInvalidCredentials);
+			sendError(R.errCannotAddEmail_msg.fill(ex.getMessage()));
+			return null;
+		}
+		
+		try {
+			MailServiceStarter.getInstance().sendActivationMail(self.getEmail(), self.getUid(), token);
+		} catch (MessagingException ex) {
+			sendError(R.sendingVerificationMailFailed_msg.fill(ex.getMessage()));
+			return null;
+		}
+
+		sendMessage(AddEmailSuccess.create());
+		return null;
+	}
+
+	@Override
+	public Void visit(VerifyEmail self, Void arg) throws IOException {
+		UserDB db = UserDBService.getInstance();
+		
+		try {
+			db.verifyEmail(self.getUid(), self.getToken());
+		} catch (DBException ex) {
+			sendError(R.errVerificationFailed_msg.fill(ex.getMessage()));
+			return null;
+		}
+		
+		sendMessage(VerifyEmailSuccess.create());
+		return null;
+	}
+	
+	@Override
+	public Void visit(Login self, Void arg) throws IOException {
+		UserDB db = UserDBService.getInstance();
+		String nickName;
+		try {
+			nickName = db.login(self.getUid(), self.getSecret());
+		} catch (DBException ex) {
+			sendMessage(LoginFailed.create().setMsg(R.errInvalidCredentials.format()));
 			return null;
 		}
 		
 		_loggedIn = true;
-		_locale = new Locale(userInfo.getLanguage());
-		_handle.getData().setName(userInfo.getNickname());
+		_handle.getData().setName(nickName);
 		sendMessage(Welcome.create().setPlayerId(getId()));
 		return null;
 	}

@@ -11,8 +11,23 @@ public abstract class ResultMsg extends Msg {
 		/** Visit case for {@link Error}.*/
 		R visit(Error self, A arg) throws E;
 
+		/** Visit case for {@link HelloResult}.*/
+		R visit(HelloResult self, A arg) throws E;
+
+		/** Visit case for {@link CreateAccountResult}.*/
+		R visit(CreateAccountResult self, A arg) throws E;
+
+		/** Visit case for {@link AddEmailSuccess}.*/
+		R visit(AddEmailSuccess self, A arg) throws E;
+
+		/** Visit case for {@link VerifyEmailSuccess}.*/
+		R visit(VerifyEmailSuccess self, A arg) throws E;
+
 		/** Visit case for {@link Welcome}.*/
 		R visit(Welcome self, A arg) throws E;
+
+		/** Visit case for {@link LoginFailed}.*/
+		R visit(LoginFailed self, A arg) throws E;
 
 		/** Visit case for {@link ListGamesResult}.*/
 		R visit(ListGamesResult self, A arg) throws E;
@@ -36,7 +51,12 @@ public abstract class ResultMsg extends Msg {
 		String type = in.nextString();
 		switch (type) {
 			case Error.ERROR__TYPE: result = de.haumacher.wizard.msg.Error.readError(in); break;
+			case HelloResult.HELLO_RESULT__TYPE: result = de.haumacher.wizard.msg.HelloResult.readHelloResult(in); break;
+			case CreateAccountResult.CREATE_ACCOUNT_RESULT__TYPE: result = de.haumacher.wizard.msg.CreateAccountResult.readCreateAccountResult(in); break;
+			case AddEmailSuccess.ADD_EMAIL_SUCCESS__TYPE: result = de.haumacher.wizard.msg.AddEmailSuccess.readAddEmailSuccess(in); break;
+			case VerifyEmailSuccess.VERIFY_EMAIL_SUCCESS__TYPE: result = de.haumacher.wizard.msg.VerifyEmailSuccess.readVerifyEmailSuccess(in); break;
 			case Welcome.WELCOME__TYPE: result = de.haumacher.wizard.msg.Welcome.readWelcome(in); break;
+			case LoginFailed.LOGIN_FAILED__TYPE: result = de.haumacher.wizard.msg.LoginFailed.readLoginFailed(in); break;
 			case ListGamesResult.LIST_GAMES_RESULT__TYPE: result = de.haumacher.wizard.msg.ListGamesResult.readListGamesResult(in); break;
 			default: in.skipValue(); result = null; break;
 		}

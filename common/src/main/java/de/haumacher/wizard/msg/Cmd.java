@@ -6,13 +6,7 @@ package de.haumacher.wizard.msg;
 public abstract class Cmd extends de.haumacher.msgbuf.data.AbstractDataObject {
 
 	/** Visitor interface for the {@link Cmd} hierarchy.*/
-	public interface Visitor<R,A,E extends Throwable> extends GameCmd.Visitor<R,A,E> {
-
-		/** Visit case for {@link Login}.*/
-		R visit(Login self, A arg) throws E;
-
-		/** Visit case for {@link Reconnect}.*/
-		R visit(Reconnect self, A arg) throws E;
+	public interface Visitor<R,A,E extends Throwable> extends LoginCmd.Visitor<R,A,E>, GameCmd.Visitor<R,A,E> {
 
 		/** Visit case for {@link ListGames}.*/
 		R visit(ListGames self, A arg) throws E;
@@ -47,13 +41,17 @@ public abstract class Cmd extends de.haumacher.msgbuf.data.AbstractDataObject {
 		in.beginArray();
 		String type = in.nextString();
 		switch (type) {
-			case Login.LOGIN__TYPE: result = de.haumacher.wizard.msg.Login.readLogin(in); break;
-			case Reconnect.RECONNECT__TYPE: result = de.haumacher.wizard.msg.Reconnect.readReconnect(in); break;
 			case ListGames.LIST_GAMES__TYPE: result = de.haumacher.wizard.msg.ListGames.readListGames(in); break;
 			case JoinGame.JOIN_GAME__TYPE: result = de.haumacher.wizard.msg.JoinGame.readJoinGame(in); break;
 			case CreateGame.CREATE_GAME__TYPE: result = de.haumacher.wizard.msg.CreateGame.readCreateGame(in); break;
 			case StartGame.START_GAME__TYPE: result = de.haumacher.wizard.msg.StartGame.readStartGame(in); break;
 			case LeaveGame.LEAVE_GAME__TYPE: result = de.haumacher.wizard.msg.LeaveGame.readLeaveGame(in); break;
+			case Hello.HELLO__TYPE: result = de.haumacher.wizard.msg.Hello.readHello(in); break;
+			case CreateAccount.CREATE_ACCOUNT__TYPE: result = de.haumacher.wizard.msg.CreateAccount.readCreateAccount(in); break;
+			case AddEmail.ADD_EMAIL__TYPE: result = de.haumacher.wizard.msg.AddEmail.readAddEmail(in); break;
+			case VerifyEmail.VERIFY_EMAIL__TYPE: result = de.haumacher.wizard.msg.VerifyEmail.readVerifyEmail(in); break;
+			case Login.LOGIN__TYPE: result = de.haumacher.wizard.msg.Login.readLogin(in); break;
+			case Reconnect.RECONNECT__TYPE: result = de.haumacher.wizard.msg.Reconnect.readReconnect(in); break;
 			case SelectTrump.SELECT_TRUMP__TYPE: result = de.haumacher.wizard.msg.SelectTrump.readSelectTrump(in); break;
 			case Bid.BID__TYPE: result = de.haumacher.wizard.msg.Bid.readBid(in); break;
 			case Lead.LEAD__TYPE: result = de.haumacher.wizard.msg.Lead.readLead(in); break;

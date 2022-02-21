@@ -88,6 +88,82 @@ message Error extends ResultMsg {
 	string `message`;
 }
 
+/** Base class for commands for account management. */
+abstract message LoginCmd extends Cmd {
+
+}
+
+/** The first method sent after opening a connection. */
+message Hello extends LoginCmd {
+
+	/** The protocol version of the connecting client. This can be used to detect version mismatch of client and server. */
+	int version;
+	
+	/** The language the server should talk to the user. */
+	string language;
+
+}
+
+/** Answer to {@link Hello}. */
+message HelloResult extends ResultMsg {
+	/** Whether protocol version matches and login can continue. */
+	boolean ok;
+
+	/** The protocol version of the server. */
+	int version;
+	
+	/** Description of the problem, if not ok. */
+	string msg;
+}
+
+/**
+ * Command requesting the creation of a new account. Result is either {@link CreateAccountResult} on success, or {@link Error} on error.
+ */
+message CreateAccount extends LoginCmd {
+	/** The nickname for the newly created account. */
+	string nickname;
+}
+
+/**
+ * Result of {@link CreateAccount}, if successful.
+ */
+message CreateAccountResult extends ResultMsg {
+	/** The user ID of the newly created account. */
+	string uid;
+	
+	/** The login credentials to use for the newly created account. */
+	string secret;
+}
+
+/** Command to assign an email to an existing account. An e-mail is send to the provided address with a verification token that must be provided to {@link VerifyEmail} in a following request. */
+message AddEmail extends LoginCmd {
+	/** The user ID, see {@link CreateAccountResult#uid}. */
+	string uid;
+
+	/** The user's login credentials, see {@link CreateAccountResult#secret}. */
+	string secret;
+	
+	/** The e-mail address to assign to the user's account. */
+	string email;
+}
+
+/** Acknowledges adding the e-mail. */
+message AddEmailSuccess extends ResultMsg {
+}
+
+/** Command that verifies the e-mail address added to an account with {@link AddEmail}. */
+message VerifyEmail extends LoginCmd {
+	/** The user ID, see {@link CreateAccountResult#uid}. */
+	string uid;
+
+	/** The verification token that was sent to the e-mail address. */
+	string token;
+}
+
+/** Acknowledges the e-mail verification. */
+message VerifyEmailSuccess extends ResultMsg {
+}
+
 /** 
  * First message that must be sent after connecting to a game server.
  *
@@ -95,10 +171,7 @@ message Error extends ResultMsg {
  * On success, a {@link Welcome} message is sent back.
  * </p> 
  */
-message Login extends Cmd {
-	/** The protocol version of the connecting client. This can be used to detect version mismatch of client and server. */
-	int version;
-
+message Login extends LoginCmd {
 	/** The UID of the player. */
 	string uid;
 	
@@ -112,8 +185,14 @@ message Welcome extends ResultMsg {
 	string playerId;
 }
 
+/** Sent, when {@link Login} is not successful. */
+message LoginFailed extends ResultMsg {
+	/** Further description of the problem */
+	string msg;
+}
+
 /** Takes over a lost connection that was established before. */
-message Reconnect extends Cmd {
+message Reconnect extends LoginCmd {
 	/** The ID that was assigned to the player in a former {@link Welcome} message. */
 	string playerId;
 	

@@ -4,11 +4,15 @@ import 'dart:core';
 import 'dart:ui';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ui/msg.dart';
 import 'package:flutter_ui/msg.dart' as msg;
 import 'package:flutter_ui/svg.dart';
+
+/// The protocol version supported by this client app.
+const int protocolVersion = 4;
 
 void main() {
   runApp(WizardApp());
@@ -166,19 +170,24 @@ class ObservableGame extends ChangeNotifier {
 
 /// State of a [ConnectionHandler].
 enum ConnectionState {
-  /// The player has not yet started logging in.
-  idle,
+  /// The player has started the application. Still initializing and connecting to the game server.
+  startup,
 
-  /// The [WebSocket] connection has been created but was not yet confirmed by
-  /// the server.
+  /// A connection with the server cannot be established, because the protocol version does not match.
+  updateRequired,
+
+  /// The application has been initialized, but no account information was found. A view is offered to create an account.
+  accountCreation,
+
+  /// The login message has been sent, waiting for acknowledge.
   connecting,
 
   /// The [Welcome] message has been receive.
-  connected,
+  loggedIn,
 
   /// The player has not yet joined a game and is listening for other players
-  /// opening games.
-  searchingGame,
+  /// opening games. A button is offered to create a game.
+  listingGames,
 
   /// The player has joined a game. The game has not been started yet, because
   /// the players are waiting for more members to join the game.
@@ -197,18 +206,25 @@ final connection = ConnectionHandler();
 /// Handler of the server connection.
 /// Allows to send [Cmd]s through [sendCommand] and dispatches [Msg]es received.
 class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void> {
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  static const playerIdKey = "playerId";
+  static const secretKey = "secret";
+
   GameList gameList = GameList();
   WizardModel? wizardModel;
 
-  final ValueNotifier<ConnectionState> state = ValueNotifier(ConnectionState.idle);
+  final ValueNotifier<ConnectionState> state = ValueNotifier(ConnectionState.startup);
 
-  String _serverAddress = "wss://play.haumacher.de/wizard-game/ws";
+  static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
 
-  /// The players nickname as it was entered in the [LoginView].
+  /// The players nickname as it was entered in the [CreateAccountView].
   String? _nickName;
 
   /// The ID of the player in this app.
   String? playerId;
+
+  void Function(String msg)? _errorHandler;
 
   /// ID of the currently joined game.
   String? get gameId => currentGame?.game.gameId;
@@ -218,43 +234,31 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   /// The [WebSocketChannel] communicating with the game server.
   WebSocketChannel? _socket;
 
-  void Function()? _connectCallback;
+  ConnectionHandler() {
+    openConnection();
+  }
 
-  String get serverAddress => _serverAddress;
-
-  void login(String serverAddress, String nickName) {
+  void openConnection() {
     _socket?.sink.close();
     _socket = null;
-
-    if (_serverAddress != serverAddress) {
-      playerId = null;
-    }
-
-    _serverAddress = serverAddress;
-    _nickName = nickName;
 
     var socket = WebSocketChannel.connect(Uri.parse(_serverAddress));
     socket.stream.listen(_onMessage, onDone: _onClose);
     // socket.onOpen.listen(_onOpen);
     _socket = socket;
 
-    state.value = ConnectionState.connecting;
-    _onOpen();
+    sendCommand(Hello(version: protocolVersion, language: PlatformDispatcher.instance.locale.languageCode));
+
+    state.value = ConnectionState.accountCreation;
+    notifyListeners();
+  }
+
+  void reconnect() {
+    openConnection();
   }
 
   void close() {
     _socket?.sink.close();
-  }
-
-  void _onOpen() {
-    state.value = ConnectionState.connected;
-    notifyListeners();
-
-    _connectCallback?.call();
-    _connectCallback = null;
-
-    sendCommand(Login(name: _nickName!, version: 3, locale: PlatformDispatcher.instance.locale.languageCode));
-    notifyListeners();
   }
 
   void sendCommand(Cmd login) {
@@ -271,7 +275,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
     }
 
     _socket = null;
-    state.value = playerId == null ? ConnectionState.idle : ConnectionState.disconnected;
+    state.value = playerId == null ? ConnectionState.startup : ConnectionState.disconnected;
     notifyListeners();
   }
 
@@ -284,17 +288,67 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   }
 
   @override
+  void visitHelloResult(HelloResult self, void arg) {
+    if (self.ok) {
+      _prefs.then((prefs) {
+        var _playerId = prefs.getString(playerIdKey);
+        // TODO: Use secure storage.
+        var secret = prefs.getString(secretKey);
+        if (_playerId != null && secret != null) {
+          playerId = _playerId;
+          
+          // Perform auto-login.
+          sendCommand(Login(uid: _playerId, secret: secret));
+          state.value = ConnectionState.connecting;
+        } else {
+          state.value = ConnectionState.accountCreation;
+        }
+      });
+    } else {
+      state.value = ConnectionState.updateRequired;
+    }
+  }
+
+  @override
+  void visitAddEmailSuccess(AddEmailSuccess self, void arg) {
+    // TODO: implement visitAddEmailSuccess
+  }
+
+  @override
+  void visitCreateAccountResult(CreateAccountResult self, void arg) {
+    var uid = self.uid;
+    var secret = self.secret;
+
+    _prefs.then((prefs) {
+      prefs.setString(playerIdKey, uid);
+      prefs.setString(secretKey, secret);
+
+      state.value = ConnectionState.connecting;
+      sendCommand(Login(uid: uid, secret: secret));
+    });
+  }
+
+  @override
+  void visitVerifyEmailSuccess(VerifyEmailSuccess self, void arg) {
+    // TODO: implement visitVerifyEmailSuccess
+  }
+
+  @override
   void visitWelcome(Welcome self, void arg) {
     playerId = self.playerId;
-    state.value = ConnectionState.connected;
+    state.value = ConnectionState.loggedIn;
     sendCommand(ListGames());
-    notifyListeners();
+  }
+
+  @override
+  void visitLoginFailed(LoginFailed self, void arg) {
+    state.value = ConnectionState.accountCreation;
   }
 
   @override
   void visitListGamesResult(ListGamesResult self, void arg) {
     gameList.setGames(self.games);
-    state.value = ConnectionState.searchingGame;
+    state.value = ConnectionState.listingGames;
     notifyListeners();
   }
 
@@ -359,7 +413,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   }
 
   void onLeaveGame() {
-    state.value = ConnectionState.searchingGame;
+    state.value = ConnectionState.listingGames;
     currentGame = null;
     
     sendCommand(ListGames());
@@ -418,7 +472,11 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
   @override
   void visitError(Error self, void arg) {
-    // TODO: implement visitError
+    _errorHandler!(self.message);
+  }
+
+  void onError(void Function(String msg) errorHandler) {
+    _errorHandler = errorHandler;
   }
 }
 
@@ -433,7 +491,7 @@ enum WizardPhase {
   /// Players have their cards. The phase is about to move forward to [trumpSelection], or [bidding].
   cardsGiven,
 
-  /// One of the players is about to select the trump color, because a wizard card was chosen as trum card.
+  /// One of the players is about to select the trump color, because a wizard card was chosen as trump card.
   trumpSelection,
 
   /// Players are placing their bids.
@@ -754,6 +812,23 @@ class WizardApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    connection.onError((msg) {
+      showDialog(context: context, builder: (context) {
+        return AlertDialog(
+          title: Text("An error occurred"),
+          content: Text(msg),
+          actions: [
+            ElevatedButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      });
+    });
+
     return MaterialApp(
       title: 'Zauberer',
       theme: ThemeData(
@@ -778,7 +853,15 @@ class HomePage extends StatelessWidget {
         }
 
         switch (state) {
-          case ConnectionState.idle:
+          case ConnectionState.startup:
+          case ConnectionState.connecting:
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text("Zauberer online"),
+              ),
+              body: const Center(child: Text("Connecting...")));
+          case ConnectionState.accountCreation:
+            return const CreateAccountView();
           case ConnectionState.disconnected:
             return Scaffold(
                 appBar: AppBar(
@@ -786,33 +869,20 @@ class HomePage extends StatelessWidget {
                 ),
                 body:  Center(
                   child: ElevatedButton(
-                    child: const Text("Login"),
+                    child: const Text("Connect"),
                     onPressed: () {
-                      var result = Navigator.push(context,
-                          MaterialPageRoute<ConnectionData>(
-                              builder: (context) => const LoginView()));
-                      result.then((data) {
-                        if (data != null) {
-                          connection.login(data.serverAddress, data.nickName);
-                        }
-                      });
+                      connection.reconnect();
                     },
                   ),
                 )
             );
-          case ConnectionState.connecting:
-            return Scaffold(
-                appBar: AppBar(
-                  title: const Text("Zauberer online"),
-                ),
-                body: const Center(child: Text("Connecting...")));
-          case ConnectionState.connected:
+          case ConnectionState.loggedIn:
             return Scaffold(
                 appBar: AppBar(
                   title: const Text("Zauberer online"),
                 ),
                 body: const Center(child: Text("Logging in...")));
-          case ConnectionState.searchingGame:
+          case ConnectionState.listingGames:
             return ChangeObserver<GameList>(
                 state: connection.gameList,
                 builder: (context, gameList) {
@@ -836,7 +906,11 @@ class HomePage extends StatelessWidget {
           case ConnectionState.waitingForStart:
             return showWaitingForStart();
           default:
-            return Center(child: Text("ERROR: " + state.name));
+            return Scaffold(
+                appBar: AppBar(
+                  title: const Text("Zauberer online"),
+                ),
+                body: Center(child: Text("ERROR: " + state.name)));
         }
       }
     );
@@ -918,7 +992,7 @@ class PlayingView extends StatelessWidget {
         }
 
         switch (state) {
-          case ConnectionState.searchingGame:
+          case ConnectionState.listingGames:
             return showWaitingForStart();
           case ConnectionState.waitingForStart:
             ObservableGame? game = connection.currentGame;
@@ -1043,7 +1117,7 @@ class WizardWidget extends StatelessWidget {
           valueListenable: connection.wizardModel!.activityState.imActive,
           builder: (context, imActive, child) {
             return imActive ?
-              TrumpSelectionView() :
+              const TrumpSelectionView() :
               WaitingForView((player) => "$player selects the trump color...");
           });
 
@@ -1057,7 +1131,7 @@ class WizardWidget extends StatelessWidget {
           });
 
       case WizardPhase.leading:
-        return LeadingView();
+        return const LeadingView();
         
       case WizardPhase.trickConfirmation:
         return Center(
@@ -1091,9 +1165,9 @@ class WizardWidget extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("You get " + connection.wizardModel!.pointsEarned.toString() + " points!", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text("You get " + connection.wizardModel!.pointsEarned.toString() + " points!", style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                       child: ElevatedButton(
                         onPressed: () {
                           connection.sendCommand(msg.ConfirmRound());
@@ -1101,7 +1175,7 @@ class WizardWidget extends StatelessWidget {
                         child: const Text("Ok")))
                   ],
                 ) :
-                Text("Waiting for other players...", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
+                const Text("Waiting for other players...", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
             }));
 
       case WizardPhase.resultConfirmation:
@@ -1131,7 +1205,7 @@ class WizardWidget extends StatelessWidget {
 
 Widget trickText({String? text, void Function()? onPressed}) {
   return trickTitle(child: text == null ? null :
-    Text(text, style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)), onPressed: onPressed);
+    Text(text, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)), onPressed: onPressed);
 }
 
 Widget trickTitle({Widget? child, void Function()? onPressed}) {
@@ -1141,7 +1215,7 @@ Widget trickTitle({Widget? child, void Function()? onPressed}) {
         maintainAnimation: true,
         maintainState: true,
         visible: child != null,
-        child: child ?? Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold))),
+        child: child ?? const Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold))),
     Padding(
         padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
         child: Visibility(
@@ -1214,7 +1288,7 @@ class WaitingForView extends StatelessWidget {
         var activePlayer = activityState.activePlayer;
         return activePlayer == null ? 
           const Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)) : 
-          Text(messageForPlayer(activePlayer.displayName), style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
+          Text(messageForPlayer(activePlayer.displayName), style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
       });
   }
 }
@@ -1302,7 +1376,7 @@ class TrickView extends StatelessWidget {
             children: [
               CardView(card.card),
               Padding(padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                child: Text(card.player.displayName, style: TextStyle(color: Colors.white)),
+                child: Text(card.player.displayName, style: const TextStyle(color: Colors.white)),
               )
             ])).toList()
       );
@@ -1543,21 +1617,20 @@ class ScaledPath {
   double ry(y) => f * y;
 }
 
-/// Route displaying a form requesting a nick name and a server address.
-/// Returns a [ConnectionData] object back to the opener.
-class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+/// View displaying a form with information required for account creation.
+class CreateAccountView extends StatefulWidget {
+  const CreateAccountView({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return LoginViewState();
+    return CreateAccountViewState();
   }
 }
 
-class LoginViewState extends State<LoginView> {
-  final GlobalKey<FormState> _formKey = GlobalKey(debugLabel: "loginState");
+class CreateAccountViewState extends State<CreateAccountView> {
+  final GlobalKey<FormState> _formKey = GlobalKey(debugLabel: "createAccountState");
   final GlobalKey<FormFieldState<String>> _nickName = GlobalKey();
-  final GlobalKey<FormFieldState<String>> _serverAddress = GlobalKey();
+  final GlobalKey<FormFieldState<String>> _email = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -1581,28 +1654,20 @@ class LoginViewState extends State<LoginView> {
                 },
               ),
               TextFormField(
-                key: _serverAddress,
-                decoration: const InputDecoration(
-                  hintText: "Server URL",
-                  labelText: "Wizard server",
-                ),
-                initialValue: connection.serverAddress,
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Server address must not be empty.";
-                  }
-                },
+                key: _email,
+                decoration: const InputDecoration(hintText: "E-mail"),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                 child: ElevatedButton(
-                  child: const Text("Connect"),
+                  child: const Text("Create account"),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      Navigator.pop(
-                        context,
-                        ConnectionData(_nickName.currentState!.value!,
-                          _serverAddress.currentState!.value!));
+                      connection.sendCommand(
+                        CreateAccount(
+                          nickname: _nickName.currentState!.value!,
+                        ),
+                      );
                     }
                   },
                 )),
@@ -1612,14 +1677,6 @@ class LoginViewState extends State<LoginView> {
       ),
     );
   }
-}
-
-/// Data collected by [LoginView].
-class ConnectionData {
-  String nickName;
-  String serverAddress;
-
-  ConnectionData(this.nickName, this.serverAddress);
 }
 
 class ChangeObserver<S extends ChangeNotifier> extends StatefulWidget {

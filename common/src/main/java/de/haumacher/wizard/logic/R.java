@@ -33,6 +33,11 @@ public class R extends StaticResources {
 	public static M0 errInvalidCredentials;
 	public static M0 errPlayerNotFound;
 	public static M1 errFailureOccurred_message;
+	public static M1 errAccountCreationFailed_msg;
+	public static M1 errCannotAddEmail_msg;
+	public static M1 sendingVerificationMailFailed_msg;
+	public static M1 errVerificationFailed_msg;
+	public static M0 connectionAccepted;
 	
 	static {
 		load(R.class);

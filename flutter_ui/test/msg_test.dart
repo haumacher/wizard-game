@@ -4,7 +4,7 @@ import 'package:flutter_ui/msg.dart';
 
 void main() {
   test("Parsing messages", () {
-    var data = Login(name: "Haui", version: 3).toString();
+    var data = Login(uid: "Haui", secret: "ABCDEFG").toString();
     print(data);
 
     var cmd = Cmd.fromString(data);
@@ -12,7 +12,7 @@ void main() {
 
     assert (cmd != null);
     assert (cmd is Login);
-    assert ((cmd as Login).name == "Haui");
+    assert ((cmd as Login).uid == "Haui");
 
     assert (cmd!.visitCmd(CmdTest(), null));
 
@@ -81,7 +81,7 @@ class CmdTest implements CmdVisitor<bool, void> {
   @override
   bool visitLogin(Login self, void arg) {
     print("Visited Login.");
-    return self.name == "Haui" && self.version == 3;
+    return self.uid == "Haui" && self.secret == "ABCDEFG";
   }
 
   @override
@@ -96,6 +96,26 @@ class CmdTest implements CmdVisitor<bool, void> {
 
   @override
   bool visitStartGame(StartGame self, void arg) {
+    return false;
+  }
+
+  @override
+  bool visitAddEmail(AddEmail self, void arg) {
+    return false;
+  }
+
+  @override
+  bool visitCreateAccount(CreateAccount self, void arg) {
+    return false;
+  }
+
+  @override
+  bool visitHello(Hello self, void arg) {
+    return false;
+  }
+
+  @override
+  bool visitVerifyEmail(VerifyEmail self, void arg) {
     return false;
   }
 

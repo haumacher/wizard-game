@@ -11,9 +11,8 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Properties;
 
+import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.server.db.DBException;
-import de.haumacher.wizard.server.db.model.CreateAccountResult;
-import de.haumacher.wizard.server.db.model.UserInfo;
 import junit.framework.TestCase;
 
 /**
@@ -76,20 +75,18 @@ public class TestH2UserDB2 extends TestCase {
 	}
 	
 	public void testCreate() throws DBException {
-		CreateAccountResult account1 = _db.createUser("haui", "de");
-		UserInfo info1 = _db.login(account1.getUid(), account1.getSecret());
-		assertEquals("haui",info1.getNickname());
-		assertEquals("de",info1.getLanguage());
+		CreateAccountResult account1 = _db.createUser("haui");
+		String nickName1 = _db.login(account1.getUid(), account1.getSecret());
+		assertEquals("haui",nickName1);
 		
 		String token = _db.addEmail(account1.getUid(), account1.getSecret(), "haui@haumacher.de");
-		_db.verifyEmail(account1.getUid(), account1.getSecret(), token);
+		_db.verifyEmail(account1.getUid(), token);
 		
 		String token2 = _db.requestSecret("haui@haumacher.de");
 		CreateAccountResult account2 = _db.newSecret("haui@haumacher.de", token2);
 		
-		UserInfo info2 = _db.login(account1.getUid(), account2.getSecret());
-		assertEquals(info2.getNickname(), info1.getNickname());
-		assertEquals(info2.getLanguage(), info1.getLanguage());
+		String nickName2 = _db.login(account1.getUid(), account2.getSecret());
+		assertEquals(nickName2, nickName1);
 	}
 
 }

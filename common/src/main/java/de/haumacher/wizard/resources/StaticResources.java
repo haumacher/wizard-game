@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 
@@ -245,11 +246,11 @@ public abstract class StaticResources {
 		}
 	}
 
-	protected static ResourceBundle bundle(Class<? extends StaticResources> type) {
+	protected static ResourceBundle bundle(Class<? extends StaticResources> type) throws MissingResourceException {
 		return bundle(bundleName(type));
 	}
 	
-	private static ResourceBundle bundle(String baseName) {
+	private static ResourceBundle bundle(String baseName) throws MissingResourceException {
 		return ResourceBundle.getBundle(baseName);
 	}
 	

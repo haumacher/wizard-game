@@ -3,17 +3,16 @@
  */
 package de.haumacher.wizard.server.db;
 
-import de.haumacher.wizard.server.db.model.CreateAccountResult;
-import de.haumacher.wizard.server.db.model.UserInfo;
+import de.haumacher.wizard.msg.CreateAccountResult;
 
 /**
  * Interface for the Wizard user database.
  */
 public interface UserDB {
 
-	CreateAccountResult createUser(String nickname, String language) throws DBException;
+	CreateAccountResult createUser(String nickname) throws DBException;
 
-	UserInfo login(String uid, String secret) throws DBException;
+	String login(String uid, String secret) throws DBException;
 
 	/**
 	 * Request lost login credentials.
@@ -36,7 +35,7 @@ public interface UserDB {
 	/**
 	 * Adds an (unverified) email for the given user.
 	 * 
-	 * @return A verification token that must be provided to {@link #verifyEmail(String, String, String)} later on.
+	 * @return A verification token that must be provided to {@link #verifyEmail(String, String)} later on.
 	 */
 	String addEmail(String uid, String secret, String email) throws DBException;
 
@@ -45,13 +44,16 @@ public interface UserDB {
 	 *
 	 * @param uid
 	 *        The user ID.
-	 * @param secret
-	 *        The users secret.
 	 * @param token
 	 *        The email token created by {@link #addEmail(String, String, String)}.
 	 * @throws DBException
 	 *         If an error occurs such as a token mismatch.
 	 */
-	void verifyEmail(String uid, String secret, String token) throws DBException;
+	void verifyEmail(String uid, String token) throws DBException;
+
+	/** 
+	 * First method called after creation.
+	 */
+	void startup();
 
 }

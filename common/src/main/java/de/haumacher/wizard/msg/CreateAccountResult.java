@@ -1,23 +1,19 @@
 package de.haumacher.wizard.msg;
 
 /**
- * First message that must be sent after connecting to a game server.
- *
- * <p>
- * On success, a {@link Welcome} message is sent back.
- * </p>
+ * Result of {@link CreateAccount}, if successful.
  */
-public class Login extends LoginCmd {
+public class CreateAccountResult extends ResultMsg {
 
 	/**
-	 * Creates a {@link Login} instance.
+	 * Creates a {@link CreateAccountResult} instance.
 	 */
-	public static Login create() {
-		return new Login();
+	public static CreateAccountResult create() {
+		return new CreateAccountResult();
 	}
 
-	/** Identifier for the {@link Login} type in JSON format. */
-	public static final String LOGIN__TYPE = "Login";
+	/** Identifier for the {@link CreateAccountResult} type in JSON format. */
+	public static final String CREATE_ACCOUNT_RESULT__TYPE = "CreateAccountResult";
 
 	/** @see #getUid() */
 	private static final String UID = "uid";
@@ -30,16 +26,16 @@ public class Login extends LoginCmd {
 	private String _secret = "";
 
 	/**
-	 * Creates a {@link Login} instance.
+	 * Creates a {@link CreateAccountResult} instance.
 	 *
 	 * @see #create()
 	 */
-	protected Login() {
+	protected CreateAccountResult() {
 		super();
 	}
 
 	/**
-	 * The UID of the player.
+	 * The user ID of the newly created account.
 	 */
 	public final String getUid() {
 		return _uid;
@@ -48,7 +44,7 @@ public class Login extends LoginCmd {
 	/**
 	 * @see #getUid()
 	 */
-	public Login setUid(String value) {
+	public CreateAccountResult setUid(String value) {
 		internalSetUid(value);
 		return this;
 	}
@@ -59,7 +55,7 @@ public class Login extends LoginCmd {
 
 
 	/**
-	 * The user's login secret.
+	 * The login credentials to use for the newly created account.
 	 */
 	public final String getSecret() {
 		return _secret;
@@ -68,7 +64,7 @@ public class Login extends LoginCmd {
 	/**
 	 * @see #getSecret()
 	 */
-	public Login setSecret(String value) {
+	public CreateAccountResult setSecret(String value) {
 		internalSetSecret(value);
 		return this;
 	}
@@ -80,12 +76,12 @@ public class Login extends LoginCmd {
 
 	@Override
 	public String jsonType() {
-		return LOGIN__TYPE;
+		return CREATE_ACCOUNT_RESULT__TYPE;
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static Login readLogin(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Login result = new Login();
+	public static CreateAccountResult readCreateAccountResult(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		CreateAccountResult result = new CreateAccountResult();
 		in.beginObject();
 		result.readFields(in);
 		in.endObject();
@@ -111,7 +107,7 @@ public class Login extends LoginCmd {
 	}
 
 	@Override
-	public <R,A,E extends Throwable> R visit(LoginCmd.Visitor<R,A,E> v, A arg) throws E {
+	public <R,A,E extends Throwable> R visit(ResultMsg.Visitor<R,A,E> v, A arg) throws E {
 		return v.visit(this, arg);
 	}
 

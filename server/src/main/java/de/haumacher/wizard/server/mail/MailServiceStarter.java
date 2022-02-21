@@ -16,14 +16,19 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 /**
- * TODO
- *
- * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
+ * The {@link MailService} singleton.
  */
 @WebListener
 public class MailServiceStarter implements ServletContextListener {
 	
 	private static MailService INSTANCE;
+	
+	/**
+	 * The {@link MailService} instance.
+	 */
+	public static MailService getInstance() {
+		return INSTANCE;
+	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {

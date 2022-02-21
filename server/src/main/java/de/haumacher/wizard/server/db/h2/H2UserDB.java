@@ -21,10 +21,9 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
 import de.haumacher.msgbuf.json.Base64Utils;
+import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.server.db.DBException;
 import de.haumacher.wizard.server.db.UserDB;
-import de.haumacher.wizard.server.db.model.CreateAccountResult;
-import de.haumacher.wizard.server.db.model.UserInfo;
 
 /**
  * The {@link UserDB} stored in a H2 relational database.
@@ -44,13 +43,19 @@ public class H2UserDB  implements UserDB {
 		_context = DSL.using(connection, SQLDialect.H2);
 		_random = new SecureRandom();
 	}
+	
+	@Override
+	public void startup() {
+		int userCnt = _context.fetchCount(USERS);
+		System.out.println("User DB startup, " + userCnt + " users registered.");
+	}
 
 	@Override
-	public CreateAccountResult createUser(String nickname, String language) throws DBException {
+	public CreateAccountResult createUser(String nickname) throws DBException {
 		Record result = _context.select().from(USERS).where(USERS.NICKNAME.eq(nickname)).fetchAny();
 		if (result != null) {
 			// Fail fast.
-			throw new DBException("Nickname already exists");
+			throw new DBException("Nickname already exists.");
 		}
 
 		String uid = newUUID();
@@ -60,10 +65,12 @@ public class H2UserDB  implements UserDB {
 		long now = System.currentTimeMillis();
 		
 		try {
+			// TODO: Remove language from user table. Language is handled dynamically.
+			
 // Seems not to work due to a bug in org.jooq SQL generation for H2?
 //			_context.begin(
 				_context.insertInto(USERS, USERS.UID, USERS.NICKNAME, USERS.LANGUAGE, USERS.VERIFIED, USERS.CREATED, USERS.LAST_LOGIN)
-					.values(uid, nickname, language, false, now, now).execute();
+					.values(uid, nickname, "en", false, now, now).execute();
 				_context.insertInto(USER_SESSION, USER_SESSION.UID, USER_SESSION.HASH)
 					.values(uid, hash).execute();
 //			).execute();
@@ -75,7 +82,7 @@ public class H2UserDB  implements UserDB {
 	}
 	
 	@Override
-	public UserInfo login(String uid, String secret) throws DBException {
+	public String login(String uid, String secret) throws DBException {
 		checkCredentials(uid, secret);
 		
 		long now = System.currentTimeMillis();
@@ -106,18 +113,9 @@ public class H2UserDB  implements UserDB {
 		}
 	}
 
-	private UserInfo getUserInfo(String uid) {
+	private String getUserInfo(String uid) {
 		Record info = _context.select().from(USERS).where(USERS.UID.eq(uid)).fetchOne();
-		
-		return UserInfo.create()
-			.setNickname(info.getValue(USERS.NICKNAME))
-			.setLanguage(info.getValue(USERS.LANGUAGE))
-			;
-	}
-	
-	private byte[] getEmail(String uid) {
-		Record info = _context.select().from(USERS).where(USERS.UID.eq(uid)).fetchOne();
-		return info.getValue(USERS.EMAIL);
+		return info.getValue(USERS.NICKNAME);
 	}
 	
 	@Override
@@ -150,9 +148,7 @@ public class H2UserDB  implements UserDB {
 	}
 	
 	@Override
-	public void verifyEmail(String uid, String secret, String token) throws DBException {
-		checkCredentials(uid, secret);
-
+	public void verifyEmail(String uid, String token) throws DBException {
 		checkToken(uid, token);
 
 //		_context.begin(

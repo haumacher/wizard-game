@@ -26,6 +26,7 @@ import javax.mail.internet.MimeMessage.RecipientType;
 import javax.mail.internet.MimeMultipart;
 
 import de.haumacher.msgbuf.json.Base64Utils;
+import de.haumacher.wizard.server.servlet.AccountServlet;
 
 /**
  * Service for sending e-mail messages.
@@ -52,7 +53,7 @@ public class MailService {
 			throws MessagingException, IOException, AddressException {
 		String image = "https://play.haumacher.de/zauberer/images/zauberer.png";
 		
-		String link = "https://play.haumacher.de/zauberer/activate?uid=" + uid + "&token=" + code;
+		String link = "https://play.haumacher.de/zauberer" + AccountServlet.PATH + "?" + AccountServlet.UID_PARAM + "=" + uid + "&" + AccountServlet.TOKEN_PARAM + "=" + code;
 		Message msg = createMessage();
 		msg.setSubject("Zauberer account creation");
 		

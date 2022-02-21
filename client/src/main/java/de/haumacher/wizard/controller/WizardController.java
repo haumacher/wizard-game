@@ -8,10 +8,12 @@ import java.util.function.Consumer;
 
 import de.haumacher.wizard.R;
 import de.haumacher.wizard.io.WizardConnection;
+import de.haumacher.wizard.msg.AddEmailSuccess;
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
+import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.msg.Error;
 import de.haumacher.wizard.msg.FinishGame;
 import de.haumacher.wizard.msg.FinishRound;
@@ -21,6 +23,7 @@ import de.haumacher.wizard.msg.GameCmd;
 import de.haumacher.wizard.msg.GameCreated;
 import de.haumacher.wizard.msg.GameDeleted;
 import de.haumacher.wizard.msg.GameStarted;
+import de.haumacher.wizard.msg.HelloResult;
 import de.haumacher.wizard.msg.JoinAnnounce;
 import de.haumacher.wizard.msg.JoinGame;
 import de.haumacher.wizard.msg.Lead;
@@ -28,6 +31,7 @@ import de.haumacher.wizard.msg.LeaveAnnounce;
 import de.haumacher.wizard.msg.LeaveGame;
 import de.haumacher.wizard.msg.ListGames;
 import de.haumacher.wizard.msg.ListGamesResult;
+import de.haumacher.wizard.msg.LoginFailed;
 import de.haumacher.wizard.msg.Msg;
 import de.haumacher.wizard.msg.RequestBid;
 import de.haumacher.wizard.msg.RequestLead;
@@ -36,6 +40,7 @@ import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartBids;
 import de.haumacher.wizard.msg.StartLead;
 import de.haumacher.wizard.msg.StartRound;
+import de.haumacher.wizard.msg.VerifyEmailSuccess;
 import de.haumacher.wizard.msg.Welcome;
 import de.haumacher.wizard.ui.GameLobby;
 import de.haumacher.wizard.ui.GameSelector;
@@ -94,6 +99,36 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 				new Alert(AlertType.ERROR, R.communicationError_msg.format(ex.getMessage()), ButtonType.OK).show();
 			}
 		});
+	}
+	
+	@Override
+	public Void visit(HelloResult self, Void arg) throws IOException {
+		//  TODO: Automatically created
+		return null;
+	}
+	
+	@Override
+	public Void visit(CreateAccountResult self, Void arg) throws IOException {
+		//  TODO: Automatically created
+		return null;
+	}
+
+	@Override
+	public Void visit(AddEmailSuccess self, Void arg) throws IOException {
+		//  TODO: Automatically created
+		return null;
+	}
+
+	@Override
+	public Void visit(VerifyEmailSuccess self, Void arg) throws IOException {
+		//  TODO: Automatically created
+		return null;
+	}
+	
+	@Override
+	public Void visit(LoginFailed self, Void arg) throws IOException {
+		//  TODO: Automatically created
+		return null;
 	}
 	
 	@Override
@@ -273,6 +308,5 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 		self.getCmd().visit(this, self.getPlayerId());
 		return null;
 	}
-
 
 }

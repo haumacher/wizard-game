@@ -55,7 +55,7 @@ public class UserDBService implements ServletContextListener {
 			    _server = Server.createTcpServer(params);
 			    _server.start();
 			}
-
+			
 			String url = (String) envCtx.lookup(DB_URL_NAME);        
 			String user = (String) envCtx.lookup(DB_USER_NAME);        
 			String password = (String) envCtx.lookup(DB_PASSWORD_NAME);
@@ -73,14 +73,15 @@ public class UserDBService implements ServletContextListener {
 				System.err.println("Missing JNDI environment setting: " + DB_PASSWORD_NAME);
 				error = true;
 			}
-
-			if (error) {
-				_connection = DriverManager.getConnection("jdbc:h2:mem", "user", "password");
-			} else {
-				_connection = DriverManager.getConnection(url, user, password);
-			}
 			
-			INSTANCE = new H2UserDB(_connection);
+			if (error) {
+				INSTANCE = NoUserDB.INSTANCE;
+			} else {
+				System.out.println("Opening user DB: " + url);
+				_connection = DriverManager.getConnection(url, user, password);
+				INSTANCE = new H2UserDB(_connection);
+			}
+			// INSTANCE.startup();
 		} catch (NamingException ex) {
 			ex.printStackTrace();
 		} catch (SQLException ex) {
@@ -115,6 +116,8 @@ public class UserDBService implements ServletContextListener {
             _server.stop();
             _server = null;
         }
+        
+        org.h2.Driver.unload();
         
         INSTANCE = null;
     }
