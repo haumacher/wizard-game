@@ -2440,14 +2440,14 @@ class PlayerInfo extends _JsonObject {
 	///  The number of won tricks.
 	int tricks;
 
-	///  The current points of the player.
-	int points;
+	///  The current total number of points won by the player so far.
+	int total;
 
 	/// Creates a PlayerInfo.
 	PlayerInfo({
 			this.bid = 0, 
 			this.tricks = 0, 
-			this.points = 0, 
+			this.total = 0, 
 	});
 
 	/// Parses a PlayerInfo from a string source.
@@ -2477,7 +2477,7 @@ class PlayerInfo extends _JsonObject {
 				break;
 			}
 			case "points": {
-				points = json.expectInt();
+				total = json.expectInt();
 				break;
 			}
 			default: super._readProperty(key, json);
@@ -2495,7 +2495,7 @@ class PlayerInfo extends _JsonObject {
 		json.addNumber(tricks);
 
 		json.addKey("points");
-		json.addNumber(points);
+		json.addNumber(total);
 	}
 
 }
@@ -2702,11 +2702,11 @@ class ConfirmTrick extends GameCmd {
 ///  Message sent after each round that announces the points received in this round.
 class FinishRound extends GameMsg {
 	///  For each player ID the number of points this player wins. The number may be negative.
-	Map<String, int> points;
+	Map<String, RoundInfo> info;
 
 	/// Creates a FinishRound.
 	FinishRound({
-			this.points = const {}, 
+			this.info = const {}, 
 	});
 
 	/// Parses a FinishRound from a string source.
@@ -2727,14 +2727,78 @@ class FinishRound extends GameMsg {
 	@override
 	void _readProperty(String key, JsonReader json) {
 		switch (key) {
-			case "points": {
-				Map<String, int> _points = {};
+			case "info": {
+				Map<String, RoundInfo> _info = {};
 				json.expectObject();
 				while (json.hasNextKey()) {
 					String __key = json.nextKey()!;
-					_points[__key] = json.expectInt();
+					if (!json.tryNull()) {
+						_info[__key] = RoundInfo.read(json);
+					}
 				}
-				points = _points;
+				info = _info;
+				break;
+			}
+			default: super._readProperty(key, json);
+		}
+	}
+
+	@override
+	void _writeProperties(JsonSink json) {
+		super._writeProperties(json);
+
+		json.addKey("info");
+		json.startObject();
+		for (var x in info.entries) {
+			json.addKey(x.key);
+			x.value.writeContent(json);
+		}
+		json.endObject();
+	}
+
+	@override
+	R visitGameMsg<R, A>(GameMsgVisitor<R, A> v, A arg) => v.visitFinishRound(this, arg);
+
+}
+
+///  Current player status at the end of a round.
+class RoundInfo extends _JsonObject {
+	///  The points won by the player during the last round. The number may be negative.
+	int points;
+
+	///  The total amount of points the player won so far. The number may be negative.
+	int total;
+
+	/// Creates a RoundInfo.
+	RoundInfo({
+			this.points = 0, 
+			this.total = 0, 
+	});
+
+	/// Parses a RoundInfo from a string source.
+	static RoundInfo? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a RoundInfo instance from the given reader.
+	static RoundInfo read(JsonReader json) {
+		RoundInfo result = RoundInfo();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "RoundInfo";
+
+	@override
+	void _readProperty(String key, JsonReader json) {
+		switch (key) {
+			case "points": {
+				points = json.expectInt();
+				break;
+			}
+			case "total": {
+				total = json.expectInt();
 				break;
 			}
 			default: super._readProperty(key, json);
@@ -2746,16 +2810,11 @@ class FinishRound extends GameMsg {
 		super._writeProperties(json);
 
 		json.addKey("points");
-		json.startObject();
-		for (var x in points.entries) {
-			json.addKey(x.key);
-			json.addNumber(x.value);
-		}
-		json.endObject();
-	}
+		json.addNumber(points);
 
-	@override
-	R visitGameMsg<R, A>(GameMsgVisitor<R, A> v, A arg) => v.visitFinishRound(this, arg);
+		json.addKey("total");
+		json.addNumber(total);
+	}
 
 }
 

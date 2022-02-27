@@ -283,7 +283,7 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 
 	@Override
 	public Void visit(FinishRound self, Void arg) throws IOException {
-		_gameView.finishRound(self.getPoints());
+		_gameView.finishRound(self.getInfo());
 		return null;
 	}
 

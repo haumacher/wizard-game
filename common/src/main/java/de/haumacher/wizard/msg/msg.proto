@@ -408,7 +408,16 @@ message ConfirmTrick extends GameCmd {
 /** Message sent after each round that announces the points received in this round. */
 message FinishRound extends GameMsg {
 	/** For each player ID the number of points this player wins. The number may be negative. */
-	map<string, int> points;
+	map<string, RoundInfo> info;
+}
+
+/** Current player status at the end of a round. */
+message RoundInfo {
+	/** The points won by the player during the last round. The number may be negative. */
+	int points;
+	
+	/** The total amount of points the player won so far. The number may be negative. */
+	int total;
 }
 
 /** Command in response to {@link FinishRound} that must be received from all players, before the next round starts */

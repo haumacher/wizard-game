@@ -15,10 +15,10 @@ public class FinishRound extends GameMsg {
 	/** Identifier for the {@link FinishRound} type in JSON format. */
 	public static final String FINISH_ROUND__TYPE = "FinishRound";
 
-	/** @see #getPoints() */
-	private static final String POINTS = "points";
+	/** @see #getInfo() */
+	private static final String INFO = "info";
 
-	private final java.util.Map<String, Integer> _points = new java.util.HashMap<>();
+	private final java.util.Map<String, RoundInfo> _info = new java.util.HashMap<>();
 
 	/**
 	 * Creates a {@link FinishRound} instance.
@@ -32,46 +32,46 @@ public class FinishRound extends GameMsg {
 	/**
 	 * For each player ID the number of points this player wins. The number may be negative.
 	 */
-	public final java.util.Map<String, Integer> getPoints() {
-		return _points;
+	public final java.util.Map<String, RoundInfo> getInfo() {
+		return _info;
 	}
 
 	/**
-	 * @see #getPoints()
+	 * @see #getInfo()
 	 */
-	public FinishRound setPoints(java.util.Map<String, Integer> value) {
-		internalSetPoints(value);
+	public FinishRound setInfo(java.util.Map<String, RoundInfo> value) {
+		internalSetInfo(value);
 		return this;
 	}
-	/** Internal setter for {@link #getPoints()} without chain call utility. */
-	protected final void internalSetPoints(java.util.Map<String, Integer> value) {
-		if (value == null) throw new IllegalArgumentException("Property 'points' cannot be null.");
-		_points.clear();
-		_points.putAll(value);
+	/** Internal setter for {@link #getInfo()} without chain call utility. */
+	protected final void internalSetInfo(java.util.Map<String, RoundInfo> value) {
+		if (value == null) throw new IllegalArgumentException("Property 'info' cannot be null.");
+		_info.clear();
+		_info.putAll(value);
 	}
 
 
 	/**
-	 * Adds a key value pair to the {@link #getPoints()} map.
+	 * Adds a key value pair to the {@link #getInfo()} map.
 	 */
-	public FinishRound putPoint(String key, int value) {
-		internalPutPoint(key, value);
+	public FinishRound putInfo(String key, RoundInfo value) {
+		internalPutInfo(key, value);
 		return this;
 	}
 
-	/** Implementation of {@link #putPoint(String, int)} without chain call utility. */
-	protected final void  internalPutPoint(String key, int value) {
-		if (_points.containsKey(key)) {
-			throw new IllegalArgumentException("Property 'points' already contains a value for key '" + key + "'.");
+	/** Implementation of {@link #putInfo(String, RoundInfo)} without chain call utility. */
+	protected final void  internalPutInfo(String key, RoundInfo value) {
+		if (_info.containsKey(key)) {
+			throw new IllegalArgumentException("Property 'info' already contains a value for key '" + key + "'.");
 		}
-		_points.put(key, value);
+		_info.put(key, value);
 	}
 
 	/**
-	 * Removes a key from the {@link #getPoints()} map.
+	 * Removes a key from the {@link #getInfo()} map.
 	 */
-	public final void removePoint(String key) {
-		_points.remove(key);
+	public final void removeInfo(String key) {
+		_info.remove(key);
 	}
 
 	@Override
@@ -91,11 +91,11 @@ public class FinishRound extends GameMsg {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(POINTS);
+		out.name(INFO);
 		out.beginObject();
-		for (java.util.Map.Entry<String,Integer> entry : getPoints().entrySet()) {
+		for (java.util.Map.Entry<String,RoundInfo> entry : getInfo().entrySet()) {
 			out.name(entry.getKey());
-			out.value(entry.getValue());
+			entry.getValue().writeTo(out);
 		}
 		out.endObject();
 	}
@@ -103,10 +103,10 @@ public class FinishRound extends GameMsg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case POINTS: {
+			case INFO: {
 				in.beginObject();
 				while (in.hasNext()) {
-					putPoint(in.nextName(), in.nextInt());
+					putInfo(in.nextName(), de.haumacher.wizard.msg.RoundInfo.readRoundInfo(in));
 				}
 				in.endObject();
 				break;

@@ -39,6 +39,7 @@ import de.haumacher.wizard.msg.PlayerState;
 import de.haumacher.wizard.msg.RequestBid;
 import de.haumacher.wizard.msg.RequestLead;
 import de.haumacher.wizard.msg.RequestTrumpSelection;
+import de.haumacher.wizard.msg.RoundInfo;
 import de.haumacher.wizard.msg.RoundState;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartBids;
@@ -52,7 +53,7 @@ import de.haumacher.wizard.msg.Value;
  */
 public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException> {
 	
-	public static final int PROTOCOL_VERSION = 4;
+	public static final int PROTOCOL_VERSION = 5;
 	
 	static final List<Card> CARDS;
 
@@ -548,14 +549,6 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			// Compute points.
 			
 			FinishRound finishRound = createFinishRoundMessage();
-			
-			// Apply delta to player state.
-			for (PlayerState state : _players) {
-				int delta = finishRound.getPoints().get(state.getPlayer().getId());
-				int newPoints = state.getPoints() + delta;
-				state.setPoints(newPoints);
-			}
-			
 			initBarrier(GameState.FINISHING_ROUND);
 			broadCast(finishRound);
 		}
@@ -572,7 +565,12 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			} else {
 				delta = -Math.abs(hitCnt - bidCnt) * 10;
 			}
-			finishRound.getPoints().put(state.getPlayer().getId(), delta);
+			
+			// Apply delta to player state.
+			state.setPoints(state.getPoints() + delta);
+			
+			finishRound.getInfo().put(state.getPlayer().getId(), 
+				RoundInfo.create().setPoints(delta).setTotal(state.getPoints()));
 		}
 		return finishRound;
 	}

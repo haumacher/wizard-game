@@ -24,6 +24,7 @@ import de.haumacher.wizard.msg.PlayedCard;
 import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.PlayerInfo;
 import de.haumacher.wizard.msg.RequestBid;
+import de.haumacher.wizard.msg.RoundInfo;
 import de.haumacher.wizard.msg.StartLead;
 import de.haumacher.wizard.msg.StartRound;
 import de.haumacher.wizard.msg.Suit;
@@ -235,17 +236,17 @@ public class GameView extends GenericController {
 		return _players.get(playerId).getName();
 	}
 
-	public void finishRound(Map<String, Integer> points) {
+	public void finishRound(Map<String, RoundInfo> info) {
 		clearTrick();
 		trumpPane.getChildren().clear();
 		
-		for (Entry<String, Integer> entry : points.entrySet()) {
-			_playerStatus.get(entry.getKey()).addScore(entry.getValue().intValue());
+		for (Entry<String, RoundInfo> entry : info.entrySet()) {
+			_playerStatus.get(entry.getKey()).setScore(entry.getValue().getTotal());
 		}
 		
 		setActiveAll();
 		
-		_currentTrick.confirm(MessageFormat.format(R.youEarn_points, points.get(_playerId)), e -> {
+		_currentTrick.confirm(MessageFormat.format(R.youEarn_points, info.get(_playerId).getPoints()), e -> {
 			_server.sendCommand(ConfirmRound.create());
 			_currentTrick.setInfo(R.waitingForOthers);
 		});

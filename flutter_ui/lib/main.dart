@@ -12,7 +12,7 @@ import 'package:flutter_ui/msg.dart' as msg;
 import 'package:flutter_ui/svg.dart';
 
 /// The protocol version supported by this client app.
-const int protocolVersion = 4;
+const int protocolVersion = 5;
 
 void main() {
   runApp(WizardApp());
@@ -42,10 +42,10 @@ void showTrickTestPage() {
               ], "1")
               ..setActivePlayers(const {"4"})
               ..finishRound({
-                "1": 50,
-                "2": 90,
-                "3": 70,
-                "4": 120,
+                "1": RoundInfo(total: 50),
+                "2": RoundInfo(total: 90),
+                "3": RoundInfo(total: 70),
+                "4": RoundInfo(total: 120),
               })
               ..bid("1", 1)
               ..bid("2", 2)
@@ -547,7 +547,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
     playerId = _playerId,
     activityState = ActivityState(_playerId);
 
-  int get pointsEarned => roundResult!.points[playerId]!;
+  int get pointsEarned => roundResult!.info[playerId]!.points;
 
   @override
   void visitAnnounce(Announce self, void arg) {
@@ -643,7 +643,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   void visitFinishRound(FinishRound self, void arg) {
     roundResult = self;
 
-    activityState.finishRound(self.points);
+    activityState.finishRound(self.info);
     initConfirmations();
     setState(WizardPhase.roundConfirmation);
   }
@@ -757,18 +757,13 @@ class ActivityState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void finishRound(Map<String, int> pointsByPlayer) {
+  void finishRound(Map<String, RoundInfo> pointsByPlayer) {
     pointsByPlayer.forEach(_updatePoints);
     notifyListeners();
   }
 
-  void updatePoints(String playerId, int points) {
-    _updatePoints(playerId, points);
-    notifyListeners();
-  }
-
-  void _updatePoints(String playerId, int points) {
-    getInfo(playerId).points = points;
+  void _updatePoints(String playerId, RoundInfo info) {
+    getInfo(playerId).total = info.total;
   }
 
   Player getPlayer(String playerId) =>
@@ -1440,7 +1435,7 @@ class PlayerStateView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
               child:
-              Text(player.displayName + " (" + info.points.toString() + ")")),
+              Text(player.displayName + " (" + info.total.toString() + ")")),
             trickView(info)
           ])
       ));
