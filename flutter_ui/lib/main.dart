@@ -16,10 +16,11 @@ const int protocolVersion = 5;
 
 void main() {
   runApp(WizardApp());
-  // showTrickTestPage();
+//  testPage(testTrickView());
+//  testPage(MyBidView(8, 5));
 }
 
-void showTrickTestPage() {
+void testPage(Widget child) {
   runApp(MaterialApp(
     title: 'Zauberer',
     theme: ThemeData(
@@ -30,58 +31,67 @@ void showTrickTestPage() {
       backgroundColor: const Color(0xff158215),
       body: ExpandDisplay(
         children: [
-          Padding(padding: const EdgeInsets.all(16),
-            child:
-            PlayerStateView(
-              ActivityState("1")
-              ..startRound([
-                Player(id: "1", name: "Player A"),
-                Player(id: "2", name: "Player B"),
-                Player(id: "3", name: "Player C"),
-                Player(id: "4", name: "You"),
-              ], "1")
-              ..setActivePlayers(const {"4"})
-              ..finishRound({
-                "1": RoundInfo(total: 50),
-                "2": RoundInfo(total: 90),
-                "3": RoundInfo(total: 70),
-                "4": RoundInfo(total: 120),
-              })
-              ..bid("1", 1)
-              ..bid("2", 2)
-              ..bid("3", 0)
-              ..bid("4", 3)
-              ..setTricks("1", 2)
-              ..setTricks("2", 1)
-              ..setTricks("3", 0)
-              ..setTricks("4", 2)
-            )
-          ),
-          Expanded(child:
-            Center(child:
-              TrickView(
-                ObservableList<TrickCard>()
-                  ..add(TrickCard(msg.Card(value: Value.c11, suit: Suit.heart), Player(name: "Player A")))
-                  ..add(TrickCard(msg.Card(value: Value.c13, suit: Suit.heart), Player(name: "Player B")))
-                  ..add(TrickCard(msg.Card(value: Value.c5, suit: Suit.spade), Player(name: "Player C")))
-                  ..add(TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "You"))),
-                child:
-                  trickText(text: "You make the trick!", onPressed: (){}),
-                ))
-          ),
-          Padding(padding: const EdgeInsets.all(16),
-            child: CardListView(
-              ObservableList<msg.Card>()
-                ..add(msg.Card(value: Value.z, suit: null))
-                ..add(msg.Card(value: Value.c13, suit: Suit.club))
-                ..add(msg.Card(value: Value.c11, suit: Suit.spade))
-                ..add(msg.Card(value: Value.c12, suit: Suit.heart))
-                ..add(msg.Card(value: Value.c9, suit: Suit.heart))
-                ..add(msg.Card(value: Value.c10, suit: Suit.diamond))
-                ..add(msg.Card(value: Value.n, suit: null))
-              )),
+          testPlayerStatus(),
+          Expanded(child: Center(child: child)),
+          testMyCards(),
         ]
       ))));
+}
+
+Widget testTrickView() {
+  return TrickView(
+    ObservableList<TrickCard>()
+      ..add(TrickCard(msg.Card(value: Value.c11, suit: Suit.heart), Player(name: "Player A")))
+      ..add(TrickCard(msg.Card(value: Value.c13, suit: Suit.heart), Player(name: "Player B")))
+      ..add(TrickCard(msg.Card(value: Value.c5, suit: Suit.spade), Player(name: "Player C")))
+      ..add(TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "You"))),
+    child:
+      trickText(text: "You make the trick!", onPressed: (){}),
+    );
+}
+
+Padding testMyCards() {
+  return Padding(padding: const EdgeInsets.all(16),
+          child: CardListView(
+            ObservableList<msg.Card>()
+              ..add(msg.Card(value: Value.z, suit: null))
+              ..add(msg.Card(value: Value.c13, suit: Suit.club))
+              ..add(msg.Card(value: Value.c11, suit: Suit.spade))
+              ..add(msg.Card(value: Value.c12, suit: Suit.heart))
+              ..add(msg.Card(value: Value.c9, suit: Suit.heart))
+              ..add(msg.Card(value: Value.c10, suit: Suit.diamond))
+              ..add(msg.Card(value: Value.n, suit: null))
+            ));
+}
+
+Padding testPlayerStatus() {
+  return Padding(padding: const EdgeInsets.all(16),
+          child:
+          PlayerStateView(
+            ActivityState("1")
+            ..startRound([
+              Player(id: "1", name: "Player A"),
+              Player(id: "2", name: "Player B"),
+              Player(id: "3", name: "Player C"),
+              Player(id: "4", name: "You"),
+            ], "1")
+            ..setActivePlayers(const {"4"})
+            ..finishRound({
+              "1": RoundInfo(total: 50),
+              "2": RoundInfo(total: 90),
+              "3": RoundInfo(total: 70),
+              "4": RoundInfo(total: 120),
+            })
+            ..bid("1", 1)
+            ..bid("2", 2)
+            ..bid("3", 0)
+            ..bid("4", 3)
+            ..setTricks("1", 2)
+            ..setTricks("2", 1)
+            ..setTricks("3", 0)
+            ..setTricks("4", 2)
+          )
+        );
 }
 
 extension CardEquality on msg.Card {
@@ -1120,7 +1130,7 @@ class WizardWidget extends StatelessWidget {
           valueListenable: connection.wizardModel!.activityState.imActive,
           builder: (context, imActive, child) {
             return imActive ?
-              MyBidView(connection.wizardModel!.roundInfo!.round) :
+              MyBidView(connection.wizardModel!.roundInfo!.round, connection.wizardModel!.expectedBids) :
               WaitingForView((player) => "Waiting for $player's bid.");
           });
 
@@ -1289,7 +1299,9 @@ class WaitingForView extends StatelessWidget {
 
 class MyBidView extends StatelessWidget {
   final int round;
-  const MyBidView(this.round, {Key? key}) : super(key: key);
+  final int expectedBids;
+
+  const MyBidView(this.round, this.expectedBids, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1306,6 +1318,7 @@ class MyBidView extends StatelessWidget {
 
   List<Widget> options() {
     List<Widget> result = [];
+    var freeTricks = round - expectedBids;
     for (var x = 0; x <= round ; x++) {
       result.add(
         Padding(
@@ -1319,6 +1332,7 @@ class MyBidView extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 fixedSize: const Size(60, 60),
                 shape: const CircleBorder(),
+                primary: x <= freeTricks ? Colors.lightBlue : Colors.orange
               ),
               onPressed: () {
                 connection.sendCommand(Bid(cnt: x));
