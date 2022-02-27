@@ -826,11 +826,10 @@ class HomePage extends StatelessWidget {
     connection.onError((msg) {
       showDialog(context: context, builder: (context) {
         return AlertDialog(
-          title: Text("An error occurred"),
-          content: Text(msg),
+          title: Text(msg),
           actions: [
             ElevatedButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
