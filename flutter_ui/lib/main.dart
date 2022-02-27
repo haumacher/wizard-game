@@ -807,6 +807,22 @@ class WizardApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Zauberer',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const HomePage()
+    );
+  }
+}
+
+/// Homepage view of the app.
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     connection.onError((msg) {
       showDialog(context: context, builder: (context) {
         return AlertDialog(
@@ -824,22 +840,6 @@ class WizardApp extends StatelessWidget {
       });
     });
 
-    return MaterialApp(
-      title: 'Zauberer',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const HomePage()
-    );
-  }
-}
-
-/// Homepage view of the app.
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
     return ValueListenableBuilder<ConnectionState>(
       valueListenable: connection.state,
       builder: (context, state, child) {
