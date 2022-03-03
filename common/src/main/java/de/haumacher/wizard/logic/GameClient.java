@@ -33,5 +33,12 @@ public interface GameClient extends ClientConnection {
 	 * Takes over this player with a new {@link ClientConnection}.
 	 */
 	void reconnectTo(ClientConnection connection);
+
+	/** 
+	 * Removes the broken connection from this client. 
+	 * 
+	 * @return Whether the given connection was formerly the active connection of this client.
+	 */
+	boolean disconnect(ClientConnection connection);
 	
 }

@@ -105,7 +105,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	public void stop() {
 		_server.removeClient(this);
 		if (_game != null) {
-			_game.removePlayer(_handle);
+			_game.removePlayer(_handle, this);
 		}
 	}
 
@@ -313,7 +313,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	@Override
 	public Void visit(LeaveGame self, Void arg) throws IOException {
 		if (_game != null && _game.getGameId().equals(self.getGameId())) {
-			_game.removePlayer(_handle);
+			_game.removePlayer(_handle, this);
 			_game = null;
 		}
 		return null;

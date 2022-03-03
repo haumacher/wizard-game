@@ -18,6 +18,18 @@ import de.haumacher.wizard.resources.StaticResources.Resource;
  */
 public class GameClientImpl implements GameClient {
 
+	private static final ClientConnection NONE = new ClientConnection() {
+		@Override
+		public void sendMessage(Msg msg) {
+			// Ignore.
+		}
+
+		@Override
+		public void sendError(Resource message) {
+			// Ignore.
+		}
+	};
+
 	private final Player _data = Player.create().setId(UUID.randomUUID().toString()).setName("Anonymous");
 	
 	private ClientConnection _connection;
@@ -32,6 +44,15 @@ public class GameClientImpl implements GameClient {
 	@Override
 	public void reconnectTo(ClientConnection connection) {
 		_connection = connection;
+	}
+	
+	@Override
+	public boolean disconnect(ClientConnection connection) {
+		boolean wasConnected = _connection == connection;
+		if (wasConnected) {
+			_connection = NONE;
+		}
+		return wasConnected;
 	}
 	
 	@Override

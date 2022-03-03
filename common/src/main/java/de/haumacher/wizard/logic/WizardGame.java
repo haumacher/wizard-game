@@ -183,19 +183,21 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	/**
 	 * Removes a player from this game.
 	 */
-	public synchronized void removePlayer(GameClient player) {
-		if (_state == State.STARTED) {
-			// A player lost its connection, prepare for reconnect.
-			_lostClients.put(player.getId(), player);
-		} else {
-			GameClient removedPlayer = _clients.remove(player.getId());
-			if (removedPlayer != null) {
-				broadCast(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
+	public synchronized void removePlayer(GameClient handle, ClientConnection connection) {
+		if (handle.disconnect(connection)) {
+			if (_state == State.STARTED) {
+				// A player lost its connection, prepare for reconnect.
+				_lostClients.put(handle.getId(), handle);
+			} else {
+				GameClient removedPlayer = _clients.remove(handle.getId());
+				if (removedPlayer != null) {
+					broadCast(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
+				}
 			}
-		}
-		
-		if (_clients.size() - _lostClients.size() == 0) {
-			gameFinished();
+			
+			if (_clients.size() - _lostClients.size() == 0) {
+				gameFinished();
+			}
 		}
 	}
 
@@ -234,11 +236,15 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 */
 	public synchronized GameClient reconnect(String clientId, ClientConnection connection) {
 		GameClient result = _lostClients.remove(clientId);
+		if (result == null) {
+			// Server connection might not yet have crashed, but the client may try to reconnect early.
+			result = _clients.get(clientId);
+		}
 		if (result != null) {
 			result.reconnectTo(connection);
 			
 			result.sendMessage(GameStarted.create().setGame(getData()));
-			sendStartRound(_players.stream().filter(s -> s.getPlayer().getId().equals(result.getId())).findFirst().get());
+			sendStartRound(_players.stream().filter(s -> s.getPlayer().getId().equals(clientId)).findFirst().get());
 			
 			switch (_gameState) {
 			case TRUMP_SELECTION:

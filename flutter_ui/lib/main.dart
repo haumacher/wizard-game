@@ -252,10 +252,18 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
     _socket?.sink.close();
     _socket = null;
 
+    if (kDebugMode) {
+      print("Opening connection.");
+    }
+
     var socket = WebSocketChannel.connect(Uri.parse(_serverAddress));
-    socket.stream.listen(_onMessage, onDone: _onClose);
+    socket.stream.listen(_onMessage, onDone: _onClose, onError: _onError, cancelOnError: true);
     // socket.onOpen.listen(_onOpen);
     _socket = socket;
+
+    if (kDebugMode) {
+      print("Connection established.");
+    }
 
     sendCommand(Hello(version: protocolVersion, language: PlatformDispatcher.instance.locale.languageCode));
 
@@ -269,6 +277,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
   void close() {
     _socket?.sink.close();
+    _socket = null;
   }
 
   void sendCommand(Cmd login) {
@@ -279,13 +288,25 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
     _socket!.sink.add(data);
   }
 
+  void _onError(Object msg) {
+    if (kDebugMode) {
+      print("Socket error: " + msg.toString());
+    }
+
+    _onConnectionError();
+  }
+
   void _onClose() {
     if (kDebugMode) {
       print("Connection closed.");
     }
+    
+    _onConnectionError();
+  }
 
-    _socket = null;
-    state.value = playerId == null ? ConnectionState.startup : ConnectionState.disconnected;
+  void _onConnectionError() {
+    close();
+    state.value = ConnectionState.disconnected;
     notifyListeners();
   }
 
@@ -300,20 +321,27 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   @override
   void visitHelloResult(HelloResult self, void arg) {
     if (self.ok) {
-      _prefs.then((prefs) {
-        var _playerId = prefs.getString(playerIdKey);
-        // TODO: Use secure storage.
-        var secret = prefs.getString(secretKey);
-        if (_playerId != null && secret != null) {
-          playerId = _playerId;
-          
-          // Perform auto-login.
-          sendCommand(Login(uid: _playerId, secret: secret));
-          state.value = ConnectionState.connecting;
-        } else {
-          state.value = ConnectionState.accountCreation;
-        }
-      });
+      var lastPlayerId = playerId;
+      var lastGameId = gameId;
+      if (lastPlayerId != null && lastGameId != null) {
+        sendCommand(Reconnect(playerId: lastPlayerId, gameId: lastGameId));
+        state.value = ConnectionState.connecting;
+      } else {
+        _prefs.then((prefs) {
+          var _playerId = prefs.getString(playerIdKey);
+          // TODO: Use secure storage.
+          var secret = prefs.getString(secretKey);
+          if (_playerId != null && secret != null) {
+            playerId = _playerId;
+
+            // Perform auto-login.
+            sendCommand(Login(uid: _playerId, secret: secret));
+            state.value = ConnectionState.connecting;
+          } else {
+            state.value = ConnectionState.accountCreation;
+          }
+        });
+      }
     } else {
       state.value = ConnectionState.updateRequired;
     }
@@ -606,7 +634,12 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
 
   @override
   void visitStartLead(StartLead self, void arg) {
-    startLead = true;
+    startLead = self.currentTrick.isEmpty;
+
+    // In case of reconnect, re-establish the current trick.
+    for (var trickCard in self.currentTrick) {
+      currentTrick.add(TrickCard(trickCard.card!, player(trickCard.playerId)));
+    }
   }
 
   @override
@@ -868,53 +901,53 @@ class HomePage extends StatelessWidget {
             return const CreateAccountView();
           case ConnectionState.disconnected:
             return Scaffold(
-                appBar: AppBar(
-                  title: const Text("Zauberer online"),
+              appBar: AppBar(
+                title: const Text("No Connection"),
+              ),
+              body:  Center(
+                child: ElevatedButton(
+                  child: const Text("Connect"),
+                  onPressed: () {
+                    connection.reconnect();
+                  },
                 ),
-                body:  Center(
-                  child: ElevatedButton(
-                    child: const Text("Connect"),
-                    onPressed: () {
-                      connection.reconnect();
-                    },
-                  ),
-                )
+              )
             );
           case ConnectionState.loggedIn:
             return Scaffold(
-                appBar: AppBar(
-                  title: const Text("Zauberer online"),
-                ),
-                body: const Center(child: Text("Logging in...")));
+              appBar: AppBar(
+                title: const Text("Zauberer online"),
+              ),
+              body: const Center(child: Text("Logging in...")));
           case ConnectionState.listingGames:
             return ChangeObserver<GameList>(
-                state: connection.gameList,
-                builder: (context, gameList) {
-                  var openGames = gameList.openGames;
-                  return Scaffold(
-                      appBar: AppBar(title: const Text("Join a game")),
-                      body: openGames.isEmpty ?
-                          const Center(child: Text("No open games.")) :
-                          ListView(
-                            children: openGames.values.map((g) =>
-                              Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                                child: GameEntryWidget(g))
-                            ).toList()),
-                      floatingActionButton: FloatingActionButton(
-                        child: const Icon(Icons.add),
-                        onPressed: () {
-                          pushGameView(context);
-                          connection.sendCommand(CreateGame());
-                        }));
-                });
+              state: connection.gameList,
+              builder: (context, gameList) {
+                var openGames = gameList.openGames;
+                return Scaffold(
+                  appBar: AppBar(title: const Text("Join a game")),
+                  body: openGames.isEmpty ?
+                    const Center(child: Text("No open games.")) :
+                    ListView(
+                      children: openGames.values.map((g) =>
+                        Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                          child: GameEntryWidget(g))
+                      ).toList()),
+                  floatingActionButton: FloatingActionButton(
+                    child: const Icon(Icons.add),
+                    onPressed: () {
+                      pushGameView(context);
+                      connection.sendCommand(CreateGame());
+                    }));
+              });
           case ConnectionState.waitingForStart:
             return showWaitingForStart();
           default:
             return Scaffold(
-                appBar: AppBar(
-                  title: const Text("Zauberer online"),
-                ),
-                body: Center(child: Text("ERROR: " + state.name)));
+              appBar: AppBar(
+                title: const Text("Zauberer online"),
+              ),
+              body: Center(child: Text("ERROR: " + state.name)));
         }
       }
     );
@@ -998,6 +1031,26 @@ class PlayingView extends StatelessWidget {
         switch (state) {
           case ConnectionState.listingGames:
             return showWaitingForStart();
+          case ConnectionState.disconnected:
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text("Connection lost"),
+              ),
+              body:  Center(
+                child: ElevatedButton(
+                  child: const Text("Re-Connect"),
+                  onPressed: () {
+                    connection.reconnect();
+                  },
+                ),
+              )
+            );
+          case ConnectionState.connecting:
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text("Zauberer online"),
+              ),
+              body: const Center(child: Text("Reconnecting...")));
           case ConnectionState.waitingForStart:
             ObservableGame? game = connection.currentGame;
             if (game == null) return showWaitingForStart();

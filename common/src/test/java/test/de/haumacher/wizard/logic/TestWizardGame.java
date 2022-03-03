@@ -55,6 +55,11 @@ public class TestWizardGame extends TestCase {
 			throw new UnsupportedOperationException();
 		}
 		
+		@Override
+		public boolean disconnect(ClientConnection connection) {
+			throw new UnsupportedOperationException();
+		}
+		
 	}
 	
 	public void testGame() throws IOException {
