@@ -1,7 +1,10 @@
-import 'dart:io';
+import 'dart:js';
 import 'dart:math';
 import 'dart:core';
 import 'dart:ui';
+
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +18,7 @@ import 'package:flutter_ui/svg.dart';
 const int protocolVersion = 5;
 
 void main() {
-  runApp(WizardApp());
+  runApp(const WizardApp());
 //  testPage(testTrickView());
 //  testPage(MyBidView(8, 5));
 }
@@ -38,7 +41,7 @@ void testPage(Widget child) {
       ))));
 }
 
-Widget testTrickView() {
+Widget testTrickView(BuildContext context) {
   return TrickView(
     ObservableList<TrickCard>()
       ..add(TrickCard(msg.Card(value: Value.c11, suit: Suit.heart), Player(name: "Player A")))
@@ -46,7 +49,7 @@ Widget testTrickView() {
       ..add(TrickCard(msg.Card(value: Value.c5, suit: Suit.spade), Player(name: "Player C")))
       ..add(TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "You"))),
     child:
-      trickText(text: "You make the trick!", onPressed: (){}),
+      trickText(context, text: AppLocalizations.of(context)!.youMakeTheTrick, onPressed: (){}),
     );
 }
 
@@ -227,9 +230,6 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   final ValueNotifier<ConnectionState> state = ValueNotifier(ConnectionState.startup);
 
   static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
-
-  /// The players nickname as it was entered in the [CreateAccountView].
-  String? _nickName;
 
   /// The ID of the player in this app.
   String? playerId;
@@ -851,6 +851,8 @@ class WizardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       title: 'Zauberer',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -872,7 +874,7 @@ class HomePage extends StatelessWidget {
           title: Text(msg),
           actions: [
             ElevatedButton(
-              child: const Text("OK"),
+              child: Text(AppLocalizations.of(context)!.ok),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -894,19 +896,19 @@ class HomePage extends StatelessWidget {
           case ConnectionState.connecting:
             return Scaffold(
               appBar: AppBar(
-                title: const Text("Zauberer online"),
+                title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: const Center(child: Text("Connecting...")));
+              body: Center(child: Text(AppLocalizations.of(context)!.connecting)));
           case ConnectionState.accountCreation:
             return const CreateAccountView();
           case ConnectionState.disconnected:
             return Scaffold(
               appBar: AppBar(
-                title: const Text("No Connection"),
+                title: Text(AppLocalizations.of(context)!.noConnection),
               ),
               body:  Center(
                 child: ElevatedButton(
-                  child: const Text("Connect"),
+                  child: Text(AppLocalizations.of(context)!.connect),
                   onPressed: () {
                     connection.reconnect();
                   },
@@ -916,18 +918,18 @@ class HomePage extends StatelessWidget {
           case ConnectionState.loggedIn:
             return Scaffold(
               appBar: AppBar(
-                title: const Text("Zauberer online"),
+                title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: const Center(child: Text("Logging in...")));
+              body: Center(child: Text(AppLocalizations.of(context)!.loggingIn)));
           case ConnectionState.listingGames:
             return ChangeObserver<GameList>(
               state: connection.gameList,
               builder: (context, gameList) {
                 var openGames = gameList.openGames;
                 return Scaffold(
-                  appBar: AppBar(title: const Text("Join a game")),
+                  appBar: AppBar(title: Text(AppLocalizations.of(context)!.joinGame)),
                   body: openGames.isEmpty ?
-                    const Center(child: Text("No open games.")) :
+                    Center(child: Text(AppLocalizations.of(context)!.noOpenGames)) :
                     ListView(
                       children: openGames.values.map((g) =>
                         Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -941,11 +943,11 @@ class HomePage extends StatelessWidget {
                     }));
               });
           case ConnectionState.waitingForStart:
-            return showWaitingForStart();
+            return showWaitingForStart(context);
           default:
             return Scaffold(
               appBar: AppBar(
-                title: const Text("Zauberer online"),
+                title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
               body: Center(child: Text("ERROR: " + state.name)));
         }
@@ -967,7 +969,7 @@ class GameEntryWidget extends StatefulWidget {
 }
 
 extension PlayerName on Player {
-  String get displayName => amI(id) ? "You" : name;
+  String displayName(BuildContext context) => amI(id) ? AppLocalizations.of(context)!.you : name;
 }
 
 /// Whether the player of this app is the player with the given ID.
@@ -1030,15 +1032,15 @@ class PlayingView extends StatelessWidget {
 
         switch (state) {
           case ConnectionState.listingGames:
-            return showWaitingForStart();
+            return showWaitingForStart(context);
           case ConnectionState.disconnected:
             return Scaffold(
               appBar: AppBar(
-                title: const Text("Connection lost"),
+                title: Text(AppLocalizations.of(context)!.connectionLost),
               ),
               body:  Center(
                 child: ElevatedButton(
-                  child: const Text("Re-Connect"),
+                  child: Text(AppLocalizations.of(context)!.reconnect),
                   onPressed: () {
                     connection.reconnect();
                   },
@@ -1048,12 +1050,12 @@ class PlayingView extends StatelessWidget {
           case ConnectionState.connecting:
             return Scaffold(
               appBar: AppBar(
-                title: const Text("Zauberer online"),
+                title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: const Center(child: Text("Reconnecting...")));
+              body: Center(child: Text(AppLocalizations.of(context)!.reconnecting)));
           case ConnectionState.waitingForStart:
             ObservableGame? game = connection.currentGame;
-            if (game == null) return showWaitingForStart();
+            if (game == null) return showWaitingForStart(context);
             return ChangeObserver<ObservableGame>(state: game,
                 builder: (context, game) {
                   if (kDebugMode) {
@@ -1063,10 +1065,10 @@ class PlayingView extends StatelessWidget {
 
                   return Scaffold(
                     appBar: AppBar(
-                      title: const Text("Waiting for players"),
+                      title: Text(AppLocalizations.of(context)!.waitingForPlayers),
                     ),
                     body: players.isEmpty ?
-                    const Center(child: Text("No players in this game.")) :
+                    Center(child: Text(AppLocalizations.of(context)!.noPlayers)) :
                     ListView(
                       children: [
                         for (var n = 0; n < players.length; n++)
@@ -1081,13 +1083,13 @@ class PlayingView extends StatelessWidget {
                                 children: [
                                   Padding(padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                                       child:
-                                      Text((n + 1).toString() + ". " + players[n].displayName))
+                                      Text((n + 1).toString() + ". " + players[n].displayName(context)))
                                 ])))
                       ]
                     ),
                     floatingActionButton:
                     FloatingActionButton.extended(
-                      label: const Text("Start"),
+                      label: Text(AppLocalizations.of(context)!.start),
                       icon: const Icon(Icons.play_arrow),
                       onPressed: () => connection.sendCommand(StartGame(gameId: game.game.gameId)),
                     ));
@@ -1101,12 +1103,12 @@ class PlayingView extends StatelessWidget {
   }
 }
 
-Scaffold showWaitingForStart() {
+Scaffold showWaitingForStart(BuildContext context) {
   return Scaffold(
       appBar: AppBar(
-        title: const Text("Waiting for players"),
+        title: Text(AppLocalizations.of(context)!.waitingForPlayers),
       ),
-      body: const Center(child: Text("Joining game...")));
+      body: Center(child: Text(AppLocalizations.of(context)!.joiningGame)));
 }
 
 class WizardWidget extends StatelessWidget {
@@ -1126,9 +1128,10 @@ class WizardWidget extends StatelessWidget {
       return Scaffold(
           appBar: AppBar(
             title: roundInfo == null ?
-            const Text("Waiting for start...") :
-            Text("Round " + roundInfo.round.toString() + " of " +
-                roundInfo.maxRound.toString()),
+            Text(AppLocalizations.of(context)!.waitingForStart) :
+            Text(AppLocalizations.of(context)!.round(
+              roundInfo.round.toString(),
+              roundInfo.maxRound.toString())),
           ),
           backgroundColor: const Color(0xff158215),
           body: ExpandDisplay(
@@ -1165,9 +1168,9 @@ class WizardWidget extends StatelessWidget {
     switch (phase) {
       case WizardPhase.idle:
       case WizardPhase.created:
-        return const Center(child: Text("Waiting for cards..."));
+        return Center(child: Text(AppLocalizations.of(context)!.waitingForCards));
       case WizardPhase.cardsGiven:
-        return const Center(child: Text("Waiting for bid request..."));
+        return Center(child: Text(AppLocalizations.of(context)!.waitingForBidRequest));
 
       case WizardPhase.trumpSelection:
         return ValueListenableBuilder<bool>(
@@ -1175,7 +1178,7 @@ class WizardWidget extends StatelessWidget {
           builder: (context, imActive, child) {
             return imActive ?
               const TrumpSelectionView() :
-              WaitingForView((player) => "$player selects the trump color...");
+              WaitingForView((player) => AppLocalizations.of(context)!.selectsTrump(player));
           });
 
       case WizardPhase.bidding:
@@ -1184,7 +1187,7 @@ class WizardWidget extends StatelessWidget {
           builder: (context, imActive, child) {
             return imActive ?
               MyBidView(connection.wizardModel!.roundInfo!.round, connection.wizardModel!.expectedBids) :
-              WaitingForView((player) => "Waiting for $player's bid.");
+              WaitingForView((player) => AppLocalizations.of(context)!.waitingForBid(player));
           });
 
       case WizardPhase.leading:
@@ -1200,14 +1203,15 @@ class WizardWidget extends StatelessWidget {
                   valueListenable: connection.wizardModel!.activityState.imActive,
                   builder: (context, amActive, child) {
                     return amActive ?
-                      trickText(
+                      trickText(context,
                         text: amI(connection.wizardModel!.turnWinner!.id) ?
-                          "You make the trick!" :
-                          connection.wizardModel!.turnWinner!.displayName + " makes the trick!",
+                          AppLocalizations.of(context)!.youMakeTheTrick :
+                          AppLocalizations.of(context)!.playerMakesTheTrick(
+                            connection.wizardModel!.turnWinner!.displayName(context)),
                         onPressed: () {
                           connection.sendCommand(msg.ConfirmTrick());
                         }) :
-                      trickText(text: "Waiting for other players...");
+                      trickText(context, text: AppLocalizations.of(context)!.waitingForOtherPlayers);
                   },
                 ) 
               ),
@@ -1222,17 +1226,19 @@ class WizardWidget extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("You get " + connection.wizardModel!.pointsEarned.toString() + " points!", style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text(AppLocalizations.of(context)!.youGetPoints(connection.wizardModel!.pointsEarned),
+                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                       child: ElevatedButton(
                         onPressed: () {
                           connection.sendCommand(msg.ConfirmRound());
                         },
-                        child: const Text("Ok")))
+                        child: Text(AppLocalizations.of(context)!.ok)))
                   ],
                 ) :
-                const Text("Waiting for other players...", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
+                Text(AppLocalizations.of(context)!.waitingForOtherPlayers,
+                  style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
             }));
 
       case WizardPhase.resultConfirmation:
@@ -1247,11 +1253,11 @@ class WizardWidget extends StatelessWidget {
               for (var score in result)
                 TableRow(children: [
                   Text((score.points == lastScore ? rank : ++rank).toString()),
-                  Text(score.player!.displayName),
+                  Text(score.player!.displayName(context)),
                   Text((lastScore = score.points).toString()),
                 ])
             ]),
-            const Text("You can now leave the game and start a new one.")
+            Text(AppLocalizations.of(context)!.youCanLeaveTheGame)
           ]));
 
       default:
@@ -1260,12 +1266,12 @@ class WizardWidget extends StatelessWidget {
   }
 }
 
-Widget trickText({String? text, void Function()? onPressed}) {
-  return trickTitle(child: text == null ? null :
+Widget trickText(BuildContext context, {String? text, void Function()? onPressed}) {
+  return trickTitle(context, child: text == null ? null :
     Text(text, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)), onPressed: onPressed);
 }
 
-Widget trickTitle({Widget? child, void Function()? onPressed}) {
+Widget trickTitle(BuildContext context, {Widget? child, void Function()? onPressed}) {
   return Column(children: [
     Visibility(
         maintainSize: true,
@@ -1281,7 +1287,7 @@ Widget trickTitle({Widget? child, void Function()? onPressed}) {
             maintainState: true,
             visible: onPressed != null,
             child: ElevatedButton(
-              child: const Text("Ok"),
+              child: Text(AppLocalizations.of(context)!.ok),
               onPressed: onPressed,
             )
         ))
@@ -1307,7 +1313,7 @@ class TrumpSelectionView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
           child:
-            trickText(text: "Select the trump color!")
+            trickText(context, text: AppLocalizations.of(context)!.selectTrump)
         )
       ]);
   }
@@ -1323,8 +1329,8 @@ class LeadingView extends StatelessWidget {
         valueListenable: connection.wizardModel!.activityState.imActive,
         builder: (context, imActive, child) {
           return imActive ?
-            trickText(text: "It's your turn!") :
-            trickTitle(child: WaitingForView((player) => "Waiting for $player's card."));
+            trickText(context, text: AppLocalizations.of(context)!.itsYourTurn) :
+            trickTitle(context, child: WaitingForView((player) => AppLocalizations.of(context)!.waitingForPlayersCard(player)));
         })
     );
   }
@@ -1345,7 +1351,8 @@ class WaitingForView extends StatelessWidget {
         var activePlayer = activityState.activePlayer;
         return activePlayer == null ? 
           const Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)) : 
-          Text(messageForPlayer(activePlayer.displayName), style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
+          Text(messageForPlayer(activePlayer.displayName(context)),
+            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
       });
   }
 }
@@ -1361,7 +1368,8 @@ class MyBidView extends StatelessWidget {
     return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("Place your bid!", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(AppLocalizations.of(context)!.placeYourBid,
+            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
           Padding(
               padding: const EdgeInsets.all(15),
               child: Wrap(
@@ -1437,7 +1445,7 @@ class TrickView extends StatelessWidget {
             children: [
               CardView(card.card),
               Padding(padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                child: Text(card.player.displayName, style: const TextStyle(color: Colors.white)),
+                child: Text(card.player.displayName(context), style: const TextStyle(color: Colors.white)),
               )
             ])).toList()
       );
@@ -1478,12 +1486,12 @@ class PlayerStateView extends StatelessWidget {
         spacing: 5,
         runSpacing: 10,
         children:
-        state.players.map(playerStateView).toList(),
+        state.players.map((player) => playerStateView(context, player)).toList(),
       );
     });
   }
 
-  Widget playerStateView(Player player) {
+  Widget playerStateView(BuildContext context, Player player) {
     var info = state.getInfo(player.id);
     var border = state.isStartPlayer(player) ?
       Border.all(color: Colors.deepOrangeAccent, width: 2) :
@@ -1501,7 +1509,7 @@ class PlayerStateView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
               child:
-              Text(player.displayName + " (" + info.total.toString() + ")")),
+              Text(player.displayName(context) + " (" + info.total.toString() + ")")),
             trickView(info)
           ])
       ));
@@ -1697,7 +1705,7 @@ class CreateAccountViewState extends State<CreateAccountView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login to Wizard server"),
+        title: Text(AppLocalizations.of(context)!.login),
       ),
       body: Form(
         key: _formKey,
@@ -1707,21 +1715,21 @@ class CreateAccountViewState extends State<CreateAccountView> {
             children: [
               TextFormField(
                 key: _nickName,
-                decoration: const InputDecoration(hintText: "Nick name"),
+                decoration: InputDecoration(hintText: AppLocalizations.of(context)!.nickname),
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
-                    return "Nick name must not be empty.";
+                    return AppLocalizations.of(context)!.nicknameMustNotBeEmpty;
                   }
                 },
               ),
               TextFormField(
                 key: _email,
-                decoration: const InputDecoration(hintText: "E-mail"),
+                decoration: InputDecoration(hintText: AppLocalizations.of(context)!.email),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                 child: ElevatedButton(
-                  child: const Text("Create account"),
+                  child: Text(AppLocalizations.of(context)!.createAccount),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       connection.sendCommand(

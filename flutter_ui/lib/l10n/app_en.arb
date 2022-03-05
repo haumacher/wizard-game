@@ -1,0 +1,69 @@
+{
+  "ok": "OK",
+  "zaubererOnline": "Zauberer online",
+  "connecting": "Connecting...",
+  "noConnection": "No Connection",
+  "connect": "Connect",
+  "loggingIn": "Logging in...",
+  "joinGame": "Join a game",
+  "noOpenGames": "No open games.",
+  "you": "You",
+  "connectionLost": "Connection lost",
+  "reconnect": "Re-Connect",
+  "reconnecting": "Reconnecting...",
+  "waitingForPlayers": "Waiting for players",
+  "waitingForOtherPlayers": "Waiting for other players...",
+  "noPlayers": "No players in this game.",
+  "start": "Start",
+  "joiningGame": "Joining game...",
+  "waitingForStart": "Waiting for start...",
+  "round": "Round {n} of {rounds}",
+  "@round": {
+    "placeholders": {
+      "n": {},
+      "rounds": {}
+    }
+  },
+  "waitingForCards": "Waiting for cards...",
+  "waitingForBidRequest": "Waiting for bid request...",
+  "selectsTrump":  "{player} selects the trump color...",
+  "@selectsTrump": {
+    "placeholders": {
+      "player": {}
+    }
+  },
+  "waitingForBid": "Waiting for {player}'s bid.",
+  "@waitingForBid": {
+    "placeholders": {
+      "player": {}
+    }
+  },
+  "youMakeTheTrick": "You make the trick!",
+  "playerMakesTheTrick": "{player} makes the trick!",
+  "@playerMakesTheTrick": {
+    "placeholders": {
+      "player": {}
+    }
+  },
+  "youGetPoints": "You get {points} points!",
+  "@youGetPoints": {
+    "placeholders": {
+      "points": {}
+    }
+  },
+  "youCanLeaveTheGame": "You can now leave the game and start a new one.",
+  "selectTrump": "Select the trump color!",
+  "itsYourTurn": "It's your turn!",
+  "waitingForPlayersCard": "Waiting for {player}'s card.",
+  "@waitingForPlayersCard": {
+    "placeholders": {
+      "player": {}
+    }
+  },
+  "placeYourBid": "Place your bid!",
+  "login": "Login to Wizard server",
+  "nickname": "Nick name",
+  "nicknameMustNotBeEmpty": "Nick name must not be empty.",
+  "email": "E-mail",
+  "createAccount": "Create account"
+}
