@@ -20,7 +20,6 @@ import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
-import de.haumacher.msgbuf.json.Base64Utils;
 import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.server.db.DBException;
 import de.haumacher.wizard.server.db.UserDB;
@@ -33,6 +32,7 @@ public class H2UserDB  implements UserDB {
 	private static final int ONE_MINUTE = 60 * 1000;
 	private static final Charset UTF_8 = Charset.forName("utf-8");
 	private static final long ONE_HOUR = 60 * ONE_MINUTE;
+	private static final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 	private DSLContext _context;
 	private SecureRandom _random;
 	
@@ -59,7 +59,7 @@ public class H2UserDB  implements UserDB {
 		}
 
 		String uid = newUUID();
-		String secret = newUUID();
+		String secret = newSecret();
 		byte[] hash = hash(secret);
 		
 		long now = System.currentTimeMillis();
@@ -253,10 +253,41 @@ public class H2UserDB  implements UserDB {
 	}
 	
 	private String newUUID() {
+		return toID(randomBytes());
+	}
+
+	private String newSecret() {
+		return toHex(randomBytes());
+	}
+	
+	private byte[] randomBytes() {
 		byte[] secretBytes = new byte[16];
 		_random.nextBytes(secretBytes);
-		String secret = Base64Utils.toBase64(secretBytes);
-		return secret;
+		return secretBytes;
+	}
+
+	private static String toHex(byte[] secretBytes) {
+		StringBuilder result = new StringBuilder(secretBytes.length * 2);
+		for (int n = 0, cnt = secretBytes.length; n < cnt; n++) {
+			byte data = secretBytes[n];
+			result.append(HEX[(data >>> 4) & 0x0F]);
+			result.append(HEX[data & 0x0F]);
+		}
+		return result.toString();
+	}
+	
+	private static String toID(byte[] secretBytes) {
+		StringBuilder result = new StringBuilder(secretBytes.length * 2 + 2);
+		for (int n = 0, cnt = secretBytes.length; n < cnt; n++) {
+			if (n == 8 || n == 24) {
+				result.append('-');
+			}
+			
+			byte data = secretBytes[n];
+			result.append(HEX[(data >>> 4) & 0x0F]);
+			result.append(HEX[data & 0x0F]);
+		}
+		return result.toString();
 	}
 
 	private byte[] hash(String secret) {
