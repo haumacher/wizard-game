@@ -9,21 +9,21 @@ public class JoinGame extends Cmd {
 	 * Creates a {@link JoinGame} instance.
 	 */
 	public static JoinGame create() {
-		return new JoinGame();
+		return new de.haumacher.wizard.msg.JoinGame();
 	}
 
 	/** Identifier for the {@link JoinGame} type in JSON format. */
 	public static final String JOIN_GAME__TYPE = "JoinGame";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID = "gameId";
+	private static final String GAME_ID__PROP = "gameId";
 
 	private String _gameId = "";
 
 	/**
 	 * Creates a {@link JoinGame} instance.
 	 *
-	 * @see #create()
+	 * @see JoinGame#create()
 	 */
 	protected JoinGame() {
 		super();
@@ -43,11 +43,11 @@ public class JoinGame extends Cmd {
 		internalSetGameId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getGameId()} without chain call utility. */
 	protected final void internalSetGameId(String value) {
 		_gameId = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -56,24 +56,22 @@ public class JoinGame extends Cmd {
 
 	/** Reads a new instance from the given reader. */
 	public static JoinGame readJoinGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		JoinGame result = new JoinGame();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.JoinGame result = new de.haumacher.wizard.msg.JoinGame();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(GAME_ID);
+		out.name(GAME_ID__PROP);
 		out.value(getGameId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

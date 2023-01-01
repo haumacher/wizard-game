@@ -9,17 +9,17 @@ public class RoundInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	 * Creates a {@link RoundInfo} instance.
 	 */
 	public static RoundInfo create() {
-		return new RoundInfo();
+		return new de.haumacher.wizard.msg.RoundInfo();
 	}
 
 	/** Identifier for the {@link RoundInfo} type in JSON format. */
 	public static final String ROUND_INFO__TYPE = "RoundInfo";
 
 	/** @see #getPoints() */
-	private static final String POINTS = "points";
+	private static final String POINTS__PROP = "points";
 
 	/** @see #getTotal() */
-	private static final String TOTAL = "total";
+	private static final String TOTAL__PROP = "total";
 
 	private int _points = 0;
 
@@ -28,7 +28,7 @@ public class RoundInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * Creates a {@link RoundInfo} instance.
 	 *
-	 * @see #create()
+	 * @see RoundInfo#create()
 	 */
 	protected RoundInfo() {
 		super();
@@ -48,11 +48,11 @@ public class RoundInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetPoints(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPoints()} without chain call utility. */
 	protected final void internalSetPoints(int value) {
 		_points = value;
 	}
-
 
 	/**
 	 * The total amount of points the player won so far. The number may be negative.
@@ -68,23 +68,16 @@ public class RoundInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetTotal(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getTotal()} without chain call utility. */
 	protected final void internalSetTotal(int value) {
 		_total = value;
 	}
 
-
-	/** The type identifier for this concrete subtype. */
-	public String jsonType() {
-		return ROUND_INFO__TYPE;
-	}
-
 	/** Reads a new instance from the given reader. */
 	public static RoundInfo readRoundInfo(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		RoundInfo result = new RoundInfo();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.RoundInfo result = new de.haumacher.wizard.msg.RoundInfo();
+		result.readContent(in);
 		return result;
 	}
 
@@ -96,17 +89,17 @@ public class RoundInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(POINTS);
+		out.name(POINTS__PROP);
 		out.value(getPoints());
-		out.name(TOTAL);
+		out.name(TOTAL__PROP);
 		out.value(getTotal());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case POINTS: setPoints(in.nextInt()); break;
-			case TOTAL: setTotal(in.nextInt()); break;
+			case POINTS__PROP: setPoints(in.nextInt()); break;
+			case TOTAL__PROP: setTotal(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

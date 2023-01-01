@@ -9,21 +9,21 @@ public class ListGamesResult extends ResultMsg {
 	 * Creates a {@link ListGamesResult} instance.
 	 */
 	public static ListGamesResult create() {
-		return new ListGamesResult();
+		return new de.haumacher.wizard.msg.ListGamesResult();
 	}
 
 	/** Identifier for the {@link ListGamesResult} type in JSON format. */
 	public static final String LIST_GAMES_RESULT__TYPE = "ListGamesResult";
 
 	/** @see #getGames() */
-	private static final String GAMES = "games";
+	private static final String GAMES__PROP = "games";
 
 	private final java.util.List<Game> _games = new java.util.ArrayList<>();
 
 	/**
 	 * Creates a {@link ListGamesResult} instance.
 	 *
-	 * @see #create()
+	 * @see ListGamesResult#create()
 	 */
 	protected ListGamesResult() {
 		super();
@@ -39,17 +39,17 @@ public class ListGamesResult extends ResultMsg {
 	/**
 	 * @see #getGames()
 	 */
-	public ListGamesResult setGames(java.util.List<Game> value) {
+	public ListGamesResult setGames(java.util.List<? extends Game> value) {
 		internalSetGames(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getGames()} without chain call utility. */
-	protected final void internalSetGames(java.util.List<Game> value) {
+	protected final void internalSetGames(java.util.List<? extends Game> value) {
 		if (value == null) throw new IllegalArgumentException("Property 'games' cannot be null.");
 		_games.clear();
 		_games.addAll(value);
 	}
-
 
 	/**
 	 * Adds a value to the {@link #getGames()} list.
@@ -78,17 +78,15 @@ public class ListGamesResult extends ResultMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static ListGamesResult readListGamesResult(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		ListGamesResult result = new ListGamesResult();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.ListGamesResult result = new de.haumacher.wizard.msg.ListGamesResult();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(GAMES);
+		out.name(GAMES__PROP);
 		out.beginArray();
 		for (Game x : getGames()) {
 			x.writeTo(out);
@@ -99,7 +97,7 @@ public class ListGamesResult extends ResultMsg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case GAMES: {
+			case GAMES__PROP: {
 				in.beginArray();
 				while (in.hasNext()) {
 					addGame(de.haumacher.wizard.msg.Game.readGame(in));

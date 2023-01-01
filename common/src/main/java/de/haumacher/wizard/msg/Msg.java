@@ -81,5 +81,4 @@ public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/** Accepts the given visitor. */
 	public abstract <R,A,E extends Throwable> R visit(Visitor<R,A,E> v, A arg) throws E;
 
-
 }

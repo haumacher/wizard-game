@@ -9,7 +9,7 @@ public class VerifyEmailSuccess extends ResultMsg {
 	 * Creates a {@link VerifyEmailSuccess} instance.
 	 */
 	public static VerifyEmailSuccess create() {
-		return new VerifyEmailSuccess();
+		return new de.haumacher.wizard.msg.VerifyEmailSuccess();
 	}
 
 	/** Identifier for the {@link VerifyEmailSuccess} type in JSON format. */
@@ -18,7 +18,7 @@ public class VerifyEmailSuccess extends ResultMsg {
 	/**
 	 * Creates a {@link VerifyEmailSuccess} instance.
 	 *
-	 * @see #create()
+	 * @see VerifyEmailSuccess#create()
 	 */
 	protected VerifyEmailSuccess() {
 		super();
@@ -31,10 +31,8 @@ public class VerifyEmailSuccess extends ResultMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static VerifyEmailSuccess readVerifyEmailSuccess(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		VerifyEmailSuccess result = new VerifyEmailSuccess();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.VerifyEmailSuccess result = new de.haumacher.wizard.msg.VerifyEmailSuccess();
+		result.readContent(in);
 		return result;
 	}
 

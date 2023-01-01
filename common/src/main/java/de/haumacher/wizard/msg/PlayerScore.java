@@ -9,17 +9,17 @@ public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 	 * Creates a {@link PlayerScore} instance.
 	 */
 	public static PlayerScore create() {
-		return new PlayerScore();
+		return new de.haumacher.wizard.msg.PlayerScore();
 	}
 
 	/** Identifier for the {@link PlayerScore} type in JSON format. */
 	public static final String PLAYER_SCORE__TYPE = "PlayerScore";
 
 	/** @see #getPlayer() */
-	private static final String PLAYER = "player";
+	private static final String PLAYER__PROP = "player";
 
 	/** @see #getPoints() */
-	private static final String POINTS = "points";
+	private static final String POINTS__PROP = "points";
 
 	private Player _player = null;
 
@@ -28,7 +28,7 @@ public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * Creates a {@link PlayerScore} instance.
 	 *
-	 * @see #create()
+	 * @see PlayerScore#create()
 	 */
 	protected PlayerScore() {
 		super();
@@ -48,11 +48,11 @@ public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetPlayer(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayer()} without chain call utility. */
 	protected final void internalSetPlayer(Player value) {
 		_player = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getPlayer()} has a value.
@@ -75,23 +75,16 @@ public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetPoints(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPoints()} without chain call utility. */
 	protected final void internalSetPoints(int value) {
 		_points = value;
 	}
 
-
-	/** The type identifier for this concrete subtype. */
-	public String jsonType() {
-		return PLAYER_SCORE__TYPE;
-	}
-
 	/** Reads a new instance from the given reader. */
 	public static PlayerScore readPlayerScore(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		PlayerScore result = new PlayerScore();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.PlayerScore result = new de.haumacher.wizard.msg.PlayerScore();
+		result.readContent(in);
 		return result;
 	}
 
@@ -104,18 +97,18 @@ public class PlayerScore extends de.haumacher.msgbuf.data.AbstractDataObject {
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
 		if (hasPlayer()) {
-			out.name(PLAYER);
+			out.name(PLAYER__PROP);
 			getPlayer().writeTo(out);
 		}
-		out.name(POINTS);
+		out.name(POINTS__PROP);
 		out.value(getPoints());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
-			case POINTS: setPoints(in.nextInt()); break;
+			case PLAYER__PROP: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
+			case POINTS__PROP: setPoints(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

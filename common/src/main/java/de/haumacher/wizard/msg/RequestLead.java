@@ -9,21 +9,21 @@ public class RequestLead extends GameMsg {
 	 * Creates a {@link RequestLead} instance.
 	 */
 	public static RequestLead create() {
-		return new RequestLead();
+		return new de.haumacher.wizard.msg.RequestLead();
 	}
 
 	/** Identifier for the {@link RequestLead} type in JSON format. */
 	public static final String REQUEST_LEAD__TYPE = "RequestLead";
 
 	/** @see #getPlayerId() */
-	private static final String PLAYER_ID = "playerId";
+	private static final String PLAYER_ID__PROP = "playerId";
 
 	private String _playerId = "";
 
 	/**
 	 * Creates a {@link RequestLead} instance.
 	 *
-	 * @see #create()
+	 * @see RequestLead#create()
 	 */
 	protected RequestLead() {
 		super();
@@ -43,11 +43,11 @@ public class RequestLead extends GameMsg {
 		internalSetPlayerId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
 	protected final void internalSetPlayerId(String value) {
 		_playerId = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -56,24 +56,22 @@ public class RequestLead extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static RequestLead readRequestLead(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		RequestLead result = new RequestLead();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.RequestLead result = new de.haumacher.wizard.msg.RequestLead();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(PLAYER_ID);
+		out.name(PLAYER_ID__PROP);
 		out.value(getPlayerId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case PLAYER_ID__PROP: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

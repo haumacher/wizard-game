@@ -9,21 +9,21 @@ public class GameDeleted extends Msg {
 	 * Creates a {@link GameDeleted} instance.
 	 */
 	public static GameDeleted create() {
-		return new GameDeleted();
+		return new de.haumacher.wizard.msg.GameDeleted();
 	}
 
 	/** Identifier for the {@link GameDeleted} type in JSON format. */
 	public static final String GAME_DELETED__TYPE = "GameDeleted";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID = "gameId";
+	private static final String GAME_ID__PROP = "gameId";
 
 	private String _gameId = "";
 
 	/**
 	 * Creates a {@link GameDeleted} instance.
 	 *
-	 * @see #create()
+	 * @see GameDeleted#create()
 	 */
 	protected GameDeleted() {
 		super();
@@ -43,11 +43,11 @@ public class GameDeleted extends Msg {
 		internalSetGameId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getGameId()} without chain call utility. */
 	protected final void internalSetGameId(String value) {
 		_gameId = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -56,24 +56,22 @@ public class GameDeleted extends Msg {
 
 	/** Reads a new instance from the given reader. */
 	public static GameDeleted readGameDeleted(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		GameDeleted result = new GameDeleted();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.GameDeleted result = new de.haumacher.wizard.msg.GameDeleted();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(GAME_ID);
+		out.name(GAME_ID__PROP);
 		out.value(getGameId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

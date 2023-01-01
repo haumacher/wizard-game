@@ -9,20 +9,20 @@ public class AddEmail extends LoginCmd {
 	 * Creates a {@link AddEmail} instance.
 	 */
 	public static AddEmail create() {
-		return new AddEmail();
+		return new de.haumacher.wizard.msg.AddEmail();
 	}
 
 	/** Identifier for the {@link AddEmail} type in JSON format. */
 	public static final String ADD_EMAIL__TYPE = "AddEmail";
 
 	/** @see #getUid() */
-	private static final String UID = "uid";
+	private static final String UID__PROP = "uid";
 
 	/** @see #getSecret() */
-	private static final String SECRET = "secret";
+	private static final String SECRET__PROP = "secret";
 
 	/** @see #getEmail() */
-	private static final String EMAIL = "email";
+	private static final String EMAIL__PROP = "email";
 
 	private String _uid = "";
 
@@ -33,7 +33,7 @@ public class AddEmail extends LoginCmd {
 	/**
 	 * Creates a {@link AddEmail} instance.
 	 *
-	 * @see #create()
+	 * @see AddEmail#create()
 	 */
 	protected AddEmail() {
 		super();
@@ -53,11 +53,11 @@ public class AddEmail extends LoginCmd {
 		internalSetUid(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getUid()} without chain call utility. */
 	protected final void internalSetUid(String value) {
 		_uid = value;
 	}
-
 
 	/**
 	 * The user's login credentials, see {@link CreateAccountResult#getSecret()}.
@@ -73,11 +73,11 @@ public class AddEmail extends LoginCmd {
 		internalSetSecret(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getSecret()} without chain call utility. */
 	protected final void internalSetSecret(String value) {
 		_secret = value;
 	}
-
 
 	/**
 	 * The e-mail address to assign to the user's account.
@@ -93,11 +93,11 @@ public class AddEmail extends LoginCmd {
 		internalSetEmail(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getEmail()} without chain call utility. */
 	protected final void internalSetEmail(String value) {
 		_email = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -106,30 +106,28 @@ public class AddEmail extends LoginCmd {
 
 	/** Reads a new instance from the given reader. */
 	public static AddEmail readAddEmail(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		AddEmail result = new AddEmail();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.AddEmail result = new de.haumacher.wizard.msg.AddEmail();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(UID);
+		out.name(UID__PROP);
 		out.value(getUid());
-		out.name(SECRET);
+		out.name(SECRET__PROP);
 		out.value(getSecret());
-		out.name(EMAIL);
+		out.name(EMAIL__PROP);
 		out.value(getEmail());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case UID: setUid(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case SECRET: setSecret(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case EMAIL: setEmail(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case UID__PROP: setUid(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case SECRET__PROP: setSecret(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case EMAIL__PROP: setEmail(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

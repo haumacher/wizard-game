@@ -9,21 +9,21 @@ public class FinishRound extends GameMsg {
 	 * Creates a {@link FinishRound} instance.
 	 */
 	public static FinishRound create() {
-		return new FinishRound();
+		return new de.haumacher.wizard.msg.FinishRound();
 	}
 
 	/** Identifier for the {@link FinishRound} type in JSON format. */
 	public static final String FINISH_ROUND__TYPE = "FinishRound";
 
 	/** @see #getInfo() */
-	private static final String INFO = "info";
+	private static final String INFO__PROP = "info";
 
 	private final java.util.Map<String, RoundInfo> _info = new java.util.HashMap<>();
 
 	/**
 	 * Creates a {@link FinishRound} instance.
 	 *
-	 * @see #create()
+	 * @see FinishRound#create()
 	 */
 	protected FinishRound() {
 		super();
@@ -43,13 +43,13 @@ public class FinishRound extends GameMsg {
 		internalSetInfo(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getInfo()} without chain call utility. */
 	protected final void internalSetInfo(java.util.Map<String, RoundInfo> value) {
 		if (value == null) throw new IllegalArgumentException("Property 'info' cannot be null.");
 		_info.clear();
 		_info.putAll(value);
 	}
-
 
 	/**
 	 * Adds a key value pair to the {@link #getInfo()} map.
@@ -81,17 +81,15 @@ public class FinishRound extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static FinishRound readFinishRound(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		FinishRound result = new FinishRound();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.FinishRound result = new de.haumacher.wizard.msg.FinishRound();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(INFO);
+		out.name(INFO__PROP);
 		out.beginObject();
 		for (java.util.Map.Entry<String,RoundInfo> entry : getInfo().entrySet()) {
 			out.name(entry.getKey());
@@ -103,7 +101,7 @@ public class FinishRound extends GameMsg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case INFO: {
+			case INFO__PROP: {
 				in.beginObject();
 				while (in.hasNext()) {
 					putInfo(in.nextName(), de.haumacher.wizard.msg.RoundInfo.readRoundInfo(in));

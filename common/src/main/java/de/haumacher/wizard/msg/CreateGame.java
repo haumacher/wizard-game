@@ -12,7 +12,7 @@ public class CreateGame extends Cmd {
 	 * Creates a {@link CreateGame} instance.
 	 */
 	public static CreateGame create() {
-		return new CreateGame();
+		return new de.haumacher.wizard.msg.CreateGame();
 	}
 
 	/** Identifier for the {@link CreateGame} type in JSON format. */
@@ -21,7 +21,7 @@ public class CreateGame extends Cmd {
 	/**
 	 * Creates a {@link CreateGame} instance.
 	 *
-	 * @see #create()
+	 * @see CreateGame#create()
 	 */
 	protected CreateGame() {
 		super();
@@ -34,10 +34,8 @@ public class CreateGame extends Cmd {
 
 	/** Reads a new instance from the given reader. */
 	public static CreateGame readCreateGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		CreateGame result = new CreateGame();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.CreateGame result = new de.haumacher.wizard.msg.CreateGame();
+		result.readContent(in);
 		return result;
 	}
 

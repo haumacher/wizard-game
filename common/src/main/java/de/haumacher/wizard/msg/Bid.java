@@ -9,17 +9,17 @@ public class Bid extends GameCmd {
 	 * Creates a {@link Bid} instance.
 	 */
 	public static Bid create() {
-		return new Bid();
+		return new de.haumacher.wizard.msg.Bid();
 	}
 
 	/** Identifier for the {@link Bid} type in JSON format. */
 	public static final String BID__TYPE = "Bid";
 
 	/** @see #getCnt() */
-	private static final String CNT = "cnt";
+	private static final String CNT__PROP = "cnt";
 
 	/** @see #getExpected() */
-	private static final String EXPECTED = "expected";
+	private static final String EXPECTED__PROP = "expected";
 
 	private int _cnt = 0;
 
@@ -28,7 +28,7 @@ public class Bid extends GameCmd {
 	/**
 	 * Creates a {@link Bid} instance.
 	 *
-	 * @see #create()
+	 * @see Bid#create()
 	 */
 	protected Bid() {
 		super();
@@ -48,11 +48,11 @@ public class Bid extends GameCmd {
 		internalSetCnt(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getCnt()} without chain call utility. */
 	protected final void internalSetCnt(int value) {
 		_cnt = value;
 	}
-
 
 	/**
 	 * The sum of tricks expected by all players so far.
@@ -72,11 +72,11 @@ public class Bid extends GameCmd {
 		internalSetExpected(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getExpected()} without chain call utility. */
 	protected final void internalSetExpected(int value) {
 		_expected = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -85,27 +85,25 @@ public class Bid extends GameCmd {
 
 	/** Reads a new instance from the given reader. */
 	public static Bid readBid(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Bid result = new Bid();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.Bid result = new de.haumacher.wizard.msg.Bid();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(CNT);
+		out.name(CNT__PROP);
 		out.value(getCnt());
-		out.name(EXPECTED);
+		out.name(EXPECTED__PROP);
 		out.value(getExpected());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case CNT: setCnt(in.nextInt()); break;
-			case EXPECTED: setExpected(in.nextInt()); break;
+			case CNT__PROP: setCnt(in.nextInt()); break;
+			case EXPECTED__PROP: setExpected(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

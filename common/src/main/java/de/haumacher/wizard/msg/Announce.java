@@ -9,17 +9,17 @@ public class Announce extends GameMsg {
 	 * Creates a {@link Announce} instance.
 	 */
 	public static Announce create() {
-		return new Announce();
+		return new de.haumacher.wizard.msg.Announce();
 	}
 
 	/** Identifier for the {@link Announce} type in JSON format. */
 	public static final String ANNOUNCE__TYPE = "Announce";
 
 	/** @see #getPlayerId() */
-	private static final String PLAYER_ID = "playerId";
+	private static final String PLAYER_ID__PROP = "playerId";
 
 	/** @see #getCmd() */
-	private static final String CMD = "cmd";
+	private static final String CMD__PROP = "cmd";
 
 	private String _playerId = "";
 
@@ -28,7 +28,7 @@ public class Announce extends GameMsg {
 	/**
 	 * Creates a {@link Announce} instance.
 	 *
-	 * @see #create()
+	 * @see Announce#create()
 	 */
 	protected Announce() {
 		super();
@@ -48,11 +48,11 @@ public class Announce extends GameMsg {
 		internalSetPlayerId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
 	protected final void internalSetPlayerId(String value) {
 		_playerId = value;
 	}
-
 
 	/**
 	 * The command sent by the player with the ID given in {@link #getPlayerId()}.
@@ -68,11 +68,11 @@ public class Announce extends GameMsg {
 		internalSetCmd(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getCmd()} without chain call utility. */
 	protected final void internalSetCmd(GameCmd value) {
 		_cmd = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getCmd()} has a value.
@@ -88,20 +88,18 @@ public class Announce extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static Announce readAnnounce(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Announce result = new Announce();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.Announce result = new de.haumacher.wizard.msg.Announce();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(PLAYER_ID);
+		out.name(PLAYER_ID__PROP);
 		out.value(getPlayerId());
 		if (hasCmd()) {
-			out.name(CMD);
+			out.name(CMD__PROP);
 			getCmd().writeTo(out);
 		}
 	}
@@ -109,8 +107,8 @@ public class Announce extends GameMsg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case CMD: setCmd(de.haumacher.wizard.msg.GameCmd.readGameCmd(in)); break;
+			case PLAYER_ID__PROP: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case CMD__PROP: setCmd(de.haumacher.wizard.msg.GameCmd.readGameCmd(in)); break;
 			default: super.readField(in, field);
 		}
 	}

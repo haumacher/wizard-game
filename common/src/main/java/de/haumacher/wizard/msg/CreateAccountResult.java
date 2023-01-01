@@ -9,17 +9,17 @@ public class CreateAccountResult extends ResultMsg {
 	 * Creates a {@link CreateAccountResult} instance.
 	 */
 	public static CreateAccountResult create() {
-		return new CreateAccountResult();
+		return new de.haumacher.wizard.msg.CreateAccountResult();
 	}
 
 	/** Identifier for the {@link CreateAccountResult} type in JSON format. */
 	public static final String CREATE_ACCOUNT_RESULT__TYPE = "CreateAccountResult";
 
 	/** @see #getUid() */
-	private static final String UID = "uid";
+	private static final String UID__PROP = "uid";
 
 	/** @see #getSecret() */
-	private static final String SECRET = "secret";
+	private static final String SECRET__PROP = "secret";
 
 	private String _uid = "";
 
@@ -28,7 +28,7 @@ public class CreateAccountResult extends ResultMsg {
 	/**
 	 * Creates a {@link CreateAccountResult} instance.
 	 *
-	 * @see #create()
+	 * @see CreateAccountResult#create()
 	 */
 	protected CreateAccountResult() {
 		super();
@@ -48,11 +48,11 @@ public class CreateAccountResult extends ResultMsg {
 		internalSetUid(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getUid()} without chain call utility. */
 	protected final void internalSetUid(String value) {
 		_uid = value;
 	}
-
 
 	/**
 	 * The login credentials to use for the newly created account.
@@ -68,11 +68,11 @@ public class CreateAccountResult extends ResultMsg {
 		internalSetSecret(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getSecret()} without chain call utility. */
 	protected final void internalSetSecret(String value) {
 		_secret = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -81,27 +81,25 @@ public class CreateAccountResult extends ResultMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static CreateAccountResult readCreateAccountResult(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		CreateAccountResult result = new CreateAccountResult();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.CreateAccountResult result = new de.haumacher.wizard.msg.CreateAccountResult();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(UID);
+		out.name(UID__PROP);
 		out.value(getUid());
-		out.name(SECRET);
+		out.name(SECRET__PROP);
 		out.value(getSecret());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case UID: setUid(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case SECRET: setSecret(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case UID__PROP: setUid(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case SECRET__PROP: setSecret(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

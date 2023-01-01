@@ -9,17 +9,17 @@ public class Hello extends LoginCmd {
 	 * Creates a {@link Hello} instance.
 	 */
 	public static Hello create() {
-		return new Hello();
+		return new de.haumacher.wizard.msg.Hello();
 	}
 
 	/** Identifier for the {@link Hello} type in JSON format. */
 	public static final String HELLO__TYPE = "Hello";
 
 	/** @see #getVersion() */
-	private static final String VERSION = "version";
+	private static final String VERSION__PROP = "version";
 
 	/** @see #getLanguage() */
-	private static final String LANGUAGE = "language";
+	private static final String LANGUAGE__PROP = "language";
 
 	private int _version = 0;
 
@@ -28,7 +28,7 @@ public class Hello extends LoginCmd {
 	/**
 	 * Creates a {@link Hello} instance.
 	 *
-	 * @see #create()
+	 * @see Hello#create()
 	 */
 	protected Hello() {
 		super();
@@ -48,11 +48,11 @@ public class Hello extends LoginCmd {
 		internalSetVersion(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getVersion()} without chain call utility. */
 	protected final void internalSetVersion(int value) {
 		_version = value;
 	}
-
 
 	/**
 	 * The language the server should talk to the user.
@@ -68,11 +68,11 @@ public class Hello extends LoginCmd {
 		internalSetLanguage(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getLanguage()} without chain call utility. */
 	protected final void internalSetLanguage(String value) {
 		_language = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -81,27 +81,25 @@ public class Hello extends LoginCmd {
 
 	/** Reads a new instance from the given reader. */
 	public static Hello readHello(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Hello result = new Hello();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.Hello result = new de.haumacher.wizard.msg.Hello();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(VERSION);
+		out.name(VERSION__PROP);
 		out.value(getVersion());
-		out.name(LANGUAGE);
+		out.name(LANGUAGE__PROP);
 		out.value(getLanguage());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case VERSION: setVersion(in.nextInt()); break;
-			case LANGUAGE: setLanguage(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case VERSION__PROP: setVersion(in.nextInt()); break;
+			case LANGUAGE__PROP: setLanguage(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

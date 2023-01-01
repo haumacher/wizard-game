@@ -47,7 +47,7 @@ public abstract class GameMsg extends Msg {
 		super();
 	}
 
-	@Override
+	/** The type identifier for this concrete subtype. */
 	public abstract String jsonType();
 
 	/** Reads a new instance from the given reader. */
@@ -75,10 +75,9 @@ public abstract class GameMsg extends Msg {
 	/** Accepts the given visitor. */
 	public abstract <R,A,E extends Throwable> R visit(Visitor<R,A,E> v, A arg) throws E;
 
-
 	@Override
 	public final <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
-		return visit((Visitor<R,A,E>) v, arg);
+		return visit((GameMsg.Visitor<R,A,E>) v, arg);
 	}
 
 }

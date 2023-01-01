@@ -9,21 +9,21 @@ public class Error extends ResultMsg {
 	 * Creates a {@link Error} instance.
 	 */
 	public static Error create() {
-		return new Error();
+		return new de.haumacher.wizard.msg.Error();
 	}
 
 	/** Identifier for the {@link Error} type in JSON format. */
 	public static final String ERROR__TYPE = "Error";
 
 	/** @see #getMessage() */
-	private static final String MESSAGE = "message";
+	private static final String MESSAGE__PROP = "message";
 
 	private String _message = "";
 
 	/**
 	 * Creates a {@link Error} instance.
 	 *
-	 * @see #create()
+	 * @see Error#create()
 	 */
 	protected Error() {
 		super();
@@ -43,11 +43,11 @@ public class Error extends ResultMsg {
 		internalSetMessage(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getMessage()} without chain call utility. */
 	protected final void internalSetMessage(String value) {
 		_message = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -56,24 +56,22 @@ public class Error extends ResultMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static Error readError(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Error result = new Error();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.Error result = new de.haumacher.wizard.msg.Error();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(MESSAGE);
+		out.name(MESSAGE__PROP);
 		out.value(getMessage());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case MESSAGE: setMessage(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case MESSAGE__PROP: setMessage(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

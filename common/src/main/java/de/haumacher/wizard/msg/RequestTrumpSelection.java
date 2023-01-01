@@ -9,21 +9,21 @@ public class RequestTrumpSelection extends GameMsg {
 	 * Creates a {@link RequestTrumpSelection} instance.
 	 */
 	public static RequestTrumpSelection create() {
-		return new RequestTrumpSelection();
+		return new de.haumacher.wizard.msg.RequestTrumpSelection();
 	}
 
 	/** Identifier for the {@link RequestTrumpSelection} type in JSON format. */
 	public static final String REQUEST_TRUMP_SELECTION__TYPE = "RequestTrumpSelection";
 
 	/** @see #getPlayerId() */
-	private static final String PLAYER_ID = "playerId";
+	private static final String PLAYER_ID__PROP = "playerId";
 
 	private String _playerId = "";
 
 	/**
 	 * Creates a {@link RequestTrumpSelection} instance.
 	 *
-	 * @see #create()
+	 * @see RequestTrumpSelection#create()
 	 */
 	protected RequestTrumpSelection() {
 		super();
@@ -43,11 +43,11 @@ public class RequestTrumpSelection extends GameMsg {
 		internalSetPlayerId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
 	protected final void internalSetPlayerId(String value) {
 		_playerId = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -56,24 +56,22 @@ public class RequestTrumpSelection extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static RequestTrumpSelection readRequestTrumpSelection(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		RequestTrumpSelection result = new RequestTrumpSelection();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.RequestTrumpSelection result = new de.haumacher.wizard.msg.RequestTrumpSelection();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(PLAYER_ID);
+		out.name(PLAYER_ID__PROP);
 		out.value(getPlayerId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case PLAYER_ID__PROP: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

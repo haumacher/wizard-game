@@ -9,20 +9,20 @@ public class RequestBid extends GameMsg {
 	 * Creates a {@link RequestBid} instance.
 	 */
 	public static RequestBid create() {
-		return new RequestBid();
+		return new de.haumacher.wizard.msg.RequestBid();
 	}
 
 	/** Identifier for the {@link RequestBid} type in JSON format. */
 	public static final String REQUEST_BID__TYPE = "RequestBid";
 
 	/** @see #getPlayerId() */
-	private static final String PLAYER_ID = "playerId";
+	private static final String PLAYER_ID__PROP = "playerId";
 
 	/** @see #getExpected() */
-	private static final String EXPECTED = "expected";
+	private static final String EXPECTED__PROP = "expected";
 
 	/** @see #getRound() */
-	private static final String ROUND = "round";
+	private static final String ROUND__PROP = "round";
 
 	private String _playerId = "";
 
@@ -33,7 +33,7 @@ public class RequestBid extends GameMsg {
 	/**
 	 * Creates a {@link RequestBid} instance.
 	 *
-	 * @see #create()
+	 * @see RequestBid#create()
 	 */
 	protected RequestBid() {
 		super();
@@ -53,11 +53,11 @@ public class RequestBid extends GameMsg {
 		internalSetPlayerId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
 	protected final void internalSetPlayerId(String value) {
 		_playerId = value;
 	}
-
 
 	/**
 	 * The number of tricks expected by other players so far.
@@ -73,11 +73,11 @@ public class RequestBid extends GameMsg {
 		internalSetExpected(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getExpected()} without chain call utility. */
 	protected final void internalSetExpected(int value) {
 		_expected = value;
 	}
-
 
 	/**
 	 * The round number and maximum number of tricks possible in that round.
@@ -93,11 +93,11 @@ public class RequestBid extends GameMsg {
 		internalSetRound(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getRound()} without chain call utility. */
 	protected final void internalSetRound(int value) {
 		_round = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -106,30 +106,28 @@ public class RequestBid extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static RequestBid readRequestBid(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		RequestBid result = new RequestBid();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.RequestBid result = new de.haumacher.wizard.msg.RequestBid();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(PLAYER_ID);
+		out.name(PLAYER_ID__PROP);
 		out.value(getPlayerId());
-		out.name(EXPECTED);
+		out.name(EXPECTED__PROP);
 		out.value(getExpected());
-		out.name(ROUND);
+		out.name(ROUND__PROP);
 		out.value(getRound());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case EXPECTED: setExpected(in.nextInt()); break;
-			case ROUND: setRound(in.nextInt()); break;
+			case PLAYER_ID__PROP: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case EXPECTED__PROP: setExpected(in.nextInt()); break;
+			case ROUND__PROP: setRound(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

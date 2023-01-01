@@ -9,17 +9,17 @@ public class FinishTurn extends GameMsg {
 	 * Creates a {@link FinishTurn} instance.
 	 */
 	public static FinishTurn create() {
-		return new FinishTurn();
+		return new de.haumacher.wizard.msg.FinishTurn();
 	}
 
 	/** Identifier for the {@link FinishTurn} type in JSON format. */
 	public static final String FINISH_TURN__TYPE = "FinishTurn";
 
 	/** @see #getTrick() */
-	private static final String TRICK = "trick";
+	private static final String TRICK__PROP = "trick";
 
 	/** @see #getWinner() */
-	private static final String WINNER = "winner";
+	private static final String WINNER__PROP = "winner";
 
 	private final java.util.List<Card> _trick = new java.util.ArrayList<>();
 
@@ -28,7 +28,7 @@ public class FinishTurn extends GameMsg {
 	/**
 	 * Creates a {@link FinishTurn} instance.
 	 *
-	 * @see #create()
+	 * @see FinishTurn#create()
 	 */
 	protected FinishTurn() {
 		super();
@@ -44,17 +44,17 @@ public class FinishTurn extends GameMsg {
 	/**
 	 * @see #getTrick()
 	 */
-	public FinishTurn setTrick(java.util.List<Card> value) {
+	public FinishTurn setTrick(java.util.List<? extends Card> value) {
 		internalSetTrick(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getTrick()} without chain call utility. */
-	protected final void internalSetTrick(java.util.List<Card> value) {
+	protected final void internalSetTrick(java.util.List<? extends Card> value) {
 		if (value == null) throw new IllegalArgumentException("Property 'trick' cannot be null.");
 		_trick.clear();
 		_trick.addAll(value);
 	}
-
 
 	/**
 	 * Adds a value to the {@link #getTrick()} list.
@@ -90,11 +90,11 @@ public class FinishTurn extends GameMsg {
 		internalSetWinner(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getWinner()} without chain call utility. */
 	protected final void internalSetWinner(Player value) {
 		_winner = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getWinner()} has a value.
@@ -110,24 +110,22 @@ public class FinishTurn extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static FinishTurn readFinishTurn(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		FinishTurn result = new FinishTurn();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.FinishTurn result = new de.haumacher.wizard.msg.FinishTurn();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(TRICK);
+		out.name(TRICK__PROP);
 		out.beginArray();
 		for (Card x : getTrick()) {
 			x.writeTo(out);
 		}
 		out.endArray();
 		if (hasWinner()) {
-			out.name(WINNER);
+			out.name(WINNER__PROP);
 			getWinner().writeTo(out);
 		}
 	}
@@ -135,7 +133,7 @@ public class FinishTurn extends GameMsg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case TRICK: {
+			case TRICK__PROP: {
 				in.beginArray();
 				while (in.hasNext()) {
 					addTrick(de.haumacher.wizard.msg.Card.readCard(in));
@@ -143,7 +141,7 @@ public class FinishTurn extends GameMsg {
 				in.endArray();
 			}
 			break;
-			case WINNER: setWinner(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
+			case WINNER__PROP: setWinner(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
 			default: super.readField(in, field);
 		}
 	}

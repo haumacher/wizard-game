@@ -9,20 +9,20 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	 * Creates a {@link PlayerState} instance.
 	 */
 	public static PlayerState create() {
-		return new PlayerState();
+		return new de.haumacher.wizard.msg.PlayerState();
 	}
 
 	/** Identifier for the {@link PlayerState} type in JSON format. */
 	public static final String PLAYER_STATE__TYPE = "PlayerState";
 
 	/** @see #getPlayer() */
-	private static final String PLAYER = "player";
+	private static final String PLAYER__PROP = "player";
 
 	/** @see #getPoints() */
-	private static final String POINTS = "points";
+	private static final String POINTS__PROP = "points";
 
 	/** @see #getRoundState() */
-	private static final String ROUND_STATE = "roundState";
+	private static final String ROUND_STATE__PROP = "roundState";
 
 	private Player _player = null;
 
@@ -33,7 +33,7 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * Creates a {@link PlayerState} instance.
 	 *
-	 * @see #create()
+	 * @see PlayerState#create()
 	 */
 	protected PlayerState() {
 		super();
@@ -53,11 +53,11 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetPlayer(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayer()} without chain call utility. */
 	protected final void internalSetPlayer(Player value) {
 		_player = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getPlayer()} has a value.
@@ -80,11 +80,11 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetPoints(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPoints()} without chain call utility. */
 	protected final void internalSetPoints(int value) {
 		_points = value;
 	}
-
 
 	/**
 	 * Information about the current round.
@@ -100,11 +100,11 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetRoundState(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getRoundState()} without chain call utility. */
 	protected final void internalSetRoundState(RoundState value) {
 		_roundState = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getRoundState()} has a value.
@@ -113,17 +113,10 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		return _roundState != null;
 	}
 
-	/** The type identifier for this concrete subtype. */
-	public String jsonType() {
-		return PLAYER_STATE__TYPE;
-	}
-
 	/** Reads a new instance from the given reader. */
 	public static PlayerState readPlayerState(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		PlayerState result = new PlayerState();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.PlayerState result = new de.haumacher.wizard.msg.PlayerState();
+		result.readContent(in);
 		return result;
 	}
 
@@ -136,13 +129,13 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
 		if (hasPlayer()) {
-			out.name(PLAYER);
+			out.name(PLAYER__PROP);
 			getPlayer().writeTo(out);
 		}
-		out.name(POINTS);
+		out.name(POINTS__PROP);
 		out.value(getPoints());
 		if (hasRoundState()) {
-			out.name(ROUND_STATE);
+			out.name(ROUND_STATE__PROP);
 			getRoundState().writeTo(out);
 		}
 	}
@@ -150,9 +143,9 @@ public class PlayerState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
-			case POINTS: setPoints(in.nextInt()); break;
-			case ROUND_STATE: setRoundState(de.haumacher.wizard.msg.RoundState.readRoundState(in)); break;
+			case PLAYER__PROP: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
+			case POINTS__PROP: setPoints(in.nextInt()); break;
+			case ROUND_STATE__PROP: setRoundState(de.haumacher.wizard.msg.RoundState.readRoundState(in)); break;
 			default: super.readField(in, field);
 		}
 	}

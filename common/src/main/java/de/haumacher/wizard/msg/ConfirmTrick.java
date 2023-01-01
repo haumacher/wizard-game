@@ -9,7 +9,7 @@ public class ConfirmTrick extends GameCmd {
 	 * Creates a {@link ConfirmTrick} instance.
 	 */
 	public static ConfirmTrick create() {
-		return new ConfirmTrick();
+		return new de.haumacher.wizard.msg.ConfirmTrick();
 	}
 
 	/** Identifier for the {@link ConfirmTrick} type in JSON format. */
@@ -18,7 +18,7 @@ public class ConfirmTrick extends GameCmd {
 	/**
 	 * Creates a {@link ConfirmTrick} instance.
 	 *
-	 * @see #create()
+	 * @see ConfirmTrick#create()
 	 */
 	protected ConfirmTrick() {
 		super();
@@ -31,10 +31,8 @@ public class ConfirmTrick extends GameCmd {
 
 	/** Reads a new instance from the given reader. */
 	public static ConfirmTrick readConfirmTrick(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		ConfirmTrick result = new ConfirmTrick();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.ConfirmTrick result = new de.haumacher.wizard.msg.ConfirmTrick();
+		result.readContent(in);
 		return result;
 	}
 

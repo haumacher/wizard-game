@@ -9,7 +9,7 @@ public class AddEmailSuccess extends ResultMsg {
 	 * Creates a {@link AddEmailSuccess} instance.
 	 */
 	public static AddEmailSuccess create() {
-		return new AddEmailSuccess();
+		return new de.haumacher.wizard.msg.AddEmailSuccess();
 	}
 
 	/** Identifier for the {@link AddEmailSuccess} type in JSON format. */
@@ -18,7 +18,7 @@ public class AddEmailSuccess extends ResultMsg {
 	/**
 	 * Creates a {@link AddEmailSuccess} instance.
 	 *
-	 * @see #create()
+	 * @see AddEmailSuccess#create()
 	 */
 	protected AddEmailSuccess() {
 		super();
@@ -31,10 +31,8 @@ public class AddEmailSuccess extends ResultMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static AddEmailSuccess readAddEmailSuccess(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		AddEmailSuccess result = new AddEmailSuccess();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.AddEmailSuccess result = new de.haumacher.wizard.msg.AddEmailSuccess();
+		result.readContent(in);
 		return result;
 	}
 

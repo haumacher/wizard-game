@@ -9,21 +9,21 @@ public class LeaveGame extends Cmd {
 	 * Creates a {@link LeaveGame} instance.
 	 */
 	public static LeaveGame create() {
-		return new LeaveGame();
+		return new de.haumacher.wizard.msg.LeaveGame();
 	}
 
 	/** Identifier for the {@link LeaveGame} type in JSON format. */
 	public static final String LEAVE_GAME__TYPE = "LeaveGame";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID = "gameId";
+	private static final String GAME_ID__PROP = "gameId";
 
 	private String _gameId = "";
 
 	/**
 	 * Creates a {@link LeaveGame} instance.
 	 *
-	 * @see #create()
+	 * @see LeaveGame#create()
 	 */
 	protected LeaveGame() {
 		super();
@@ -43,11 +43,11 @@ public class LeaveGame extends Cmd {
 		internalSetGameId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getGameId()} without chain call utility. */
 	protected final void internalSetGameId(String value) {
 		_gameId = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -56,24 +56,22 @@ public class LeaveGame extends Cmd {
 
 	/** Reads a new instance from the given reader. */
 	public static LeaveGame readLeaveGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		LeaveGame result = new LeaveGame();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.LeaveGame result = new de.haumacher.wizard.msg.LeaveGame();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(GAME_ID);
+		out.name(GAME_ID__PROP);
 		out.value(getGameId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

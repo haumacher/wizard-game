@@ -4,6 +4,8 @@ option NoReflection;
 option NoListener;
 option NoBinary;
 option NoTypeKind;
+option NoXml;
+option NoInterfaces;
 option DartLib = "../../../../flutter_ui/lib/msg.dart";
 
 /** Information about a game. */

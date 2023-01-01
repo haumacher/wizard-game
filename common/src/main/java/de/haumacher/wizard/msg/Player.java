@@ -9,17 +9,17 @@ public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 	 * Creates a {@link Player} instance.
 	 */
 	public static Player create() {
-		return new Player();
+		return new de.haumacher.wizard.msg.Player();
 	}
 
 	/** Identifier for the {@link Player} type in JSON format. */
 	public static final String PLAYER__TYPE = "Player";
 
 	/** @see #getId() */
-	private static final String ID = "id";
+	private static final String ID__PROP = "id";
 
 	/** @see #getName() */
-	private static final String NAME = "name";
+	private static final String NAME__PROP = "name";
 
 	private String _id = "";
 
@@ -28,7 +28,7 @@ public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * Creates a {@link Player} instance.
 	 *
-	 * @see #create()
+	 * @see Player#create()
 	 */
 	protected Player() {
 		super();
@@ -48,11 +48,11 @@ public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getId()} without chain call utility. */
 	protected final void internalSetId(String value) {
 		_id = value;
 	}
-
 
 	/**
 	 * A nick name for the player to display to other users.
@@ -68,23 +68,16 @@ public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetName(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getName()} without chain call utility. */
 	protected final void internalSetName(String value) {
 		_name = value;
 	}
 
-
-	/** The type identifier for this concrete subtype. */
-	public String jsonType() {
-		return PLAYER__TYPE;
-	}
-
 	/** Reads a new instance from the given reader. */
 	public static Player readPlayer(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Player result = new Player();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.Player result = new de.haumacher.wizard.msg.Player();
+		result.readContent(in);
 		return result;
 	}
 
@@ -96,17 +89,17 @@ public class Player extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(ID);
+		out.name(ID__PROP);
 		out.value(getId());
-		out.name(NAME);
+		out.name(NAME__PROP);
 		out.value(getName());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case ID: setId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case NAME: setName(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case ID__PROP: setId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case NAME__PROP: setName(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

@@ -9,17 +9,17 @@ public class PlayedCard extends de.haumacher.msgbuf.data.AbstractDataObject {
 	 * Creates a {@link PlayedCard} instance.
 	 */
 	public static PlayedCard create() {
-		return new PlayedCard();
+		return new de.haumacher.wizard.msg.PlayedCard();
 	}
 
 	/** Identifier for the {@link PlayedCard} type in JSON format. */
 	public static final String PLAYED_CARD__TYPE = "PlayedCard";
 
 	/** @see #getPlayerId() */
-	private static final String PLAYER_ID = "playerId";
+	private static final String PLAYER_ID__PROP = "playerId";
 
 	/** @see #getCard() */
-	private static final String CARD = "card";
+	private static final String CARD__PROP = "card";
 
 	private String _playerId = "";
 
@@ -28,7 +28,7 @@ public class PlayedCard extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * Creates a {@link PlayedCard} instance.
 	 *
-	 * @see #create()
+	 * @see PlayedCard#create()
 	 */
 	protected PlayedCard() {
 		super();
@@ -48,11 +48,11 @@ public class PlayedCard extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetPlayerId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
 	protected final void internalSetPlayerId(String value) {
 		_playerId = value;
 	}
-
 
 	/**
 	 * The {@link Card} that lays on the table.
@@ -68,11 +68,11 @@ public class PlayedCard extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetCard(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getCard()} without chain call utility. */
 	protected final void internalSetCard(Card value) {
 		_card = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getCard()} has a value.
@@ -81,17 +81,10 @@ public class PlayedCard extends de.haumacher.msgbuf.data.AbstractDataObject {
 		return _card != null;
 	}
 
-	/** The type identifier for this concrete subtype. */
-	public String jsonType() {
-		return PLAYED_CARD__TYPE;
-	}
-
 	/** Reads a new instance from the given reader. */
 	public static PlayedCard readPlayedCard(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		PlayedCard result = new PlayedCard();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.PlayedCard result = new de.haumacher.wizard.msg.PlayedCard();
+		result.readContent(in);
 		return result;
 	}
 
@@ -103,10 +96,10 @@ public class PlayedCard extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(PLAYER_ID);
+		out.name(PLAYER_ID__PROP);
 		out.value(getPlayerId());
 		if (hasCard()) {
-			out.name(CARD);
+			out.name(CARD__PROP);
 			getCard().writeTo(out);
 		}
 	}
@@ -114,8 +107,8 @@ public class PlayedCard extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case CARD: setCard(de.haumacher.wizard.msg.Card.readCard(in)); break;
+			case PLAYER_ID__PROP: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case CARD__PROP: setCard(de.haumacher.wizard.msg.Card.readCard(in)); break;
 			default: super.readField(in, field);
 		}
 	}

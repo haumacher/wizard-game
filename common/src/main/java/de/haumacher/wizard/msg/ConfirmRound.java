@@ -9,7 +9,7 @@ public class ConfirmRound extends GameCmd {
 	 * Creates a {@link ConfirmRound} instance.
 	 */
 	public static ConfirmRound create() {
-		return new ConfirmRound();
+		return new de.haumacher.wizard.msg.ConfirmRound();
 	}
 
 	/** Identifier for the {@link ConfirmRound} type in JSON format. */
@@ -18,7 +18,7 @@ public class ConfirmRound extends GameCmd {
 	/**
 	 * Creates a {@link ConfirmRound} instance.
 	 *
-	 * @see #create()
+	 * @see ConfirmRound#create()
 	 */
 	protected ConfirmRound() {
 		super();
@@ -31,10 +31,8 @@ public class ConfirmRound extends GameCmd {
 
 	/** Reads a new instance from the given reader. */
 	public static ConfirmRound readConfirmRound(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		ConfirmRound result = new ConfirmRound();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.ConfirmRound result = new de.haumacher.wizard.msg.ConfirmRound();
+		result.readContent(in);
 		return result;
 	}
 

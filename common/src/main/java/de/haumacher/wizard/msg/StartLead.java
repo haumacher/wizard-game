@@ -9,17 +9,17 @@ public class StartLead extends GameMsg {
 	 * Creates a {@link StartLead} instance.
 	 */
 	public static StartLead create() {
-		return new StartLead();
+		return new de.haumacher.wizard.msg.StartLead();
 	}
 
 	/** Identifier for the {@link StartLead} type in JSON format. */
 	public static final String START_LEAD__TYPE = "StartLead";
 
 	/** @see #getState() */
-	private static final String STATE = "state";
+	private static final String STATE__PROP = "state";
 
 	/** @see #getCurrentTrick() */
-	private static final String CURRENT_TRICK = "currentTrick";
+	private static final String CURRENT_TRICK__PROP = "currentTrick";
 
 	private final java.util.Map<String, PlayerInfo> _state = new java.util.HashMap<>();
 
@@ -28,7 +28,7 @@ public class StartLead extends GameMsg {
 	/**
 	 * Creates a {@link StartLead} instance.
 	 *
-	 * @see #create()
+	 * @see StartLead#create()
 	 */
 	protected StartLead() {
 		super();
@@ -48,13 +48,13 @@ public class StartLead extends GameMsg {
 		internalSetState(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getState()} without chain call utility. */
 	protected final void internalSetState(java.util.Map<String, PlayerInfo> value) {
 		if (value == null) throw new IllegalArgumentException("Property 'state' cannot be null.");
 		_state.clear();
 		_state.putAll(value);
 	}
-
 
 	/**
 	 * Adds a key value pair to the {@link #getState()} map.
@@ -89,17 +89,17 @@ public class StartLead extends GameMsg {
 	/**
 	 * @see #getCurrentTrick()
 	 */
-	public StartLead setCurrentTrick(java.util.List<PlayedCard> value) {
+	public StartLead setCurrentTrick(java.util.List<? extends PlayedCard> value) {
 		internalSetCurrentTrick(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getCurrentTrick()} without chain call utility. */
-	protected final void internalSetCurrentTrick(java.util.List<PlayedCard> value) {
+	protected final void internalSetCurrentTrick(java.util.List<? extends PlayedCard> value) {
 		if (value == null) throw new IllegalArgumentException("Property 'currentTrick' cannot be null.");
 		_currentTrick.clear();
 		_currentTrick.addAll(value);
 	}
-
 
 	/**
 	 * Adds a value to the {@link #getCurrentTrick()} list.
@@ -128,24 +128,22 @@ public class StartLead extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static StartLead readStartLead(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		StartLead result = new StartLead();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.StartLead result = new de.haumacher.wizard.msg.StartLead();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(STATE);
+		out.name(STATE__PROP);
 		out.beginObject();
 		for (java.util.Map.Entry<String,PlayerInfo> entry : getState().entrySet()) {
 			out.name(entry.getKey());
 			entry.getValue().writeTo(out);
 		}
 		out.endObject();
-		out.name(CURRENT_TRICK);
+		out.name(CURRENT_TRICK__PROP);
 		out.beginArray();
 		for (PlayedCard x : getCurrentTrick()) {
 			x.writeTo(out);
@@ -156,7 +154,7 @@ public class StartLead extends GameMsg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case STATE: {
+			case STATE__PROP: {
 				in.beginObject();
 				while (in.hasNext()) {
 					putState(in.nextName(), de.haumacher.wizard.msg.PlayerInfo.readPlayerInfo(in));
@@ -164,7 +162,7 @@ public class StartLead extends GameMsg {
 				in.endObject();
 				break;
 			}
-			case CURRENT_TRICK: {
+			case CURRENT_TRICK__PROP: {
 				in.beginArray();
 				while (in.hasNext()) {
 					addCurrentTrick(de.haumacher.wizard.msg.PlayedCard.readPlayedCard(in));

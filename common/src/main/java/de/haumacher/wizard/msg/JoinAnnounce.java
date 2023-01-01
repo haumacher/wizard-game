@@ -9,17 +9,17 @@ public class JoinAnnounce extends Msg {
 	 * Creates a {@link JoinAnnounce} instance.
 	 */
 	public static JoinAnnounce create() {
-		return new JoinAnnounce();
+		return new de.haumacher.wizard.msg.JoinAnnounce();
 	}
 
 	/** Identifier for the {@link JoinAnnounce} type in JSON format. */
 	public static final String JOIN_ANNOUNCE__TYPE = "JoinAnnounce";
 
 	/** @see #getPlayer() */
-	private static final String PLAYER = "player";
+	private static final String PLAYER__PROP = "player";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID = "gameId";
+	private static final String GAME_ID__PROP = "gameId";
 
 	private Player _player = null;
 
@@ -28,7 +28,7 @@ public class JoinAnnounce extends Msg {
 	/**
 	 * Creates a {@link JoinAnnounce} instance.
 	 *
-	 * @see #create()
+	 * @see JoinAnnounce#create()
 	 */
 	protected JoinAnnounce() {
 		super();
@@ -48,11 +48,11 @@ public class JoinAnnounce extends Msg {
 		internalSetPlayer(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayer()} without chain call utility. */
 	protected final void internalSetPlayer(Player value) {
 		_player = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getPlayer()} has a value.
@@ -75,11 +75,11 @@ public class JoinAnnounce extends Msg {
 		internalSetGameId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getGameId()} without chain call utility. */
 	protected final void internalSetGameId(String value) {
 		_gameId = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -88,10 +88,8 @@ public class JoinAnnounce extends Msg {
 
 	/** Reads a new instance from the given reader. */
 	public static JoinAnnounce readJoinAnnounce(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		JoinAnnounce result = new JoinAnnounce();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.JoinAnnounce result = new de.haumacher.wizard.msg.JoinAnnounce();
+		result.readContent(in);
 		return result;
 	}
 
@@ -99,18 +97,18 @@ public class JoinAnnounce extends Msg {
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
 		if (hasPlayer()) {
-			out.name(PLAYER);
+			out.name(PLAYER__PROP);
 			getPlayer().writeTo(out);
 		}
-		out.name(GAME_ID);
+		out.name(GAME_ID__PROP);
 		out.value(getGameId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
-			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case PLAYER__PROP: setPlayer(de.haumacher.wizard.msg.Player.readPlayer(in)); break;
+			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

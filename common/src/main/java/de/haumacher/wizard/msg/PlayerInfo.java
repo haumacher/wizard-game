@@ -9,20 +9,20 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	 * Creates a {@link PlayerInfo} instance.
 	 */
 	public static PlayerInfo create() {
-		return new PlayerInfo();
+		return new de.haumacher.wizard.msg.PlayerInfo();
 	}
 
 	/** Identifier for the {@link PlayerInfo} type in JSON format. */
 	public static final String PLAYER_INFO__TYPE = "PlayerInfo";
 
 	/** @see #getBid() */
-	private static final String BID = "bid";
+	private static final String BID__PROP = "bid";
 
 	/** @see #getTricks() */
-	private static final String TRICKS = "tricks";
+	private static final String TRICKS__PROP = "tricks";
 
 	/** @see #getPoints() */
-	private static final String POINTS = "points";
+	private static final String POINTS__PROP = "points";
 
 	private int _bid = 0;
 
@@ -33,7 +33,7 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * Creates a {@link PlayerInfo} instance.
 	 *
-	 * @see #create()
+	 * @see PlayerInfo#create()
 	 */
 	protected PlayerInfo() {
 		super();
@@ -53,11 +53,11 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetBid(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getBid()} without chain call utility. */
 	protected final void internalSetBid(int value) {
 		_bid = value;
 	}
-
 
 	/**
 	 * The number of won tricks.
@@ -73,11 +73,11 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetTricks(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getTricks()} without chain call utility. */
 	protected final void internalSetTricks(int value) {
 		_tricks = value;
 	}
-
 
 	/**
 	 * The current points of the player.
@@ -93,23 +93,16 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetPoints(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPoints()} without chain call utility. */
 	protected final void internalSetPoints(int value) {
 		_points = value;
 	}
 
-
-	/** The type identifier for this concrete subtype. */
-	public String jsonType() {
-		return PLAYER_INFO__TYPE;
-	}
-
 	/** Reads a new instance from the given reader. */
 	public static PlayerInfo readPlayerInfo(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		PlayerInfo result = new PlayerInfo();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.PlayerInfo result = new de.haumacher.wizard.msg.PlayerInfo();
+		result.readContent(in);
 		return result;
 	}
 
@@ -121,20 +114,20 @@ public class PlayerInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(BID);
+		out.name(BID__PROP);
 		out.value(getBid());
-		out.name(TRICKS);
+		out.name(TRICKS__PROP);
 		out.value(getTricks());
-		out.name(POINTS);
+		out.name(POINTS__PROP);
 		out.value(getPoints());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case BID: setBid(in.nextInt()); break;
-			case TRICKS: setTricks(in.nextInt()); break;
-			case POINTS: setPoints(in.nextInt()); break;
+			case BID__PROP: setBid(in.nextInt()); break;
+			case TRICKS__PROP: setTricks(in.nextInt()); break;
+			case POINTS__PROP: setPoints(in.nextInt()); break;
 			default: super.readField(in, field);
 		}
 	}

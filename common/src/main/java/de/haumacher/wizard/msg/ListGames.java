@@ -9,7 +9,7 @@ public class ListGames extends Cmd {
 	 * Creates a {@link ListGames} instance.
 	 */
 	public static ListGames create() {
-		return new ListGames();
+		return new de.haumacher.wizard.msg.ListGames();
 	}
 
 	/** Identifier for the {@link ListGames} type in JSON format. */
@@ -18,7 +18,7 @@ public class ListGames extends Cmd {
 	/**
 	 * Creates a {@link ListGames} instance.
 	 *
-	 * @see #create()
+	 * @see ListGames#create()
 	 */
 	protected ListGames() {
 		super();
@@ -31,10 +31,8 @@ public class ListGames extends Cmd {
 
 	/** Reads a new instance from the given reader. */
 	public static ListGames readListGames(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		ListGames result = new ListGames();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.ListGames result = new de.haumacher.wizard.msg.ListGames();
+		result.readContent(in);
 		return result;
 	}
 

@@ -9,20 +9,20 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	 * Creates a {@link RoundState} instance.
 	 */
 	public static RoundState create() {
-		return new RoundState();
+		return new de.haumacher.wizard.msg.RoundState();
 	}
 
 	/** Identifier for the {@link RoundState} type in JSON format. */
 	public static final String ROUND_STATE__TYPE = "RoundState";
 
 	/** @see #getBidCnt() */
-	private static final String BID_CNT = "bidCnt";
+	private static final String BID_CNT__PROP = "bidCnt";
 
 	/** @see #getWinCnt() */
-	private static final String WIN_CNT = "winCnt";
+	private static final String WIN_CNT__PROP = "winCnt";
 
 	/** @see #getCards() */
-	private static final String CARDS = "cards";
+	private static final String CARDS__PROP = "cards";
 
 	private int _bidCnt = 0;
 
@@ -33,7 +33,7 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * Creates a {@link RoundState} instance.
 	 *
-	 * @see #create()
+	 * @see RoundState#create()
 	 */
 	protected RoundState() {
 		super();
@@ -53,11 +53,11 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetBidCnt(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getBidCnt()} without chain call utility. */
 	protected final void internalSetBidCnt(int value) {
 		_bidCnt = value;
 	}
-
 
 	/**
 	 * The number of tricks won.
@@ -73,11 +73,11 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		internalSetWinCnt(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getWinCnt()} without chain call utility. */
 	protected final void internalSetWinCnt(int value) {
 		_winCnt = value;
 	}
-
 
 	/**
 	 * The cards that the player has currently in his hand.
@@ -89,17 +89,17 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	/**
 	 * @see #getCards()
 	 */
-	public RoundState setCards(java.util.List<Card> value) {
+	public RoundState setCards(java.util.List<? extends Card> value) {
 		internalSetCards(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getCards()} without chain call utility. */
-	protected final void internalSetCards(java.util.List<Card> value) {
+	protected final void internalSetCards(java.util.List<? extends Card> value) {
 		if (value == null) throw new IllegalArgumentException("Property 'cards' cannot be null.");
 		_cards.clear();
 		_cards.addAll(value);
 	}
-
 
 	/**
 	 * Adds a value to the {@link #getCards()} list.
@@ -121,17 +121,10 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 		_cards.remove(value);
 	}
 
-	/** The type identifier for this concrete subtype. */
-	public String jsonType() {
-		return ROUND_STATE__TYPE;
-	}
-
 	/** Reads a new instance from the given reader. */
 	public static RoundState readRoundState(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		RoundState result = new RoundState();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.RoundState result = new de.haumacher.wizard.msg.RoundState();
+		result.readContent(in);
 		return result;
 	}
 
@@ -143,11 +136,11 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(BID_CNT);
+		out.name(BID_CNT__PROP);
 		out.value(getBidCnt());
-		out.name(WIN_CNT);
+		out.name(WIN_CNT__PROP);
 		out.value(getWinCnt());
-		out.name(CARDS);
+		out.name(CARDS__PROP);
 		out.beginArray();
 		for (Card x : getCards()) {
 			x.writeTo(out);
@@ -158,9 +151,9 @@ public class RoundState extends de.haumacher.msgbuf.data.AbstractDataObject {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case BID_CNT: setBidCnt(in.nextInt()); break;
-			case WIN_CNT: setWinCnt(in.nextInt()); break;
-			case CARDS: {
+			case BID_CNT__PROP: setBidCnt(in.nextInt()); break;
+			case WIN_CNT__PROP: setWinCnt(in.nextInt()); break;
+			case CARDS__PROP: {
 				in.beginArray();
 				while (in.hasNext()) {
 					addCard(de.haumacher.wizard.msg.Card.readCard(in));

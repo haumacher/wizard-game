@@ -9,17 +9,17 @@ public class VerifyEmail extends LoginCmd {
 	 * Creates a {@link VerifyEmail} instance.
 	 */
 	public static VerifyEmail create() {
-		return new VerifyEmail();
+		return new de.haumacher.wizard.msg.VerifyEmail();
 	}
 
 	/** Identifier for the {@link VerifyEmail} type in JSON format. */
 	public static final String VERIFY_EMAIL__TYPE = "VerifyEmail";
 
 	/** @see #getUid() */
-	private static final String UID = "uid";
+	private static final String UID__PROP = "uid";
 
 	/** @see #getToken() */
-	private static final String TOKEN = "token";
+	private static final String TOKEN__PROP = "token";
 
 	private String _uid = "";
 
@@ -28,7 +28,7 @@ public class VerifyEmail extends LoginCmd {
 	/**
 	 * Creates a {@link VerifyEmail} instance.
 	 *
-	 * @see #create()
+	 * @see VerifyEmail#create()
 	 */
 	protected VerifyEmail() {
 		super();
@@ -48,11 +48,11 @@ public class VerifyEmail extends LoginCmd {
 		internalSetUid(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getUid()} without chain call utility. */
 	protected final void internalSetUid(String value) {
 		_uid = value;
 	}
-
 
 	/**
 	 * The verification token that was sent to the e-mail address.
@@ -68,11 +68,11 @@ public class VerifyEmail extends LoginCmd {
 		internalSetToken(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getToken()} without chain call utility. */
 	protected final void internalSetToken(String value) {
 		_token = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -81,27 +81,25 @@ public class VerifyEmail extends LoginCmd {
 
 	/** Reads a new instance from the given reader. */
 	public static VerifyEmail readVerifyEmail(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		VerifyEmail result = new VerifyEmail();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.VerifyEmail result = new de.haumacher.wizard.msg.VerifyEmail();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(UID);
+		out.name(UID__PROP);
 		out.value(getUid());
-		out.name(TOKEN);
+		out.name(TOKEN__PROP);
 		out.value(getToken());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case UID: setUid(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case TOKEN: setToken(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case UID__PROP: setUid(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case TOKEN__PROP: setToken(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

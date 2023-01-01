@@ -9,21 +9,21 @@ public class GameStarted extends Msg {
 	 * Creates a {@link GameStarted} instance.
 	 */
 	public static GameStarted create() {
-		return new GameStarted();
+		return new de.haumacher.wizard.msg.GameStarted();
 	}
 
 	/** Identifier for the {@link GameStarted} type in JSON format. */
 	public static final String GAME_STARTED__TYPE = "GameStarted";
 
 	/** @see #getGame() */
-	private static final String GAME = "game";
+	private static final String GAME__PROP = "game";
 
 	private Game _game = null;
 
 	/**
 	 * Creates a {@link GameStarted} instance.
 	 *
-	 * @see #create()
+	 * @see GameStarted#create()
 	 */
 	protected GameStarted() {
 		super();
@@ -43,11 +43,11 @@ public class GameStarted extends Msg {
 		internalSetGame(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getGame()} without chain call utility. */
 	protected final void internalSetGame(Game value) {
 		_game = value;
 	}
-
 
 	/**
 	 * Checks, whether {@link #getGame()} has a value.
@@ -63,10 +63,8 @@ public class GameStarted extends Msg {
 
 	/** Reads a new instance from the given reader. */
 	public static GameStarted readGameStarted(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		GameStarted result = new GameStarted();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.GameStarted result = new de.haumacher.wizard.msg.GameStarted();
+		result.readContent(in);
 		return result;
 	}
 
@@ -74,7 +72,7 @@ public class GameStarted extends Msg {
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
 		if (hasGame()) {
-			out.name(GAME);
+			out.name(GAME__PROP);
 			getGame().writeTo(out);
 		}
 	}
@@ -82,7 +80,7 @@ public class GameStarted extends Msg {
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case GAME: setGame(de.haumacher.wizard.msg.Game.readGame(in)); break;
+			case GAME__PROP: setGame(de.haumacher.wizard.msg.Game.readGame(in)); break;
 			default: super.readField(in, field);
 		}
 	}

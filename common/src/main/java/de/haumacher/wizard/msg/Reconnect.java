@@ -9,17 +9,17 @@ public class Reconnect extends LoginCmd {
 	 * Creates a {@link Reconnect} instance.
 	 */
 	public static Reconnect create() {
-		return new Reconnect();
+		return new de.haumacher.wizard.msg.Reconnect();
 	}
 
 	/** Identifier for the {@link Reconnect} type in JSON format. */
 	public static final String RECONNECT__TYPE = "Reconnect";
 
 	/** @see #getPlayerId() */
-	private static final String PLAYER_ID = "playerId";
+	private static final String PLAYER_ID__PROP = "playerId";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID = "gameId";
+	private static final String GAME_ID__PROP = "gameId";
 
 	private String _playerId = "";
 
@@ -28,7 +28,7 @@ public class Reconnect extends LoginCmd {
 	/**
 	 * Creates a {@link Reconnect} instance.
 	 *
-	 * @see #create()
+	 * @see Reconnect#create()
 	 */
 	protected Reconnect() {
 		super();
@@ -48,11 +48,11 @@ public class Reconnect extends LoginCmd {
 		internalSetPlayerId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
 	protected final void internalSetPlayerId(String value) {
 		_playerId = value;
 	}
-
 
 	/**
 	 * The ID of the game that this player would like to reconnect to.
@@ -68,11 +68,11 @@ public class Reconnect extends LoginCmd {
 		internalSetGameId(value);
 		return this;
 	}
+
 	/** Internal setter for {@link #getGameId()} without chain call utility. */
 	protected final void internalSetGameId(String value) {
 		_gameId = value;
 	}
-
 
 	@Override
 	public String jsonType() {
@@ -81,27 +81,25 @@ public class Reconnect extends LoginCmd {
 
 	/** Reads a new instance from the given reader. */
 	public static Reconnect readReconnect(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Reconnect result = new Reconnect();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.Reconnect result = new de.haumacher.wizard.msg.Reconnect();
+		result.readContent(in);
 		return result;
 	}
 
 	@Override
 	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
 		super.writeFields(out);
-		out.name(PLAYER_ID);
+		out.name(PLAYER_ID__PROP);
 		out.value(getPlayerId());
-		out.name(GAME_ID);
+		out.name(GAME_ID__PROP);
 		out.value(getGameId());
 	}
 
 	@Override
 	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
 		switch (field) {
-			case PLAYER_ID: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case GAME_ID: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case PLAYER_ID__PROP: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
+			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
 			default: super.readField(in, field);
 		}
 	}

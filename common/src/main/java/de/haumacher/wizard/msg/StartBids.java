@@ -9,7 +9,7 @@ public class StartBids extends GameMsg {
 	 * Creates a {@link StartBids} instance.
 	 */
 	public static StartBids create() {
-		return new StartBids();
+		return new de.haumacher.wizard.msg.StartBids();
 	}
 
 	/** Identifier for the {@link StartBids} type in JSON format. */
@@ -18,7 +18,7 @@ public class StartBids extends GameMsg {
 	/**
 	 * Creates a {@link StartBids} instance.
 	 *
-	 * @see #create()
+	 * @see StartBids#create()
 	 */
 	protected StartBids() {
 		super();
@@ -31,10 +31,8 @@ public class StartBids extends GameMsg {
 
 	/** Reads a new instance from the given reader. */
 	public static StartBids readStartBids(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		StartBids result = new StartBids();
-		in.beginObject();
-		result.readFields(in);
-		in.endObject();
+		de.haumacher.wizard.msg.StartBids result = new de.haumacher.wizard.msg.StartBids();
+		result.readContent(in);
 		return result;
 	}
 
