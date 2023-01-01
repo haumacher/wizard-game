@@ -117,7 +117,7 @@
 
 							<!-- The destination directory of your generated classes. Using Maven 
 								directory layout here -->
-							<directory>/home/bhu/git/wizard-game/server/src/main/java</directory>
+							<directory>${project.build.sourceDirectory}</directory>
 						</target>
 					</generator>
 				</configuration>
