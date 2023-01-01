@@ -3,115 +3,46 @@ package de.haumacher.wizard.msg;
 /**
  * Provides a listing of games waiting for players.
  */
-public class ListGamesResult extends ResultMsg {
+public interface ListGamesResult extends ResultMsg {
 
 	/**
-	 * Creates a {@link ListGamesResult} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.ListGamesResult} instance.
 	 */
-	public static ListGamesResult create() {
-		return new de.haumacher.wizard.msg.ListGamesResult();
+	static de.haumacher.wizard.msg.ListGamesResult create() {
+		return new de.haumacher.wizard.msg.impl.ListGamesResult_Impl();
 	}
 
-	/** Identifier for the {@link ListGamesResult} type in JSON format. */
-	public static final String LIST_GAMES_RESULT__TYPE = "ListGamesResult";
+	/** Identifier for the {@link de.haumacher.wizard.msg.ListGamesResult} type in JSON format. */
+	String LIST_GAMES_RESULT__TYPE = "ListGamesResult";
 
 	/** @see #getGames() */
-	private static final String GAMES__PROP = "games";
-
-	private final java.util.List<Game> _games = new java.util.ArrayList<>();
-
-	/**
-	 * Creates a {@link ListGamesResult} instance.
-	 *
-	 * @see ListGamesResult#create()
-	 */
-	protected ListGamesResult() {
-		super();
-	}
+	String GAMES__PROP = "games";
 
 	/**
 	 * List of all games on the server currently accepting new players.
 	 */
-	public final java.util.List<Game> getGames() {
-		return _games;
-	}
+	java.util.List<de.haumacher.wizard.msg.Game> getGames();
 
 	/**
 	 * @see #getGames()
 	 */
-	public ListGamesResult setGames(java.util.List<? extends Game> value) {
-		internalSetGames(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getGames()} without chain call utility. */
-	protected final void internalSetGames(java.util.List<? extends Game> value) {
-		if (value == null) throw new IllegalArgumentException("Property 'games' cannot be null.");
-		_games.clear();
-		_games.addAll(value);
-	}
+	de.haumacher.wizard.msg.ListGamesResult setGames(java.util.List<? extends de.haumacher.wizard.msg.Game> value);
 
 	/**
 	 * Adds a value to the {@link #getGames()} list.
 	 */
-	public ListGamesResult addGame(Game value) {
-		internalAddGame(value);
-		return this;
-	}
-
-	/** Implementation of {@link #addGame(Game)} without chain call utility. */
-	protected final void internalAddGame(Game value) {
-		_games.add(value);
-	}
+	de.haumacher.wizard.msg.ListGamesResult addGame(de.haumacher.wizard.msg.Game value);
 
 	/**
 	 * Removes a value from the {@link #getGames()} list.
 	 */
-	public final void removeGame(Game value) {
-		_games.remove(value);
-	}
-
-	@Override
-	public String jsonType() {
-		return LIST_GAMES_RESULT__TYPE;
-	}
+	void removeGame(de.haumacher.wizard.msg.Game value);
 
 	/** Reads a new instance from the given reader. */
-	public static ListGamesResult readListGamesResult(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.ListGamesResult result = new de.haumacher.wizard.msg.ListGamesResult();
+	static de.haumacher.wizard.msg.ListGamesResult readListGamesResult(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.ListGamesResult_Impl result = new de.haumacher.wizard.msg.impl.ListGamesResult_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		super.writeFields(out);
-		out.name(GAMES__PROP);
-		out.beginArray();
-		for (Game x : getGames()) {
-			x.writeTo(out);
-		}
-		out.endArray();
-	}
-
-	@Override
-	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
-		switch (field) {
-			case GAMES__PROP: {
-				in.beginArray();
-				while (in.hasNext()) {
-					addGame(de.haumacher.wizard.msg.Game.readGame(in));
-				}
-				in.endArray();
-			}
-			break;
-			default: super.readField(in, field);
-		}
-	}
-
-	@Override
-	public <R,A,E extends Throwable> R visit(ResultMsg.Visitor<R,A,E> v, A arg) throws E {
-		return v.visit(this, arg);
 	}
 
 }

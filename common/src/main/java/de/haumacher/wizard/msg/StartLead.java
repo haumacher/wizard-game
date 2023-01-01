@@ -3,180 +3,69 @@ package de.haumacher.wizard.msg;
 /**
  * Message announcing that all bids are placed.
  */
-public class StartLead extends GameMsg {
+public interface StartLead extends GameMsg {
 
 	/**
-	 * Creates a {@link StartLead} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.StartLead} instance.
 	 */
-	public static StartLead create() {
-		return new de.haumacher.wizard.msg.StartLead();
+	static de.haumacher.wizard.msg.StartLead create() {
+		return new de.haumacher.wizard.msg.impl.StartLead_Impl();
 	}
 
-	/** Identifier for the {@link StartLead} type in JSON format. */
-	public static final String START_LEAD__TYPE = "StartLead";
+	/** Identifier for the {@link de.haumacher.wizard.msg.StartLead} type in JSON format. */
+	String START_LEAD__TYPE = "StartLead";
 
 	/** @see #getState() */
-	private static final String STATE__PROP = "state";
+	String STATE__PROP = "state";
 
 	/** @see #getCurrentTrick() */
-	private static final String CURRENT_TRICK__PROP = "currentTrick";
-
-	private final java.util.Map<String, PlayerInfo> _state = new java.util.HashMap<>();
-
-	private final java.util.List<PlayedCard> _currentTrick = new java.util.ArrayList<>();
-
-	/**
-	 * Creates a {@link StartLead} instance.
-	 *
-	 * @see StartLead#create()
-	 */
-	protected StartLead() {
-		super();
-	}
+	String CURRENT_TRICK__PROP = "currentTrick";
 
 	/**
 	 * Score information of all players by their IDs.
 	 */
-	public final java.util.Map<String, PlayerInfo> getState() {
-		return _state;
-	}
+	java.util.Map<String, de.haumacher.wizard.msg.PlayerInfo> getState();
 
 	/**
 	 * @see #getState()
 	 */
-	public StartLead setState(java.util.Map<String, PlayerInfo> value) {
-		internalSetState(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getState()} without chain call utility. */
-	protected final void internalSetState(java.util.Map<String, PlayerInfo> value) {
-		if (value == null) throw new IllegalArgumentException("Property 'state' cannot be null.");
-		_state.clear();
-		_state.putAll(value);
-	}
+	de.haumacher.wizard.msg.StartLead setState(java.util.Map<String, de.haumacher.wizard.msg.PlayerInfo> value);
 
 	/**
 	 * Adds a key value pair to the {@link #getState()} map.
 	 */
-	public StartLead putState(String key, PlayerInfo value) {
-		internalPutState(key, value);
-		return this;
-	}
-
-	/** Implementation of {@link #putState(String, PlayerInfo)} without chain call utility. */
-	protected final void  internalPutState(String key, PlayerInfo value) {
-		if (_state.containsKey(key)) {
-			throw new IllegalArgumentException("Property 'state' already contains a value for key '" + key + "'.");
-		}
-		_state.put(key, value);
-	}
+	de.haumacher.wizard.msg.StartLead putState(String key, de.haumacher.wizard.msg.PlayerInfo value);
 
 	/**
 	 * Removes a key from the {@link #getState()} map.
 	 */
-	public final void removeState(String key) {
-		_state.remove(key);
-	}
+	void removeState(String key);
 
 	/**
 	 * The cards played so far. Only relevant when reconnecting to a game.
 	 */
-	public final java.util.List<PlayedCard> getCurrentTrick() {
-		return _currentTrick;
-	}
+	java.util.List<de.haumacher.wizard.msg.PlayedCard> getCurrentTrick();
 
 	/**
 	 * @see #getCurrentTrick()
 	 */
-	public StartLead setCurrentTrick(java.util.List<? extends PlayedCard> value) {
-		internalSetCurrentTrick(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getCurrentTrick()} without chain call utility. */
-	protected final void internalSetCurrentTrick(java.util.List<? extends PlayedCard> value) {
-		if (value == null) throw new IllegalArgumentException("Property 'currentTrick' cannot be null.");
-		_currentTrick.clear();
-		_currentTrick.addAll(value);
-	}
+	de.haumacher.wizard.msg.StartLead setCurrentTrick(java.util.List<? extends de.haumacher.wizard.msg.PlayedCard> value);
 
 	/**
 	 * Adds a value to the {@link #getCurrentTrick()} list.
 	 */
-	public StartLead addCurrentTrick(PlayedCard value) {
-		internalAddCurrentTrick(value);
-		return this;
-	}
-
-	/** Implementation of {@link #addCurrentTrick(PlayedCard)} without chain call utility. */
-	protected final void internalAddCurrentTrick(PlayedCard value) {
-		_currentTrick.add(value);
-	}
+	de.haumacher.wizard.msg.StartLead addCurrentTrick(de.haumacher.wizard.msg.PlayedCard value);
 
 	/**
 	 * Removes a value from the {@link #getCurrentTrick()} list.
 	 */
-	public final void removeCurrentTrick(PlayedCard value) {
-		_currentTrick.remove(value);
-	}
-
-	@Override
-	public String jsonType() {
-		return START_LEAD__TYPE;
-	}
+	void removeCurrentTrick(de.haumacher.wizard.msg.PlayedCard value);
 
 	/** Reads a new instance from the given reader. */
-	public static StartLead readStartLead(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.StartLead result = new de.haumacher.wizard.msg.StartLead();
+	static de.haumacher.wizard.msg.StartLead readStartLead(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.StartLead_Impl result = new de.haumacher.wizard.msg.impl.StartLead_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		super.writeFields(out);
-		out.name(STATE__PROP);
-		out.beginObject();
-		for (java.util.Map.Entry<String,PlayerInfo> entry : getState().entrySet()) {
-			out.name(entry.getKey());
-			entry.getValue().writeTo(out);
-		}
-		out.endObject();
-		out.name(CURRENT_TRICK__PROP);
-		out.beginArray();
-		for (PlayedCard x : getCurrentTrick()) {
-			x.writeTo(out);
-		}
-		out.endArray();
-	}
-
-	@Override
-	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
-		switch (field) {
-			case STATE__PROP: {
-				in.beginObject();
-				while (in.hasNext()) {
-					putState(in.nextName(), de.haumacher.wizard.msg.PlayerInfo.readPlayerInfo(in));
-				}
-				in.endObject();
-				break;
-			}
-			case CURRENT_TRICK__PROP: {
-				in.beginArray();
-				while (in.hasNext()) {
-					addCurrentTrick(de.haumacher.wizard.msg.PlayedCard.readPlayedCard(in));
-				}
-				in.endArray();
-			}
-			break;
-			default: super.readField(in, field);
-		}
-	}
-
-	@Override
-	public <R,A,E extends Throwable> R visit(GameMsg.Visitor<R,A,E> v, A arg) throws E {
-		return v.visit(this, arg);
 	}
 
 }

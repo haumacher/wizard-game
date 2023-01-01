@@ -3,41 +3,34 @@ package de.haumacher.wizard.msg;
 /**
  * A message that is sent from a client to the game server to trigger some action.
  */
-public abstract class Cmd extends de.haumacher.msgbuf.data.AbstractDataObject {
+public interface Cmd extends de.haumacher.msgbuf.data.DataObject {
 
-	/** Visitor interface for the {@link Cmd} hierarchy.*/
-	public interface Visitor<R,A,E extends Throwable> extends LoginCmd.Visitor<R,A,E>, GameCmd.Visitor<R,A,E> {
+	/** Visitor interface for the {@link de.haumacher.wizard.msg.Cmd} hierarchy.*/
+	public interface Visitor<R,A,E extends Throwable> extends de.haumacher.wizard.msg.LoginCmd.Visitor<R,A,E>, de.haumacher.wizard.msg.GameCmd.Visitor<R,A,E> {
 
-		/** Visit case for {@link ListGames}.*/
-		R visit(ListGames self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.ListGames}.*/
+		R visit(de.haumacher.wizard.msg.ListGames self, A arg) throws E;
 
-		/** Visit case for {@link JoinGame}.*/
-		R visit(JoinGame self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.JoinGame}.*/
+		R visit(de.haumacher.wizard.msg.JoinGame self, A arg) throws E;
 
-		/** Visit case for {@link CreateGame}.*/
-		R visit(CreateGame self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.CreateGame}.*/
+		R visit(de.haumacher.wizard.msg.CreateGame self, A arg) throws E;
 
-		/** Visit case for {@link StartGame}.*/
-		R visit(StartGame self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.StartGame}.*/
+		R visit(de.haumacher.wizard.msg.StartGame self, A arg) throws E;
 
-		/** Visit case for {@link LeaveGame}.*/
-		R visit(LeaveGame self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.LeaveGame}.*/
+		R visit(de.haumacher.wizard.msg.LeaveGame self, A arg) throws E;
 
-	}
-
-	/**
-	 * Creates a {@link Cmd} instance.
-	 */
-	protected Cmd() {
-		super();
 	}
 
 	/** The type identifier for this concrete subtype. */
-	public abstract String jsonType();
+	String jsonType();
 
 	/** Reads a new instance from the given reader. */
-	public static Cmd readCmd(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Cmd result;
+	static de.haumacher.wizard.msg.Cmd readCmd(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.Cmd result;
 		in.beginArray();
 		String type = in.nextString();
 		switch (type) {
@@ -61,14 +54,6 @@ public abstract class Cmd extends de.haumacher.msgbuf.data.AbstractDataObject {
 		}
 		in.endArray();
 		return result;
-	}
-
-	@Override
-	public final void writeTo(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		out.beginArray();
-		out.value(jsonType());
-		writeContent(out);
-		out.endArray();
 	}
 
 	/** Accepts the given visitor. */

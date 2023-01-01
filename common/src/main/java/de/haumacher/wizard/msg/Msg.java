@@ -3,41 +3,34 @@ package de.haumacher.wizard.msg;
 /**
  * A message sent from the game server to active clients.
  */
-public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
+public interface Msg extends de.haumacher.msgbuf.data.DataObject {
 
-	/** Visitor interface for the {@link Msg} hierarchy.*/
-	public interface Visitor<R,A,E extends Throwable> extends ResultMsg.Visitor<R,A,E>, GameMsg.Visitor<R,A,E> {
+	/** Visitor interface for the {@link de.haumacher.wizard.msg.Msg} hierarchy.*/
+	public interface Visitor<R,A,E extends Throwable> extends de.haumacher.wizard.msg.ResultMsg.Visitor<R,A,E>, de.haumacher.wizard.msg.GameMsg.Visitor<R,A,E> {
 
-		/** Visit case for {@link GameCreated}.*/
-		R visit(GameCreated self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.GameCreated}.*/
+		R visit(de.haumacher.wizard.msg.GameCreated self, A arg) throws E;
 
-		/** Visit case for {@link GameDeleted}.*/
-		R visit(GameDeleted self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.GameDeleted}.*/
+		R visit(de.haumacher.wizard.msg.GameDeleted self, A arg) throws E;
 
-		/** Visit case for {@link GameStarted}.*/
-		R visit(GameStarted self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.GameStarted}.*/
+		R visit(de.haumacher.wizard.msg.GameStarted self, A arg) throws E;
 
-		/** Visit case for {@link JoinAnnounce}.*/
-		R visit(JoinAnnounce self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.JoinAnnounce}.*/
+		R visit(de.haumacher.wizard.msg.JoinAnnounce self, A arg) throws E;
 
-		/** Visit case for {@link LeaveAnnounce}.*/
-		R visit(LeaveAnnounce self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.LeaveAnnounce}.*/
+		R visit(de.haumacher.wizard.msg.LeaveAnnounce self, A arg) throws E;
 
-	}
-
-	/**
-	 * Creates a {@link Msg} instance.
-	 */
-	protected Msg() {
-		super();
 	}
 
 	/** The type identifier for this concrete subtype. */
-	public abstract String jsonType();
+	String jsonType();
 
 	/** Reads a new instance from the given reader. */
-	public static Msg readMsg(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		Msg result;
+	static de.haumacher.wizard.msg.Msg readMsg(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.Msg result;
 		in.beginArray();
 		String type = in.nextString();
 		switch (type) {
@@ -68,14 +61,6 @@ public abstract class Msg extends de.haumacher.msgbuf.data.AbstractDataObject {
 		}
 		in.endArray();
 		return result;
-	}
-
-	@Override
-	public final void writeTo(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		out.beginArray();
-		out.value(jsonType());
-		writeContent(out);
-		out.endArray();
 	}
 
 	/** Accepts the given visitor. */

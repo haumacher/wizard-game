@@ -3,138 +3,59 @@ package de.haumacher.wizard.msg;
 /**
  * Information about a game.
  */
-public class Game extends de.haumacher.msgbuf.data.AbstractDataObject {
+public interface Game extends de.haumacher.msgbuf.data.DataObject {
 
 	/**
-	 * Creates a {@link Game} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.Game} instance.
 	 */
-	public static Game create() {
-		return new de.haumacher.wizard.msg.Game();
+	static de.haumacher.wizard.msg.Game create() {
+		return new de.haumacher.wizard.msg.impl.Game_Impl();
 	}
 
-	/** Identifier for the {@link Game} type in JSON format. */
-	public static final String GAME__TYPE = "Game";
+	/** Identifier for the {@link de.haumacher.wizard.msg.Game} type in JSON format. */
+	String GAME__TYPE = "Game";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID__PROP = "gameId";
+	String GAME_ID__PROP = "gameId";
 
 	/** @see #getPlayers() */
-	private static final String PLAYERS__PROP = "players";
-
-	private String _gameId = "";
-
-	private final java.util.List<Player> _players = new java.util.ArrayList<>();
-
-	/**
-	 * Creates a {@link Game} instance.
-	 *
-	 * @see Game#create()
-	 */
-	protected Game() {
-		super();
-	}
+	String PLAYERS__PROP = "players";
 
 	/**
 	 * A unique identifier of the game used to reference this game in messages.
 	 */
-	public final String getGameId() {
-		return _gameId;
-	}
+	String getGameId();
 
 	/**
 	 * @see #getGameId()
 	 */
-	public Game setGameId(String value) {
-		internalSetGameId(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getGameId()} without chain call utility. */
-	protected final void internalSetGameId(String value) {
-		_gameId = value;
-	}
+	de.haumacher.wizard.msg.Game setGameId(String value);
 
 	/**
 	 * The players that have joined this game.
 	 */
-	public final java.util.List<Player> getPlayers() {
-		return _players;
-	}
+	java.util.List<de.haumacher.wizard.msg.Player> getPlayers();
 
 	/**
 	 * @see #getPlayers()
 	 */
-	public Game setPlayers(java.util.List<? extends Player> value) {
-		internalSetPlayers(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getPlayers()} without chain call utility. */
-	protected final void internalSetPlayers(java.util.List<? extends Player> value) {
-		if (value == null) throw new IllegalArgumentException("Property 'players' cannot be null.");
-		_players.clear();
-		_players.addAll(value);
-	}
+	de.haumacher.wizard.msg.Game setPlayers(java.util.List<? extends de.haumacher.wizard.msg.Player> value);
 
 	/**
 	 * Adds a value to the {@link #getPlayers()} list.
 	 */
-	public Game addPlayer(Player value) {
-		internalAddPlayer(value);
-		return this;
-	}
-
-	/** Implementation of {@link #addPlayer(Player)} without chain call utility. */
-	protected final void internalAddPlayer(Player value) {
-		_players.add(value);
-	}
+	de.haumacher.wizard.msg.Game addPlayer(de.haumacher.wizard.msg.Player value);
 
 	/**
 	 * Removes a value from the {@link #getPlayers()} list.
 	 */
-	public final void removePlayer(Player value) {
-		_players.remove(value);
-	}
+	void removePlayer(de.haumacher.wizard.msg.Player value);
 
 	/** Reads a new instance from the given reader. */
-	public static Game readGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.Game result = new de.haumacher.wizard.msg.Game();
+	static de.haumacher.wizard.msg.Game readGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.Game_Impl result = new de.haumacher.wizard.msg.impl.Game_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	public final void writeTo(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		writeContent(out);
-	}
-
-	@Override
-	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		super.writeFields(out);
-		out.name(GAME_ID__PROP);
-		out.value(getGameId());
-		out.name(PLAYERS__PROP);
-		out.beginArray();
-		for (Player x : getPlayers()) {
-			x.writeTo(out);
-		}
-		out.endArray();
-	}
-
-	@Override
-	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
-		switch (field) {
-			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case PLAYERS__PROP: {
-				in.beginArray();
-				while (in.hasNext()) {
-					addPlayer(de.haumacher.wizard.msg.Player.readPlayer(in));
-				}
-				in.endArray();
-			}
-			break;
-			default: super.readField(in, field);
-		}
 	}
 
 }

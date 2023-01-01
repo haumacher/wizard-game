@@ -3,82 +3,36 @@ package de.haumacher.wizard.msg;
 /**
  * Command to request leaving a game.
  */
-public class LeaveGame extends Cmd {
+public interface LeaveGame extends Cmd {
 
 	/**
-	 * Creates a {@link LeaveGame} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.LeaveGame} instance.
 	 */
-	public static LeaveGame create() {
-		return new de.haumacher.wizard.msg.LeaveGame();
+	static de.haumacher.wizard.msg.LeaveGame create() {
+		return new de.haumacher.wizard.msg.impl.LeaveGame_Impl();
 	}
 
-	/** Identifier for the {@link LeaveGame} type in JSON format. */
-	public static final String LEAVE_GAME__TYPE = "LeaveGame";
+	/** Identifier for the {@link de.haumacher.wizard.msg.LeaveGame} type in JSON format. */
+	String LEAVE_GAME__TYPE = "LeaveGame";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID__PROP = "gameId";
-
-	private String _gameId = "";
-
-	/**
-	 * Creates a {@link LeaveGame} instance.
-	 *
-	 * @see LeaveGame#create()
-	 */
-	protected LeaveGame() {
-		super();
-	}
+	String GAME_ID__PROP = "gameId";
 
 	/**
 	 * The ID of the game to leave.
 	 */
-	public final String getGameId() {
-		return _gameId;
-	}
+	String getGameId();
 
 	/**
 	 * @see #getGameId()
 	 */
-	public LeaveGame setGameId(String value) {
-		internalSetGameId(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getGameId()} without chain call utility. */
-	protected final void internalSetGameId(String value) {
-		_gameId = value;
-	}
-
-	@Override
-	public String jsonType() {
-		return LEAVE_GAME__TYPE;
-	}
+	de.haumacher.wizard.msg.LeaveGame setGameId(String value);
 
 	/** Reads a new instance from the given reader. */
-	public static LeaveGame readLeaveGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.LeaveGame result = new de.haumacher.wizard.msg.LeaveGame();
+	static de.haumacher.wizard.msg.LeaveGame readLeaveGame(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.LeaveGame_Impl result = new de.haumacher.wizard.msg.impl.LeaveGame_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		super.writeFields(out);
-		out.name(GAME_ID__PROP);
-		out.value(getGameId());
-	}
-
-	@Override
-	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
-		switch (field) {
-			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			default: super.readField(in, field);
-		}
-	}
-
-	@Override
-	public <R,A,E extends Throwable> R visit(Cmd.Visitor<R,A,E> v, A arg) throws E {
-		return v.visit(this, arg);
 	}
 
 }

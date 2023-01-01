@@ -3,105 +3,49 @@ package de.haumacher.wizard.msg;
 /**
  * Current player status at the end of a round.
  */
-public class RoundInfo extends de.haumacher.msgbuf.data.AbstractDataObject {
+public interface RoundInfo extends de.haumacher.msgbuf.data.DataObject {
 
 	/**
-	 * Creates a {@link RoundInfo} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.RoundInfo} instance.
 	 */
-	public static RoundInfo create() {
-		return new de.haumacher.wizard.msg.RoundInfo();
+	static de.haumacher.wizard.msg.RoundInfo create() {
+		return new de.haumacher.wizard.msg.impl.RoundInfo_Impl();
 	}
 
-	/** Identifier for the {@link RoundInfo} type in JSON format. */
-	public static final String ROUND_INFO__TYPE = "RoundInfo";
+	/** Identifier for the {@link de.haumacher.wizard.msg.RoundInfo} type in JSON format. */
+	String ROUND_INFO__TYPE = "RoundInfo";
 
 	/** @see #getPoints() */
-	private static final String POINTS__PROP = "points";
+	String POINTS__PROP = "points";
 
 	/** @see #getTotal() */
-	private static final String TOTAL__PROP = "total";
-
-	private int _points = 0;
-
-	private int _total = 0;
-
-	/**
-	 * Creates a {@link RoundInfo} instance.
-	 *
-	 * @see RoundInfo#create()
-	 */
-	protected RoundInfo() {
-		super();
-	}
+	String TOTAL__PROP = "total";
 
 	/**
 	 * The points won by the player during the last round. The number may be negative.
 	 */
-	public final int getPoints() {
-		return _points;
-	}
+	int getPoints();
 
 	/**
 	 * @see #getPoints()
 	 */
-	public RoundInfo setPoints(int value) {
-		internalSetPoints(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getPoints()} without chain call utility. */
-	protected final void internalSetPoints(int value) {
-		_points = value;
-	}
+	de.haumacher.wizard.msg.RoundInfo setPoints(int value);
 
 	/**
 	 * The total amount of points the player won so far. The number may be negative.
 	 */
-	public final int getTotal() {
-		return _total;
-	}
+	int getTotal();
 
 	/**
 	 * @see #getTotal()
 	 */
-	public RoundInfo setTotal(int value) {
-		internalSetTotal(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getTotal()} without chain call utility. */
-	protected final void internalSetTotal(int value) {
-		_total = value;
-	}
+	de.haumacher.wizard.msg.RoundInfo setTotal(int value);
 
 	/** Reads a new instance from the given reader. */
-	public static RoundInfo readRoundInfo(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.RoundInfo result = new de.haumacher.wizard.msg.RoundInfo();
+	static de.haumacher.wizard.msg.RoundInfo readRoundInfo(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.RoundInfo_Impl result = new de.haumacher.wizard.msg.impl.RoundInfo_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	public final void writeTo(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		writeContent(out);
-	}
-
-	@Override
-	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		super.writeFields(out);
-		out.name(POINTS__PROP);
-		out.value(getPoints());
-		out.name(TOTAL__PROP);
-		out.value(getTotal());
-	}
-
-	@Override
-	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
-		switch (field) {
-			case POINTS__PROP: setPoints(in.nextInt()); break;
-			case TOTAL__PROP: setTotal(in.nextInt()); break;
-			default: super.readField(in, field);
-		}
 	}
 
 }

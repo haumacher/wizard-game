@@ -3,110 +3,49 @@ package de.haumacher.wizard.msg;
 /**
  * Announces that a player has left a game.
  */
-public class LeaveAnnounce extends Msg {
+public interface LeaveAnnounce extends Msg {
 
 	/**
-	 * Creates a {@link LeaveAnnounce} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.LeaveAnnounce} instance.
 	 */
-	public static LeaveAnnounce create() {
-		return new de.haumacher.wizard.msg.LeaveAnnounce();
+	static de.haumacher.wizard.msg.LeaveAnnounce create() {
+		return new de.haumacher.wizard.msg.impl.LeaveAnnounce_Impl();
 	}
 
-	/** Identifier for the {@link LeaveAnnounce} type in JSON format. */
-	public static final String LEAVE_ANNOUNCE__TYPE = "LeaveAnnounce";
+	/** Identifier for the {@link de.haumacher.wizard.msg.LeaveAnnounce} type in JSON format. */
+	String LEAVE_ANNOUNCE__TYPE = "LeaveAnnounce";
 
 	/** @see #getPlayerId() */
-	private static final String PLAYER_ID__PROP = "playerId";
+	String PLAYER_ID__PROP = "playerId";
 
 	/** @see #getGameId() */
-	private static final String GAME_ID__PROP = "gameId";
-
-	private String _playerId = "";
-
-	private String _gameId = "";
-
-	/**
-	 * Creates a {@link LeaveAnnounce} instance.
-	 *
-	 * @see LeaveAnnounce#create()
-	 */
-	protected LeaveAnnounce() {
-		super();
-	}
+	String GAME_ID__PROP = "gameId";
 
 	/**
 	 * The ID of the player that left a game.
 	 */
-	public final String getPlayerId() {
-		return _playerId;
-	}
+	String getPlayerId();
 
 	/**
 	 * @see #getPlayerId()
 	 */
-	public LeaveAnnounce setPlayerId(String value) {
-		internalSetPlayerId(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getPlayerId()} without chain call utility. */
-	protected final void internalSetPlayerId(String value) {
-		_playerId = value;
-	}
+	de.haumacher.wizard.msg.LeaveAnnounce setPlayerId(String value);
 
 	/**
 	 * The ID of the game the player left.
 	 */
-	public final String getGameId() {
-		return _gameId;
-	}
+	String getGameId();
 
 	/**
 	 * @see #getGameId()
 	 */
-	public LeaveAnnounce setGameId(String value) {
-		internalSetGameId(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getGameId()} without chain call utility. */
-	protected final void internalSetGameId(String value) {
-		_gameId = value;
-	}
-
-	@Override
-	public String jsonType() {
-		return LEAVE_ANNOUNCE__TYPE;
-	}
+	de.haumacher.wizard.msg.LeaveAnnounce setGameId(String value);
 
 	/** Reads a new instance from the given reader. */
-	public static LeaveAnnounce readLeaveAnnounce(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.LeaveAnnounce result = new de.haumacher.wizard.msg.LeaveAnnounce();
+	static de.haumacher.wizard.msg.LeaveAnnounce readLeaveAnnounce(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.LeaveAnnounce_Impl result = new de.haumacher.wizard.msg.impl.LeaveAnnounce_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		super.writeFields(out);
-		out.name(PLAYER_ID__PROP);
-		out.value(getPlayerId());
-		out.name(GAME_ID__PROP);
-		out.value(getGameId());
-	}
-
-	@Override
-	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
-		switch (field) {
-			case PLAYER_ID__PROP: setPlayerId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			case GAME_ID__PROP: setGameId(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			default: super.readField(in, field);
-		}
-	}
-
-	@Override
-	public <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
-		return v.visit(this, arg);
 	}
 
 }

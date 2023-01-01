@@ -3,82 +3,36 @@ package de.haumacher.wizard.msg;
 /**
  * Sent, when {@link Login} is not successful.
  */
-public class LoginFailed extends ResultMsg {
+public interface LoginFailed extends ResultMsg {
 
 	/**
-	 * Creates a {@link LoginFailed} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.LoginFailed} instance.
 	 */
-	public static LoginFailed create() {
-		return new de.haumacher.wizard.msg.LoginFailed();
+	static de.haumacher.wizard.msg.LoginFailed create() {
+		return new de.haumacher.wizard.msg.impl.LoginFailed_Impl();
 	}
 
-	/** Identifier for the {@link LoginFailed} type in JSON format. */
-	public static final String LOGIN_FAILED__TYPE = "LoginFailed";
+	/** Identifier for the {@link de.haumacher.wizard.msg.LoginFailed} type in JSON format. */
+	String LOGIN_FAILED__TYPE = "LoginFailed";
 
 	/** @see #getMsg() */
-	private static final String MSG__PROP = "msg";
-
-	private String _msg = "";
-
-	/**
-	 * Creates a {@link LoginFailed} instance.
-	 *
-	 * @see LoginFailed#create()
-	 */
-	protected LoginFailed() {
-		super();
-	}
+	String MSG__PROP = "msg";
 
 	/**
 	 * Further description of the problem
 	 */
-	public final String getMsg() {
-		return _msg;
-	}
+	String getMsg();
 
 	/**
 	 * @see #getMsg()
 	 */
-	public LoginFailed setMsg(String value) {
-		internalSetMsg(value);
-		return this;
-	}
-
-	/** Internal setter for {@link #getMsg()} without chain call utility. */
-	protected final void internalSetMsg(String value) {
-		_msg = value;
-	}
-
-	@Override
-	public String jsonType() {
-		return LOGIN_FAILED__TYPE;
-	}
+	de.haumacher.wizard.msg.LoginFailed setMsg(String value);
 
 	/** Reads a new instance from the given reader. */
-	public static LoginFailed readLoginFailed(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.LoginFailed result = new de.haumacher.wizard.msg.LoginFailed();
+	static de.haumacher.wizard.msg.LoginFailed readLoginFailed(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.LoginFailed_Impl result = new de.haumacher.wizard.msg.impl.LoginFailed_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	protected void writeFields(de.haumacher.msgbuf.json.JsonWriter out) throws java.io.IOException {
-		super.writeFields(out);
-		out.name(MSG__PROP);
-		out.value(getMsg());
-	}
-
-	@Override
-	protected void readField(de.haumacher.msgbuf.json.JsonReader in, String field) throws java.io.IOException {
-		switch (field) {
-			case MSG__PROP: setMsg(de.haumacher.msgbuf.json.JsonUtil.nextStringOptional(in)); break;
-			default: super.readField(in, field);
-		}
-	}
-
-	@Override
-	public <R,A,E extends Throwable> R visit(ResultMsg.Visitor<R,A,E> v, A arg) throws E {
-		return v.visit(this, arg);
 	}
 
 }

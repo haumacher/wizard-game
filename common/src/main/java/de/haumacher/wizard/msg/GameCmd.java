@@ -3,38 +3,31 @@ package de.haumacher.wizard.msg;
 /**
  * A {@link Cmd} targeting a running game.
  */
-public abstract class GameCmd extends Cmd {
+public interface GameCmd extends Cmd {
 
-	/** Visitor interface for the {@link GameCmd} hierarchy.*/
+	/** Visitor interface for the {@link de.haumacher.wizard.msg.GameCmd} hierarchy.*/
 	public interface Visitor<R,A,E extends Throwable> {
 
-		/** Visit case for {@link SelectTrump}.*/
-		R visit(SelectTrump self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.SelectTrump}.*/
+		R visit(de.haumacher.wizard.msg.SelectTrump self, A arg) throws E;
 
-		/** Visit case for {@link Bid}.*/
-		R visit(Bid self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.Bid}.*/
+		R visit(de.haumacher.wizard.msg.Bid self, A arg) throws E;
 
-		/** Visit case for {@link Lead}.*/
-		R visit(Lead self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.Lead}.*/
+		R visit(de.haumacher.wizard.msg.Lead self, A arg) throws E;
 
-		/** Visit case for {@link ConfirmTrick}.*/
-		R visit(ConfirmTrick self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.ConfirmTrick}.*/
+		R visit(de.haumacher.wizard.msg.ConfirmTrick self, A arg) throws E;
 
-		/** Visit case for {@link ConfirmRound}.*/
-		R visit(ConfirmRound self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.ConfirmRound}.*/
+		R visit(de.haumacher.wizard.msg.ConfirmRound self, A arg) throws E;
 
-	}
-
-	/**
-	 * Creates a {@link GameCmd} instance.
-	 */
-	protected GameCmd() {
-		super();
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static GameCmd readGameCmd(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		GameCmd result;
+	static de.haumacher.wizard.msg.GameCmd readGameCmd(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.GameCmd result;
 		in.beginArray();
 		String type = in.nextString();
 		switch (type) {
@@ -51,10 +44,5 @@ public abstract class GameCmd extends Cmd {
 
 	/** Accepts the given visitor. */
 	public abstract <R,A,E extends Throwable> R visit(Visitor<R,A,E> v, A arg) throws E;
-
-	@Override
-	public final <R,A,E extends Throwable> R visit(Cmd.Visitor<R,A,E> v, A arg) throws E {
-		return visit((GameCmd.Visitor<R,A,E>) v, arg);
-	}
 
 }

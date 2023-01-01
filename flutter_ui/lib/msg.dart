@@ -173,9 +173,13 @@ class Player extends _JsonObject {
 
 ///  The suit of a card.
 enum Suit {
+	///  The yellow diamond suite.
 	diamond,
+	///  The red heart suite.
 	heart,
+	///  The green spade suite.
 	spade,
+	///  The blue club suite.
 	club,
 }
 
@@ -205,18 +209,31 @@ Suit readSuit(JsonReader json) {
 enum Value {
 	///  A jester.
 	n,
+	///  The card with value 1.
 	c1,
+	///  The card with value 2.
 	c2,
+	///  The card with value 3.
 	c3,
+	///  The card with value 4.
 	c4,
+	///  The card with value 5.
 	c5,
+	///  The card with value 6.
 	c6,
+	///  The card with value 7.
 	c7,
+	///  The card with value 8.
 	c8,
+	///  The card with value 9.
 	c9,
+	///  The card with value 10.
 	c10,
+	///  The card with value 11.
 	c11,
+	///  The card with value 12.
 	c12,
+	///  The card with value 13.
 	c13,
 	///  A wizard.
 	z,
@@ -2440,14 +2457,14 @@ class PlayerInfo extends _JsonObject {
 	///  The number of won tricks.
 	int tricks;
 
-	///  The current total number of points won by the player so far.
-	int total;
+	///  The current points of the player.
+	int points;
 
 	/// Creates a PlayerInfo.
 	PlayerInfo({
 			this.bid = 0, 
 			this.tricks = 0, 
-			this.total = 0, 
+			this.points = 0, 
 	});
 
 	/// Parses a PlayerInfo from a string source.
@@ -2477,7 +2494,7 @@ class PlayerInfo extends _JsonObject {
 				break;
 			}
 			case "points": {
-				total = json.expectInt();
+				points = json.expectInt();
 				break;
 			}
 			default: super._readProperty(key, json);
@@ -2495,7 +2512,7 @@ class PlayerInfo extends _JsonObject {
 		json.addNumber(tricks);
 
 		json.addKey("points");
-		json.addNumber(total);
+		json.addNumber(points);
 	}
 
 }

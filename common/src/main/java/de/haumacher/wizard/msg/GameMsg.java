@@ -3,53 +3,46 @@ package de.haumacher.wizard.msg;
 /**
  * A {@link Msg} targeting a running game and is only interesting for players of that game.
  */
-public abstract class GameMsg extends Msg {
+public interface GameMsg extends Msg {
 
-	/** Visitor interface for the {@link GameMsg} hierarchy.*/
+	/** Visitor interface for the {@link de.haumacher.wizard.msg.GameMsg} hierarchy.*/
 	public interface Visitor<R,A,E extends Throwable> {
 
-		/** Visit case for {@link StartRound}.*/
-		R visit(StartRound self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.StartRound}.*/
+		R visit(de.haumacher.wizard.msg.StartRound self, A arg) throws E;
 
-		/** Visit case for {@link RequestTrumpSelection}.*/
-		R visit(RequestTrumpSelection self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.RequestTrumpSelection}.*/
+		R visit(de.haumacher.wizard.msg.RequestTrumpSelection self, A arg) throws E;
 
-		/** Visit case for {@link StartBids}.*/
-		R visit(StartBids self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.StartBids}.*/
+		R visit(de.haumacher.wizard.msg.StartBids self, A arg) throws E;
 
-		/** Visit case for {@link RequestBid}.*/
-		R visit(RequestBid self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.RequestBid}.*/
+		R visit(de.haumacher.wizard.msg.RequestBid self, A arg) throws E;
 
-		/** Visit case for {@link StartLead}.*/
-		R visit(StartLead self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.StartLead}.*/
+		R visit(de.haumacher.wizard.msg.StartLead self, A arg) throws E;
 
-		/** Visit case for {@link RequestLead}.*/
-		R visit(RequestLead self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.RequestLead}.*/
+		R visit(de.haumacher.wizard.msg.RequestLead self, A arg) throws E;
 
-		/** Visit case for {@link FinishTurn}.*/
-		R visit(FinishTurn self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.FinishTurn}.*/
+		R visit(de.haumacher.wizard.msg.FinishTurn self, A arg) throws E;
 
-		/** Visit case for {@link FinishRound}.*/
-		R visit(FinishRound self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.FinishRound}.*/
+		R visit(de.haumacher.wizard.msg.FinishRound self, A arg) throws E;
 
-		/** Visit case for {@link FinishGame}.*/
-		R visit(FinishGame self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.FinishGame}.*/
+		R visit(de.haumacher.wizard.msg.FinishGame self, A arg) throws E;
 
-		/** Visit case for {@link Announce}.*/
-		R visit(Announce self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.Announce}.*/
+		R visit(de.haumacher.wizard.msg.Announce self, A arg) throws E;
 
-	}
-
-	/**
-	 * Creates a {@link GameMsg} instance.
-	 */
-	protected GameMsg() {
-		super();
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static GameMsg readGameMsg(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		GameMsg result;
+	static de.haumacher.wizard.msg.GameMsg readGameMsg(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.GameMsg result;
 		in.beginArray();
 		String type = in.nextString();
 		switch (type) {
@@ -71,10 +64,5 @@ public abstract class GameMsg extends Msg {
 
 	/** Accepts the given visitor. */
 	public abstract <R,A,E extends Throwable> R visit(Visitor<R,A,E> v, A arg) throws E;
-
-	@Override
-	public final <R,A,E extends Throwable> R visit(Msg.Visitor<R,A,E> v, A arg) throws E {
-		return visit((GameMsg.Visitor<R,A,E>) v, arg);
-	}
 
 }

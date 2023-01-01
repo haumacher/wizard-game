@@ -3,42 +3,23 @@ package de.haumacher.wizard.msg;
 /**
  * Acknowledges adding the e-mail.
  */
-public class AddEmailSuccess extends ResultMsg {
+public interface AddEmailSuccess extends ResultMsg {
 
 	/**
-	 * Creates a {@link AddEmailSuccess} instance.
+	 * Creates a {@link de.haumacher.wizard.msg.AddEmailSuccess} instance.
 	 */
-	public static AddEmailSuccess create() {
-		return new de.haumacher.wizard.msg.AddEmailSuccess();
+	static de.haumacher.wizard.msg.AddEmailSuccess create() {
+		return new de.haumacher.wizard.msg.impl.AddEmailSuccess_Impl();
 	}
 
-	/** Identifier for the {@link AddEmailSuccess} type in JSON format. */
-	public static final String ADD_EMAIL_SUCCESS__TYPE = "AddEmailSuccess";
-
-	/**
-	 * Creates a {@link AddEmailSuccess} instance.
-	 *
-	 * @see AddEmailSuccess#create()
-	 */
-	protected AddEmailSuccess() {
-		super();
-	}
-
-	@Override
-	public String jsonType() {
-		return ADD_EMAIL_SUCCESS__TYPE;
-	}
+	/** Identifier for the {@link de.haumacher.wizard.msg.AddEmailSuccess} type in JSON format. */
+	String ADD_EMAIL_SUCCESS__TYPE = "AddEmailSuccess";
 
 	/** Reads a new instance from the given reader. */
-	public static AddEmailSuccess readAddEmailSuccess(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		de.haumacher.wizard.msg.AddEmailSuccess result = new de.haumacher.wizard.msg.AddEmailSuccess();
+	static de.haumacher.wizard.msg.AddEmailSuccess readAddEmailSuccess(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.impl.AddEmailSuccess_Impl result = new de.haumacher.wizard.msg.impl.AddEmailSuccess_Impl();
 		result.readContent(in);
 		return result;
-	}
-
-	@Override
-	public <R,A,E extends Throwable> R visit(ResultMsg.Visitor<R,A,E> v, A arg) throws E {
-		return v.visit(this, arg);
 	}
 
 }

@@ -3,41 +3,34 @@ package de.haumacher.wizard.msg;
 /**
  * Base class for commands for account management.
  */
-public abstract class LoginCmd extends Cmd {
+public interface LoginCmd extends Cmd {
 
-	/** Visitor interface for the {@link LoginCmd} hierarchy.*/
+	/** Visitor interface for the {@link de.haumacher.wizard.msg.LoginCmd} hierarchy.*/
 	public interface Visitor<R,A,E extends Throwable> {
 
-		/** Visit case for {@link Hello}.*/
-		R visit(Hello self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.Hello}.*/
+		R visit(de.haumacher.wizard.msg.Hello self, A arg) throws E;
 
-		/** Visit case for {@link CreateAccount}.*/
-		R visit(CreateAccount self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.CreateAccount}.*/
+		R visit(de.haumacher.wizard.msg.CreateAccount self, A arg) throws E;
 
-		/** Visit case for {@link AddEmail}.*/
-		R visit(AddEmail self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.AddEmail}.*/
+		R visit(de.haumacher.wizard.msg.AddEmail self, A arg) throws E;
 
-		/** Visit case for {@link VerifyEmail}.*/
-		R visit(VerifyEmail self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.VerifyEmail}.*/
+		R visit(de.haumacher.wizard.msg.VerifyEmail self, A arg) throws E;
 
-		/** Visit case for {@link Login}.*/
-		R visit(Login self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.Login}.*/
+		R visit(de.haumacher.wizard.msg.Login self, A arg) throws E;
 
-		/** Visit case for {@link Reconnect}.*/
-		R visit(Reconnect self, A arg) throws E;
+		/** Visit case for {@link de.haumacher.wizard.msg.Reconnect}.*/
+		R visit(de.haumacher.wizard.msg.Reconnect self, A arg) throws E;
 
-	}
-
-	/**
-	 * Creates a {@link LoginCmd} instance.
-	 */
-	protected LoginCmd() {
-		super();
 	}
 
 	/** Reads a new instance from the given reader. */
-	public static LoginCmd readLoginCmd(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
-		LoginCmd result;
+	static de.haumacher.wizard.msg.LoginCmd readLoginCmd(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
+		de.haumacher.wizard.msg.LoginCmd result;
 		in.beginArray();
 		String type = in.nextString();
 		switch (type) {
@@ -55,10 +48,5 @@ public abstract class LoginCmd extends Cmd {
 
 	/** Accepts the given visitor. */
 	public abstract <R,A,E extends Throwable> R visit(Visitor<R,A,E> v, A arg) throws E;
-
-	@Override
-	public final <R,A,E extends Throwable> R visit(Cmd.Visitor<R,A,E> v, A arg) throws E {
-		return visit((LoginCmd.Visitor<R,A,E>) v, arg);
-	}
 
 }
