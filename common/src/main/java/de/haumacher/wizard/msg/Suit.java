@@ -5,12 +5,24 @@ package de.haumacher.wizard.msg;
  */
 public enum Suit implements de.haumacher.msgbuf.data.ProtocolEnum {
 
+	/**
+	 * The yellow diamond suite.
+	 */
 	DIAMOND("diamond"),
 
+	/**
+	 * The red heart suite.
+	 */
 	HEART("heart"),
 
+	/**
+	 * The green spade suite.
+	 */
 	SPADE("spade"),
 
+	/**
+	 * The blue club suite.
+	 */
 	CLUB("club"),
 
 	;

@@ -32,9 +32,6 @@ public abstract class GameCmd extends Cmd {
 		super();
 	}
 
-	/** The type identifier for this concrete subtype. */
-	public abstract String jsonType();
-
 	/** Reads a new instance from the given reader. */
 	public static GameCmd readGameCmd(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
 		GameCmd result;

@@ -41,9 +41,6 @@ public abstract class ResultMsg extends Msg {
 		super();
 	}
 
-	/** The type identifier for this concrete subtype. */
-	public abstract String jsonType();
-
 	/** Reads a new instance from the given reader. */
 	public static ResultMsg readResultMsg(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
 		ResultMsg result;

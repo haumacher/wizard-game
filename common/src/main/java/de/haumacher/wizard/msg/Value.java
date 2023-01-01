@@ -10,30 +10,69 @@ public enum Value implements de.haumacher.msgbuf.data.ProtocolEnum {
 	 */
 	N("N"),
 
+	/**
+	 * The card with value 1.
+	 */
 	C_1("C1"),
 
+	/**
+	 * The card with value 2.
+	 */
 	C_2("C2"),
 
+	/**
+	 * The card with value 3.
+	 */
 	C_3("C3"),
 
+	/**
+	 * The card with value 4.
+	 */
 	C_4("C4"),
 
+	/**
+	 * The card with value 5.
+	 */
 	C_5("C5"),
 
+	/**
+	 * The card with value 6.
+	 */
 	C_6("C6"),
 
+	/**
+	 * The card with value 7.
+	 */
 	C_7("C7"),
 
+	/**
+	 * The card with value 8.
+	 */
 	C_8("C8"),
 
+	/**
+	 * The card with value 9.
+	 */
 	C_9("C9"),
 
+	/**
+	 * The card with value 10.
+	 */
 	C_10("C10"),
 
+	/**
+	 * The card with value 11.
+	 */
 	C_11("C11"),
 
+	/**
+	 * The card with value 12.
+	 */
 	C_12("C12"),
 
+	/**
+	 * The card with value 13.
+	 */
 	C_13("C13"),
 
 	/**

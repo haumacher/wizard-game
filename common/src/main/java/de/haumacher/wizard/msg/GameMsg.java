@@ -47,9 +47,6 @@ public abstract class GameMsg extends Msg {
 		super();
 	}
 
-	/** The type identifier for this concrete subtype. */
-	public abstract String jsonType();
-
 	/** Reads a new instance from the given reader. */
 	public static GameMsg readGameMsg(de.haumacher.msgbuf.json.JsonReader in) throws java.io.IOException {
 		GameMsg result;

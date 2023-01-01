@@ -30,9 +30,13 @@ message Player {
  * The suit of a card.
  */
 enum Suit {
+	/** The yellow diamond suite. */
 	diamond;
+	/** The red heart suite. */
 	heart;
+	/** The green spade suite. */
 	spade;
+	/** The blue club suite. */
 	club;
 }
 
@@ -43,18 +47,31 @@ enum Value {
 	/** A jester. */
 	N;
 	
+	/** The card with value 1. */
 	C1;
+	/** The card with value 2. */
 	C2;
+	/** The card with value 3. */
 	C3;
+	/** The card with value 4. */
 	C4;
+	/** The card with value 5. */
 	C5;
+	/** The card with value 6. */
 	C6;
+	/** The card with value 7. */
 	C7;
+	/** The card with value 8. */
 	C8;
+	/** The card with value 9. */
 	C9;
+	/** The card with value 10. */
 	C10;
+	/** The card with value 11. */
 	C11;
+	/** The card with value 12. */
 	C12;
+	/** The card with value 13. */
 	C13;
 
 	/** A wizard. */
