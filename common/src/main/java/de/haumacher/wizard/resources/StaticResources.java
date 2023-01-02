@@ -13,10 +13,15 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility base class for loading a resource bundle and binding it to Java constants.
  */
 public abstract class StaticResources {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(StaticResources.class);
 	
 	public interface Resource {
 		String key();
@@ -241,7 +246,7 @@ public abstract class StaticResources {
 
 				f.set(null, value);
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchMethodException | SecurityException | InstantiationException | InvocationTargetException ex) {
-				System.err.println("Invalid resource field: " + f + ": " + ex.getMessage());
+				LOG.error("Invalid resource field: " + f + ": " + ex.getMessage(), ex);
 			}
 		}
 	}

@@ -19,6 +19,8 @@ import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.server.db.DBException;
@@ -29,6 +31,8 @@ import de.haumacher.wizard.server.db.UserDB;
  */
 public class H2UserDB  implements UserDB {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(H2UserDB.class);
+
 	private static final int ONE_MINUTE = 60 * 1000;
 	private static final Charset UTF_8 = Charset.forName("utf-8");
 	private static final long ONE_HOUR = 60 * ONE_MINUTE;
@@ -47,7 +51,7 @@ public class H2UserDB  implements UserDB {
 	@Override
 	public void startup() {
 		int userCnt = _context.fetchCount(USERS);
-		System.out.println("User DB startup, " + userCnt + " users registered.");
+		LOG.info("User DB startup, " + userCnt + " users registered.");
 	}
 
 	@Override

@@ -14,11 +14,16 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Servlet filter that dispatches to localized resources and sets the default character encoding <code>utf-8</code>.
  */
 @WebFilter(urlPatterns = "/*")
 public class I18NFilter implements Filter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(I18NFilter.class);
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -31,7 +36,7 @@ public class I18NFilter implements Filter {
 			Locale locale = request.getLocale();
 			String language = locale.getLanguage();
 			if (!language.equals("en")) {
-				System.out.println("Localizing (" + language + "): " + servletPath);
+				LOG.info("Localizing (" + language + "): " + servletPath);
 				
 				int nameSep = servletPath.lastIndexOf('/');
 				if (nameSep == servletPath.length() - 1) {

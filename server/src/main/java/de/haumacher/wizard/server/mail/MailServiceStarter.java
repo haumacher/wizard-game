@@ -16,11 +16,16 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The {@link MailService} singleton.
  */
 @WebListener
 public class MailServiceStarter implements ServletContextListener {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(MailServiceStarter.class);
 	
 	private static MailService INSTANCE;
 	
@@ -64,17 +69,17 @@ public class MailServiceStarter implements ServletContextListener {
 				INSTANCE = new MailService() {
 					@Override
 					public void startUp() {
-						System.err.println("No mail configuration, sending mails is deactivated.");
+						LOG.warn("No mail configuration, sending mails is deactivated.");
 					}
 
 					@Override
 					public void shutdown() {
-						System.err.println("Shutting down mail service.");
+						LOG.warn("Shutting down mail service.");
 					}
 
 					@Override
 					public void sendActivationMail(String email, String uid, String token) throws MessagingException {
-						System.err.println("Skipped sending mail to '" + uid +"', no mail service active.");
+						LOG.warn("Skipped sending mail to '" + uid +"', no mail service active.");
 					}
 				};
 			}

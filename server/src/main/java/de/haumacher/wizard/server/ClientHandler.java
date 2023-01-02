@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.logic.R;
@@ -52,6 +55,8 @@ import de.haumacher.wizard.server.mail.MailServiceStarter;
  * Server-side logic for a single player.
  */
 public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, ClientConnection {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ClientHandler.class);
 
 	private final WizardServer _server;
 	
@@ -114,10 +119,10 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	 */
 	public void handleCmd(Cmd cmd) throws IOException {
 		if (cmd != null) {
-			System.out.println(_handle.getName() + " -> " + cmd);
+			LOG.info(_handle.getName() + " -> " + cmd);
 			cmd.visit(this, null);
 		} else {
-			System.err.println("Received unknown command from '" + _handle + "'.");
+			LOG.warn("Received unknown command from '" + _handle + "'.");
 		}
 	}
 

@@ -5,6 +5,9 @@ package de.haumacher.wizard.server.standalone;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.msgbuf.json.JsonReader;
 import de.haumacher.msgbuf.json.JsonToken;
 import de.haumacher.msgbuf.json.JsonWriter;
@@ -18,6 +21,8 @@ import de.haumacher.wizard.server.WizardServer;
 
 public class StandaloneClient implements Runnable {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StandaloneClient.class);
+
 	private JsonReader _in;
 	private JsonWriter _out;
 	
@@ -30,12 +35,12 @@ public class StandaloneClient implements Runnable {
 		_clientHandler = new ClientHandler(server, msg -> {
 			try {
 				synchronized (_out) {
-					System.out.println(_clientHandler.getName() + " <- " + msg);
+					LOG.info(_clientHandler.getName() + " <- " + msg);
 					msg.writeTo(_out);
 					_out.flush();
 				}
 			} catch (IOException ex) {
-				System.err.println("Cannot send to " + _clientHandler + ": " + msg + " (" + ex.getMessage() + ")");
+				LOG.error("Cannot send to " + _clientHandler + ": " + msg + " (" + ex.getMessage() + ")", ex);
 			}
 		});
 	}
@@ -69,10 +74,10 @@ public class StandaloneClient implements Runnable {
 			_in.endArray();
 			_out.endArray();
 		} catch (IOException ex) {
-			System.out.println("Client stopped: " + ex.getMessage());
+			LOG.info("Client stopped: " + ex.getMessage(), ex);
 		} finally {
 			_clientHandler.stop();
-			System.err.println("Client terminated: " + _clientHandler);
+			LOG.info("Client terminated: " + _clientHandler);
 		}
 	}
 

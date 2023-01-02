@@ -25,6 +25,9 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 import javax.mail.internet.MimeMultipart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.msgbuf.json.Base64Utils;
 import de.haumacher.wizard.server.servlet.AccountServlet;
 
@@ -33,6 +36,8 @@ import de.haumacher.wizard.server.servlet.AccountServlet;
  */
 public class SmtpMailService implements MailService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(SmtpMailService.class);
+	
 	private Session _session;
 	private String _user;
 	private String _password;
@@ -104,8 +109,7 @@ public class SmtpMailService implements MailService {
 			_transport = _session.getTransport();
 			_transport.connect(_user, _password);
 		} catch (MessagingException ex) {
-			System.err.println("Error starting mail service: " + ex.getMessage());
-			ex.printStackTrace();
+			LOG.error("Error starting mail service: " + ex.getMessage(), ex);
 		}
 	}
 
@@ -148,8 +152,7 @@ public class SmtpMailService implements MailService {
 				}
 			}
 		} catch (IOException ex) {
-			System.err.println("Cannot read mail template: " + resource);
-			ex.printStackTrace();
+			LOG.error("Cannot read mail template: " + resource, ex);
 		}
 		return result.toString().replace("{link}", link).replace("{code}", code).replace("{image}", image);
 	}

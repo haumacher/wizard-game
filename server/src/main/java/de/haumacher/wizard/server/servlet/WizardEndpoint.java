@@ -13,6 +13,9 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.msgbuf.io.StringR;
 import de.haumacher.msgbuf.json.JsonReader;
 import de.haumacher.wizard.logic.R;
@@ -25,6 +28,8 @@ import de.haumacher.wizard.server.ClientHandler;
 @ServerEndpoint(value = "/ws")
 //@ServerEndpoint(value = "/ws", configurator = WizardEndpoint.Configurator.class)
 public class WizardEndpoint {
+
+	private static final Logger LOG = LoggerFactory.getLogger(WizardEndpoint.class);
 
 	// Makes only sense if there is a session.
 	
@@ -48,7 +53,7 @@ public class WizardEndpoint {
 	
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) throws IOException {
-		System.out.println("Opened websocket connection.");
+		LOG.info("Opened websocket connection.");
 		
 		_session = session;
 		
@@ -57,7 +62,7 @@ public class WizardEndpoint {
 				return;
 			}
 			
-			System.out.println(_clientHandler.getName() + " <- " + msg);
+			LOG.info(_clientHandler.getName() + " <- " + msg);
 			synchronized (_session) {
 				try {
 					_session.getBasicRemote().sendText(msg.toString());
@@ -95,7 +100,7 @@ public class WizardEndpoint {
     
     @OnClose
     public void onClose(Session session) throws IOException {
-		System.out.println("Closed websocket connection.");
+		LOG.info("Closed websocket connection.");
 
 		_closed = true;
 		_clientHandler.stop();
@@ -103,7 +108,6 @@ public class WizardEndpoint {
 
     @OnError
     public void onError(Session session, Throwable ex) {
-    	System.err.println("Error in endpoint for " + _clientHandler + ": " + ex.getMessage());
-    	ex.printStackTrace();
+    	LOG.error("Error in endpoint for " + _clientHandler + ": " + ex.getMessage(), ex);
     }
 }

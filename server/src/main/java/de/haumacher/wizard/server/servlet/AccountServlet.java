@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.wizard.server.db.DBException;
 import de.haumacher.wizard.server.db.UserDB;
 import de.haumacher.wizard.server.db.UserDBService;
@@ -21,6 +24,8 @@ import de.haumacher.wizard.server.db.UserDBService;
 @WebServlet(loadOnStartup = 1, value = AccountServlet.PATH)
 public class AccountServlet extends HttpServlet {
 
+	private static final Logger LOG = LoggerFactory.getLogger(AccountServlet.class);
+	
 	public static final String PATH = "/account";
 	
 	public static final String UID_PARAM = "uid";
@@ -37,7 +42,7 @@ public class AccountServlet extends HttpServlet {
 		try {
 			db.verifyEmail(uid, token);
 		} catch (DBException ex) {
-			System.err.println("Account activation for '" + uid + "' failed: " + ex.getMessage());
+			LOG.error("Account activation for '" + uid + "' failed: " + ex.getMessage(), ex);
 			resp.sendRedirect(req.getContextPath() + "/verification-failed.html");
 			return;
 		}

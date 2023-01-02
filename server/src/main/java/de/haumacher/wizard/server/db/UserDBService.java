@@ -18,6 +18,8 @@ import javax.servlet.annotation.WebListener;
 
 import org.h2.tools.Server;
 import org.h2.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.haumacher.wizard.server.db.h2.H2UserDB;
 
@@ -26,6 +28,8 @@ import de.haumacher.wizard.server.db.h2.H2UserDB;
  */
 @WebListener
 public class UserDBService implements ServletContextListener {
+
+	private static final Logger LOG = LoggerFactory.getLogger(UserDBService.class);
 
 	private static final String DB_TCP_SERVER_NAME = "db/tcpServer";
 
@@ -55,7 +59,7 @@ public class UserDBService implements ServletContextListener {
 				_server = Server.createTcpServer(params);
 				_server.start();
 			} catch (NameNotFoundException ex) {
-				System.out.println("No JDNI environment setting '" + DB_TCP_SERVER_NAME + "', no DB access through TCP.");
+				LOG.warn("No JDNI environment setting '" + DB_TCP_SERVER_NAME + "', no DB access through TCP.");
 			}
 			
 			boolean error = false;
@@ -63,7 +67,7 @@ public class UserDBService implements ServletContextListener {
 			try {
 				url = (String) envCtx.lookup(DB_URL_NAME);
 			} catch (NameNotFoundException ex) {
-				System.err.println("Missing JNDI environment setting: " + DB_URL_NAME);
+				LOG.warn("Missing JNDI environment setting: " + DB_URL_NAME);
 				error = true;
 			}
 			
@@ -71,7 +75,7 @@ public class UserDBService implements ServletContextListener {
 			try {
 				user = (String) envCtx.lookup(DB_USER_NAME);
 			} catch (NameNotFoundException ex) {
-				System.err.println("Missing JNDI environment setting: " + DB_USER_NAME);
+				LOG.warn("Missing JNDI environment setting: " + DB_USER_NAME);
 				error = true;
 			}
 			
@@ -79,14 +83,14 @@ public class UserDBService implements ServletContextListener {
 			try {
 				password = (String) envCtx.lookup(DB_PASSWORD_NAME);
 			} catch (NameNotFoundException ex) {
-				System.err.println("Missing JNDI environment setting: " + DB_PASSWORD_NAME);
+				LOG.warn("Missing JNDI environment setting: " + DB_PASSWORD_NAME);
 				error = true;
 			}
 			
 			if (error) {
 				INSTANCE = new NoUserDB();
 			} else {
-				System.out.println("Opening user DB: " + url);
+				LOG.info("Opening user DB: " + url);
 				_connection = DriverManager.getConnection(url, user, password);
 				INSTANCE = new H2UserDB(_connection);
 			}

@@ -7,6 +7,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.wizard.server.WizardServer;
 
 /**
@@ -14,6 +17,8 @@ import de.haumacher.wizard.server.WizardServer;
  */
 @WebListener
 public class WizardWebapp implements ServletContextListener {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(WizardWebapp.class);
 	
 	private static WizardServer _server;
 	
@@ -23,7 +28,7 @@ public class WizardWebapp implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		System.out.println("Started wizard server.");
+		LOG.info("Started wizard server.");
 		
 		_server = new WizardServer();
 		
@@ -32,7 +37,7 @@ public class WizardWebapp implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		System.out.println("Shutting down wizard server.");
+		LOG.info("Shutting down wizard server.");
 		
 		if (_server != null) {
 			_server.shutdown();

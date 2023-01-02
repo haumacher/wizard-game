@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.server.data.Account;
 
@@ -14,6 +17,8 @@ import de.haumacher.wizard.server.data.Account;
  * Stub for {@link UserDB} that does not fulfill any request.
  */
 public class NoUserDB implements UserDB {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(NoUserDB.class);
 	
 	private final Map<String, Account> _accoundByUID = new HashMap<>();
 	
@@ -26,7 +31,7 @@ public class NoUserDB implements UserDB {
 	
 	@Override
 	public void startup() {
-		System.out.println("No user DB found.");
+		LOG.info("No user DB found.");
 	}
 
 	@Override
