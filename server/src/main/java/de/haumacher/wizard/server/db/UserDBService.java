@@ -84,7 +84,7 @@ public class UserDBService implements ServletContextListener {
 			}
 			
 			if (error) {
-				INSTANCE = NoUserDB.INSTANCE;
+				INSTANCE = new NoUserDB();
 			} else {
 				System.out.println("Opening user DB: " + url);
 				_connection = DriverManager.getConnection(url, user, password);

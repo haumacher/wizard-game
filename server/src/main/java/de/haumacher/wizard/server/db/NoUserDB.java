@@ -3,20 +3,25 @@
  */
 package de.haumacher.wizard.server.db;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import de.haumacher.wizard.msg.CreateAccountResult;
+import de.haumacher.wizard.server.data.Account;
 
 /**
  * Stub for {@link UserDB} that does not fulfill any request.
  */
 public class NoUserDB implements UserDB {
 	
+	private final Map<String, Account> _accoundByUID = new HashMap<>();
+	
 	/**
-	 * Singleton {@link NoUserDB} instance.
+	 * Creates a {@link NoUserDB}.
 	 */
-	public static final NoUserDB INSTANCE = new NoUserDB();
-
-	private NoUserDB() {
-		// Singleton constructor.
+	public NoUserDB() {
+		super();
 	}
 	
 	@Override
@@ -26,12 +31,25 @@ public class NoUserDB implements UserDB {
 
 	@Override
 	public CreateAccountResult createUser(String nickname) throws DBException {
-		return CreateAccountResult.create().setUid(nickname).setSecret("123");
+		String uid = UUID.randomUUID().toString();
+		String secret = UUID.randomUUID().toString();
+		CreateAccountResult account = CreateAccountResult.create().setUid(uid).setSecret(secret);
+		
+		_accoundByUID.put(uid, Account.create().setNick(nickname).setUid(uid).setPassword(secret));
+		
+		return account;
 	}
 
 	@Override
 	public String login(String uid, String secret) throws DBException {
-		return uid;
+		Account account = _accoundByUID.get(uid);
+		if (account == null) {
+			throw new DBException("No such user or wrong password: " + uid);
+		}
+		if (!account.getPassword().equals(secret)) {
+			throw new DBException("No such user or wrong password: " + uid);
+		}
+		return account.getNick();
 	}
 
 	@Override

@@ -1,0 +1,7 @@
+package de.haumacher.wizard.server.data;
+
+message Account {
+	string uid;
+	string nick;
+	string password;
+}

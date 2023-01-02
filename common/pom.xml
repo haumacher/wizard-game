@@ -10,10 +10,6 @@
 	<artifactId>wizard-common</artifactId>
 	<name>wizard-common</name>
 	
-	<properties>
-		<msgbuf.version>1.1.2-SNAPSHOT</msgbuf.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>de.haumacher.msgbuf</groupId>
