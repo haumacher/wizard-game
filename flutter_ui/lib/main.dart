@@ -1,9 +1,7 @@
-import 'dart:js';
 import 'dart:math';
 import 'dart:core';
 import 'dart:ui';
 
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -240,6 +238,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   String? errorMessage;
 
   static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
+  // static const String _serverAddress = "ws://homepi:8081/zauberer-test/ws";
 
   /// The ID of the player in this app.
   String? playerId;
@@ -909,7 +908,7 @@ class HomePage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: Center(child: Text(AppLocalizations.of(context)!.connecting)));
+              body: centerText(AppLocalizations.of(context)!.connecting));
           case ConnectionState.accountCreation:
             return const CreateAccountView();
           case ConnectionState.disconnected:
@@ -931,7 +930,7 @@ class HomePage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: Center(child: Text(AppLocalizations.of(context)!.loggingIn)));
+              body: centerText(AppLocalizations.of(context)!.loggingIn));
           case ConnectionState.listingGames:
             return ChangeObserver<GameList>(
               state: connection.gameList,
@@ -940,7 +939,7 @@ class HomePage extends StatelessWidget {
                 return Scaffold(
                   appBar: AppBar(title: Text(AppLocalizations.of(context)!.joinGame)),
                   body: openGames.isEmpty ?
-                    Center(child: Text(AppLocalizations.of(context)!.noOpenGames)) :
+                    centerText(AppLocalizations.of(context)!.noOpenGames) :
                     ListView(
                       children: openGames.values.map((g) =>
                         Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -961,25 +960,14 @@ class HomePage extends StatelessWidget {
                   title: Text(AppLocalizations.of(context)!.zaubererOnline),
                 ),
                 backgroundColor: Colors.deepOrange,
-                body: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Center(
-                    child: Text(connection.errorMessage ?? state.name,
-                      textAlign: TextAlign.justify,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                    )
-                  )
-                )
+                body: centerText(connection.errorMessage ?? state.name),
             );
           default:
             return Scaffold(
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: Center(child: Text("ERROR: " + state.name)));
+              body: centerText("ERROR: " + state.name));
         }
       }
     );
@@ -1024,7 +1012,7 @@ class GameEntryState extends ChangeNotifierState<GameEntryWidget, ObservableGame
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(child:
-                Text(observable.players.map((e) => e.displayName).join(", "))),
+                Text(observable.players.map((e) => e.displayName(context)).join(", "))),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   fixedSize: const Size(40, 40),
@@ -1082,7 +1070,7 @@ class PlayingView extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: Center(child: Text(AppLocalizations.of(context)!.reconnecting)));
+              body: centerText(AppLocalizations.of(context)!.reconnecting));
           case ConnectionState.waitingForStart:
             ObservableGame? game = connection.currentGame;
             if (game == null) return showWaitingForStart(context);
@@ -1098,7 +1086,7 @@ class PlayingView extends StatelessWidget {
                       title: Text(AppLocalizations.of(context)!.waitingForPlayers),
                     ),
                     body: players.isEmpty ?
-                    Center(child: Text(AppLocalizations.of(context)!.noPlayers)) :
+                    centerText(AppLocalizations.of(context)!.noPlayers) :
                     ListView(
                       children: [
                         for (var n = 0; n < players.length; n++)
@@ -1138,7 +1126,7 @@ Scaffold showWaitingForStart(BuildContext context) {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.waitingForPlayers),
       ),
-      body: Center(child: Text(AppLocalizations.of(context)!.joiningGame)));
+      body: centerText(AppLocalizations.of(context)!.joiningGame));
 }
 
 class WizardWidget extends StatelessWidget {
@@ -1198,9 +1186,9 @@ class WizardWidget extends StatelessWidget {
     switch (phase) {
       case WizardPhase.idle:
       case WizardPhase.created:
-        return Center(child: Text(AppLocalizations.of(context)!.waitingForCards));
+        return centerText(AppLocalizations.of(context)!.waitingForCards);
       case WizardPhase.cardsGiven:
-        return Center(child: Text(AppLocalizations.of(context)!.waitingForBidRequest));
+        return centerText(AppLocalizations.of(context)!.waitingForBidRequest);
 
       case WizardPhase.trumpSelection:
         return ValueListenableBuilder<bool>(
@@ -1291,9 +1279,25 @@ class WizardWidget extends StatelessWidget {
           ]));
 
       default:
-        return Center(child: Text("ERROR: " + phase.name));
+        return centerText("ERROR: " + phase.name);
     }
   }
+}
+
+/// Message text centered on the game area.
+Widget centerText(String text) {
+  return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Center(
+          child: Text(text,
+            textAlign: TextAlign.justify,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          )
+      )
+  );
 }
 
 Widget trickText(BuildContext context, {String? text, void Function()? onPressed}) {
@@ -1423,7 +1427,7 @@ class MyBidView extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 fixedSize: const Size(60, 60),
                 shape: const CircleBorder(),
-                primary: x <= freeTricks ? Colors.lightBlue : Colors.orange
+                backgroundColor: x <= freeTricks ? Colors.lightBlue : Colors.orange
               ),
               onPressed: () {
                 connection.sendCommand(Bid(cnt: x));
@@ -1750,6 +1754,7 @@ class CreateAccountViewState extends State<CreateAccountView> {
                   if (value == null || value.isEmpty) {
                     return AppLocalizations.of(context)!.nicknameMustNotBeEmpty;
                   }
+                  return null;
                 },
               ),
               TextFormField(
