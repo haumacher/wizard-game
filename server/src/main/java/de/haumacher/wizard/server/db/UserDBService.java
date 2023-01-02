@@ -10,6 +10,7 @@ import java.sql.Statement;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -47,29 +48,37 @@ public class UserDBService implements ServletContextListener {
 			InitialContext initCtx = new InitialContext();
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
 			
-			String tcpServer = (String) envCtx.lookup(DB_TCP_SERVER_NAME);        
-			if (tcpServer == null) {
+			String tcpServer;
+			try {
+				tcpServer = (String) envCtx.lookup(DB_TCP_SERVER_NAME);        
+				String[] params = StringUtils.arraySplit(tcpServer, ' ', true);
+				_server = Server.createTcpServer(params);
+				_server.start();
+			} catch (NameNotFoundException ex) {
 				System.out.println("No JDNI environment setting '" + DB_TCP_SERVER_NAME + "', no DB access through TCP.");
-			} else {
-			    String[] params = StringUtils.arraySplit(tcpServer, ' ', true);
-			    _server = Server.createTcpServer(params);
-			    _server.start();
 			}
 			
-			String url = (String) envCtx.lookup(DB_URL_NAME);        
-			String user = (String) envCtx.lookup(DB_USER_NAME);        
-			String password = (String) envCtx.lookup(DB_PASSWORD_NAME);
-			
 			boolean error = false;
-			if (url == null) {
+			String url = null;
+			try {
+				url = (String) envCtx.lookup(DB_URL_NAME);
+			} catch (NameNotFoundException ex) {
 				System.err.println("Missing JNDI environment setting: " + DB_URL_NAME);
 				error = true;
 			}
-			if (user == null) {
+			
+			String user = null;
+			try {
+				user = (String) envCtx.lookup(DB_USER_NAME);
+			} catch (NameNotFoundException ex) {
 				System.err.println("Missing JNDI environment setting: " + DB_USER_NAME);
 				error = true;
 			}
-			if (password == null) {
+			
+			String password = null;
+			try {
+				password = (String) envCtx.lookup(DB_PASSWORD_NAME);
+			} catch (NameNotFoundException ex) {
 				System.err.println("Missing JNDI environment setting: " + DB_PASSWORD_NAME);
 				error = true;
 			}
@@ -81,7 +90,7 @@ public class UserDBService implements ServletContextListener {
 				_connection = DriverManager.getConnection(url, user, password);
 				INSTANCE = new H2UserDB(_connection);
 			}
-			// INSTANCE.startup();
+			INSTANCE.startup();
 		} catch (NamingException ex) {
 			ex.printStackTrace();
 		} catch (SQLException ex) {

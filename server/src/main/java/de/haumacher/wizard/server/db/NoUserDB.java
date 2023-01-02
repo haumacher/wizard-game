@@ -26,12 +26,12 @@ public class NoUserDB implements UserDB {
 
 	@Override
 	public CreateAccountResult createUser(String nickname) throws DBException {
-		throw new UnsupportedOperationException();
+		return CreateAccountResult.create().setUid(nickname).setSecret("123");
 	}
 
 	@Override
 	public String login(String uid, String secret) throws DBException {
-		throw new UnsupportedOperationException();
+		return uid;
 	}
 
 	@Override

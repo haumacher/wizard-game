@@ -185,8 +185,8 @@
 				<configuration>
 					<ignorePackaging>true</ignorePackaging>
 					<url>${wizard.server.deployUrl}</url>
-					<server>wizard-server</server>
-					<path>/zauberer</path>
+					<server>${wizard.server.id}</server>
+					<path>${wizard.server.contextPath}</path>
 				</configuration>
 			</plugin>
 		</plugins>

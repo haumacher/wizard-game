@@ -9,6 +9,7 @@ import javax.mail.MessagingException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
@@ -36,11 +37,12 @@ public class MailServiceStarter implements ServletContextListener {
 			InitialContext initCtx = new InitialContext();
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
 			
-			String user = (String) envCtx.lookup("smtp/user");        
-			String password = (String) envCtx.lookup("smtp/password");
-			if (user == null && password == null) {
-				System.err.println("No mail configuration found.");
-			} else {
+			String user;
+			String password;
+			try {
+				user = (String) envCtx.lookup("smtp/user");        
+				password = (String) envCtx.lookup("smtp/password");
+				
 				Properties properties = new Properties();
 				Context propertyContext = (Context) envCtx.lookup("smtp/properties");
 				if (propertyContext != null) {
@@ -56,12 +58,29 @@ public class MailServiceStarter implements ServletContextListener {
 					}
 				}
 				
-				MailService mailService = new MailService(user, password, properties);
-				mailService.startUp();
-				
+				MailService mailService = new SmtpMailService(user, password, properties);
 				INSTANCE = mailService;
+			} catch (NameNotFoundException ex) {
+				INSTANCE = new MailService() {
+					@Override
+					public void startUp() {
+						System.err.println("No mail configuration, sending mails is deactivated.");
+					}
+
+					@Override
+					public void shutdown() {
+						System.err.println("Shutting down mail service.");
+					}
+
+					@Override
+					public void sendActivationMail(String email, String uid, String token) throws MessagingException {
+						System.err.println("Skipped sending mail to '" + uid +"', no mail service active.");
+					}
+				};
 			}
-		} catch (NamingException | MessagingException ex) {
+
+			INSTANCE.startUp();
+		} catch (NamingException ex) {
 			ex.printStackTrace();
 		}
 	}

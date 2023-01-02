@@ -12,6 +12,14 @@ public interface UserDB {
 
 	CreateAccountResult createUser(String nickname) throws DBException;
 
+	/**
+	 * Verifies the user login.
+	 *
+	 * @param uid The user ID as created by {@link #createUser(String)}, see {@link CreateAccountResult#getUid()}.
+	 * @param secret The user password assigned by {@link #createUser(String)}, see {@link CreateAccountResult#getSecret()}.
+	 * @return The logged in user's nick name.
+	 * @throws DBException If user verification fails.
+	 */
 	String login(String uid, String secret) throws DBException;
 
 	/**

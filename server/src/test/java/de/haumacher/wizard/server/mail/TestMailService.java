@@ -29,7 +29,7 @@ public class TestMailService extends TestCase {
 		String password = popProperty(properties, "test.password");
 		String receiver = popProperty(properties, "test.receiver");
 		
-		MailService service = new MailService(user, password, properties);
+		MailService service = new SmtpMailService(user, password, properties);
 		service.startUp();
 		
 		service.sendActivationMail(receiver, "4711", "12345678");
