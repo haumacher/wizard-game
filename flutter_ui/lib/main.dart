@@ -15,12 +15,12 @@ import 'package:flutter_ui/msg.dart' as msg;
 import 'package:flutter_ui/svg.dart';
 
 /// The protocol version supported by this client app.
-const int protocolVersion = 5;
+const int protocolVersion = 6;
 
 void main() {
-  runApp(const WizardApp());
-//  testPage(testTrickView());
-//  testPage(MyBidView(8, 5));
+    runApp(const WizardApp());
+//  testPage(const TestTrickView());
+//  testPage(const MyBidView(8, 5));
 }
 
 void testPage(Widget child) {
@@ -29,6 +29,8 @@ void testPage(Widget child) {
     theme: ThemeData(
       primarySwatch: Colors.blue,
     ),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     home: Scaffold(
       appBar: AppBar(title: const Text("Place your cards")),
       backgroundColor: const Color(0xff158215),
@@ -41,16 +43,21 @@ void testPage(Widget child) {
       ))));
 }
 
-Widget testTrickView(BuildContext context) {
-  return TrickView(
-    ObservableList<TrickCard>()
-      ..add(TrickCard(msg.Card(value: Value.c11, suit: Suit.heart), Player(name: "Player A")))
-      ..add(TrickCard(msg.Card(value: Value.c13, suit: Suit.heart), Player(name: "Player B")))
-      ..add(TrickCard(msg.Card(value: Value.c5, suit: Suit.spade), Player(name: "Player C")))
-      ..add(TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "You"))),
-    child:
+class TestTrickView extends StatelessWidget {
+  const TestTrickView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TrickView(
+      ObservableList<TrickCard>()
+        ..add(TrickCard(msg.Card(value: Value.c11, suit: Suit.heart), Player(name: "Player A")))
+        ..add(TrickCard(msg.Card(value: Value.c13, suit: Suit.heart), Player(name: "Player B")))
+        ..add(TrickCard(msg.Card(value: Value.c5, suit: Suit.spade), Player(name: "Player C")))
+        ..add(TrickCard(msg.Card(value: Value.z, suit: null), Player(name: "You"))),
+      child:
       trickText(context, text: AppLocalizations.of(context)!.youMakeTheTrick, onPressed: (){}),
     );
+  }
 }
 
 Padding testMyCards() {
@@ -229,6 +236,9 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
   final ValueNotifier<ConnectionState> state = ValueNotifier(ConnectionState.startup);
 
+  /// The message sent by the server if the connection cannot be established.
+  String? errorMessage;
+
   static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
 
   /// The ID of the player in this app.
@@ -344,6 +354,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
       }
     } else {
       state.value = ConnectionState.updateRequired;
+      errorMessage = self.msg;
     }
   }
 
@@ -806,7 +817,7 @@ class ActivityState extends ChangeNotifier {
   }
 
   void _updatePoints(String playerId, RoundInfo info) {
-    getInfo(playerId).total = info.total;
+    getInfo(playerId).points = info.total;
   }
 
   Player getPlayer(String playerId) =>
@@ -851,12 +862,12 @@ class WizardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
       title: 'Zauberer',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const HomePage()
     );
   }
@@ -944,6 +955,25 @@ class HomePage extends StatelessWidget {
               });
           case ConnectionState.waitingForStart:
             return showWaitingForStart(context);
+          case ConnectionState.updateRequired:
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text(AppLocalizations.of(context)!.zaubererOnline),
+                ),
+                backgroundColor: Colors.deepOrange,
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Center(
+                    child: Text(connection.errorMessage ?? state.name,
+                      textAlign: TextAlign.justify,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    )
+                  )
+                )
+            );
           default:
             return Scaffold(
               appBar: AppBar(
@@ -1509,7 +1539,7 @@ class PlayerStateView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
               child:
-              Text(player.displayName(context) + " (" + info.total.toString() + ")")),
+              Text(player.displayName(context) + " (" + info.points.toString() + ")")),
             trickView(info)
           ])
       ));
