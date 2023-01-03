@@ -3,6 +3,9 @@
  */
 package de.haumacher.wizard.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.msg.Msg;
@@ -16,15 +19,17 @@ import de.haumacher.wizard.resources.StaticResources.Resource;
  */
 public class GameClientImpl implements GameClient {
 
+	private static final Logger LOG = LoggerFactory.getLogger(GameClientImpl.class);
+
 	private static final ClientConnection NONE = new ClientConnection() {
 		@Override
 		public void sendMessage(Msg msg) {
-			// Ignore.
+			LOG.warn("Trying to send message to void connection: " + msg);
 		}
 
 		@Override
 		public void sendError(Resource message) {
-			// Ignore.
+			LOG.warn("Trying to send errorto void connection: " + message);
 		}
 	};
 

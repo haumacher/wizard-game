@@ -59,6 +59,7 @@ public class WizardEndpoint {
 		
 		_clientHandler = new ClientHandler(WizardWebapp.getServer(), msg -> {
 			if (_closed) {
+				LOG.warn("Skipping message sent to closed connection: " + _clientHandler.getName() + " <- " + msg);
 				return;
 			}
 			

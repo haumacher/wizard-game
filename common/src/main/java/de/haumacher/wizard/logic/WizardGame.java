@@ -345,21 +345,19 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	/**
 	 * Removes a player from this game.
 	 */
-	public synchronized void removePlayer(GameClient handle, ClientConnection connection) {
-		if (handle.disconnect(connection)) {
-			if (_lifeCycle == LifeCycleState.ACTIVE) {
-				// A player lost its connection, prepare for reconnect.
-				_lostClients.put(handle.getId(), handle);
-			} else {
-				GameClient removedPlayer = _clientByPlayerId.remove(handle.getId());
-				if (removedPlayer != null) {
-					broadCastAll(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
-				}
+	public synchronized void removePlayer(GameClient handle) {
+		if (_lifeCycle == LifeCycleState.ACTIVE) {
+			// A player lost its connection, prepare for reconnect.
+			_lostClients.put(handle.getId(), handle);
+		} else {
+			GameClient removedPlayer = _clientByPlayerId.remove(handle.getId());
+			if (removedPlayer != null) {
+				broadCastAll(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
 			}
-			
-			if (_clientByPlayerId.size() - _lostClients.size() == 0) {
-				gameFinished();
-			}
+		}
+		
+		if (_clientByPlayerId.size() - _lostClients.size() == 0) {
+			gameFinished();
 		}
 	}
 
@@ -391,6 +389,8 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		
 		// Choose starting player.
 		_bidOffset = (int) (Math.random() * _players.size());
+		
+		LOG.info("Started game '" + getGameId() + "' with " + _maxRound + " rounds, players: " + _players);
 
 		startRound();
 	}
@@ -460,6 +460,8 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		_trumpCard = trumpIndex < cards.size() ? cards.get(trumpIndex) : null;
 		_trumpSuit = _trumpCard != null ? _trumpCard.getSuit() : null;
 		
+		LOG.info("Starting round with trump card: " + _trumpCard);
+		
 		int firstCard = 0;
 		for (PlayerState player : _players) {
 			RoundState state = RoundState.create();
@@ -467,7 +469,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			Collections.sort(playerCards, CardComparator.INSTANCE);
 			state.getCards().addAll(playerCards);
 			player.setRoundState(state);
-			
+
+			LOG.info("Giving cards to '" + player.getPlayer() + "': " + playerCards);
+
 			sendStartRound(player);
 			
 			firstCard += _round;
@@ -478,6 +482,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			
 			int trumpSelectIndex = _bidOffset + (_players.size() - 1);
 			_trumpSelectorId = getPlayerId(trumpSelectIndex);
+			
+			LOG.info("Requesting trump selection from '" + playerState(trumpSelectIndex).getPlayer() + "'.");
+			
 			broadCast(createSelectTrumpMessage());
 		} else {
 			startBids();
@@ -558,6 +565,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void startBids() {
+		LOG.info("Requesting bids.");
 		_gameState = PlayingState.BIDDING;
 		
 		_trumpSelectorId = null;

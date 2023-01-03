@@ -62,10 +62,10 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 
 	private final WizardServer _server;
 	
+	private final Consumer<Msg> _msgSink;
+	
 	private WizardGame _game;
 	
-	private Consumer<Msg> _msgSink;
-
 	private GameClient _handle;
 	
 	private Locale _locale = Locale.getDefault();
@@ -101,6 +101,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	 * </p>
 	 */
 	public void start() {
+		LOG.info("Starting client " + _handle);
 		_server.addClient(this);
 	}
 
@@ -108,9 +109,13 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	 * Called whenever the client connection to the game server has terminated.
 	 */
 	public void stop() {
+		LOG.info("Stopping client " + _handle);
 		_server.removeClient(this);
 		if (_game != null) {
-			_game.removePlayer(_handle, this);
+			if (_handle.disconnect(this)) {
+				LOG.info("Removing client " + _handle + " from game " + _game.getGameId());
+				_game.removePlayer(_handle);
+			}
 		}
 	}
 
@@ -332,7 +337,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	@Override
 	public Void visit(LeaveGame self, Void arg) throws IOException {
 		if (_game != null && _game.getGameId().equals(self.getGameId())) {
-			_game.removePlayer(_handle, this);
+			_game.removePlayer(_handle);
 			_game = null;
 		}
 		return null;
