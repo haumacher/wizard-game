@@ -254,6 +254,13 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 */
 	private int _turnsLeft;
 
+	/**
+	 * {@link GameClient} by {@link Player#getId()} that are required to confirm the last
+	 * announcement before the game might continue.
+	 * 
+	 * @see ConfirmTrick
+	 * @see ConfirmRound
+	 */
 	private Map<String, GameClient> _barrier = new HashMap<>();
 
 	/**
@@ -296,7 +303,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 * Description of this game.
 	 */
 	public Game getData() {
-		return Game.create().setGameId(_id).setPlayers(_clientByPlayerId.values().stream().map(c -> c.getData()).collect(Collectors.toList()));
+		return Game.create()
+			.setGameId(_id)
+			.setPlayers(_players.stream().map(PlayerState::getPlayer).collect(Collectors.toList()));
 	}
 	
 	/**
@@ -315,7 +324,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 		
 		_clientByPlayerId.put(player.getId(), player);
-		broadCast(JoinAnnounce.create().setGameId(_id).setPlayer(player.getData()));
+		broadCastAll(JoinAnnounce.create().setGameId(_id).setPlayer(player.getData()));
 		return true;
 	}
 	
@@ -330,7 +339,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			} else {
 				GameClient removedPlayer = _clientByPlayerId.remove(handle.getId());
 				if (removedPlayer != null) {
-					broadCast(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
+					broadCastAll(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
 				}
 			}
 			
@@ -340,10 +349,6 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 	}
 
-	private void broadCast(Msg msg) {
-		_broadCastAll.accept(msg);
-	}
-	
 	private void broadCast(GameMsg msg) {
 		for (GameClient player : _clientByPlayerId.values()) {
 			player.sendMessage(msg);
@@ -360,9 +365,11 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		_lifeCycle = LifeCycleState.ACTIVE;
 		
 		_round = 1;
-		_maxRound = ALL_CARDS.size() / _clientByPlayerId.size();
-		
-		_players = _clientByPlayerId.values().stream().map(c -> PlayerState.create().setPlayer(c.getData())).collect(Collectors.toList());
+		_players = _clientByPlayerId.values()
+			.stream()
+			.map(c -> PlayerState.create().setPlayer(c.getData()))
+			.collect(Collectors.toList());
+		_maxRound = ALL_CARDS.size() / _players.size();
 		
 		// Choose starting player.
 		_bidOffset = (int) (Math.random() * _players.size());
@@ -377,7 +384,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		GameClient result = _lostClients.remove(clientId);
 		if (result == null) {
 			// Server connection might not yet have crashed, but the client may try to reconnect early.
-			result = _clientByPlayerId.get(clientId);
+			result = client(clientId);
 		}
 		if (result != null) {
 			result.reconnectTo(connection);
@@ -444,7 +451,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		if (isCustomTrumpSelection()) {
 			_gameState = PlayingState.TRUMP_SELECTION;
 			
-			int trumpSelectIndex = _clientByPlayerId.size() - 1 + _bidOffset;
+			int trumpSelectIndex = _bidOffset + (_players.size() - 1);
 			_trumpSelectorId = getPlayerId(trumpSelectIndex);
 			broadCast(createSelectTrumpMessage());
 		} else {
@@ -482,10 +489,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private String getPlayerId(int index) {
-		return getPlayerState(index).getPlayer().getId();
+		return playerState(index).getPlayer().getId();
 	}
 
-	private PlayerState getPlayerState(int index) {
+	private PlayerState playerState(int index) {
 		return _players.get(normalizeIndex(index));
 	}
 
@@ -494,29 +501,29 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	@Override
-	public Void visit(SelectTrump self, GameClient arg)  {
+	public Void visit(SelectTrump self, GameClient sender)  {
 		synchronized (this) {
 			if (_trumpSuit != null) {
-				arg.sendError(R.errTrumpAlreadySelected);
+				sender.sendError(R.errTrumpAlreadySelected);
 				return null;
 			}
-			if (!arg.getId().equals(_trumpSelectorId)) {
-				arg.sendError(R.errYouCannotSelectTrump);
+			if (!sender.getId().equals(_trumpSelectorId)) {
+				sender.sendError(R.errYouCannotSelectTrump);
 				return null;
 			}
 			if (self.getTrumpSuit() == null) {
-				arg.sendError(R.errMustSelectTrump);
+				sender.sendError(R.errMustSelectTrump);
 				return null;
 			}
 			if (!isCustomTrumpSelection()) {
-				arg.sendError(R.errNoTrumpSelectionAllowed);
+				sender.sendError(R.errNoTrumpSelectionAllowed);
 				return null;
 			}
 			
 			_trumpSuit = self.getTrumpSuit();
 		}
 		
-		forward(arg, self);
+		forward(sender, self);
 		startBids();
 		return null;
 	}
@@ -542,17 +549,17 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	@Override
-	public Void visit(Bid self, GameClient arg)  {
+	public Void visit(Bid self, GameClient sender)  {
 		boolean lastBid;
 		synchronized (this) {
 			boolean bidOpen = _bidCount >= _players.size();
 			if (bidOpen) {
-				arg.sendError(R.errAllBidsPlaced);
+				sender.sendError(R.errAllBidsPlaced);
 				return null;
 			}
-			PlayerState playerState = getPlayerState(_bidOffset + _bidCount);
-			if (!playerState.getPlayer().getId().equals(arg.getId())) {
-				arg.sendError(R.errNotYourTurnToBid);
+			PlayerState playerState = playerState(_bidOffset + _bidCount);
+			if (!playerState.getPlayer().getId().equals(sender.getId())) {
+				sender.sendError(R.errNotYourTurnToBid);
 				return null;
 			}
 			int currentBid = self.getCnt();
@@ -563,7 +570,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			lastBid = _bidCount >= _players.size();
 		}
 		
-		forward(arg, self);
+		forward(sender, self);
 		
 		if (lastBid) {
 			broadCast(createStartLeadMessage());
@@ -595,31 +602,31 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	@Override
-	public Void visit(Lead self, GameClient arg)  {
-		PlayerState playerState;
+	public Void visit(Lead self, GameClient sender)  {
+		PlayerState activePlayer;
 		synchronized (this) {
 			if (_bidCount < _players.size()) {
-				arg.sendError(R.errNotAllBidsPlaced);
+				sender.sendError(R.errNotAllBidsPlaced);
 				return null;
 			}
-			playerState = getPlayerState(_startPlayerOffset + _cardsPlayed.size());
-			if (!playerState.getPlayer().getId().equals(arg.getId())) {
-				arg.sendError(R.errNotYourTurn);
+			activePlayer = playerState(_startPlayerOffset + _cardsPlayed.size());
+			if (!activePlayer.getPlayer().getId().equals(sender.getId())) {
+				sender.sendError(R.errNotYourTurn);
 				return null;
 			}
 			if (!_barrier.isEmpty()) {
-				arg.sendError(R.errAllPlayersMustConfirm);
+				sender.sendError(R.errAllPlayersMustConfirm);
 				return null;
 			}
 		}
 		
-		RoundState roundState = playerState.getRoundState();
+		RoundState roundState = activePlayer.getRoundState();
 		List<Card> deck = roundState.getCards();
 		Card putCard = self.getCard();
 		Optional<Card> searchResult = 
 			deck.stream().filter(c -> c.getSuit() == putCard.getSuit() && c.getValue() == putCard.getValue()).findFirst();
 		if (!searchResult.isPresent()) {
-			arg.sendError(R.errWrongCard);
+			sender.sendError(R.errWrongCard);
 			return null;
 		}
 		Card playedCard = searchResult.get();
@@ -627,14 +634,14 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		Suit leadSuit = leadSuit(_cardsPlayed);
 		if (leadSuit != null && playedCard.getSuit() != null && playedCard.getSuit() != leadSuit) {
 			if (deck.stream().filter(c -> c.getSuit() == leadSuit).findFirst().isPresent()) {
-				arg.sendError(R.errMustFollowSuit);
+				sender.sendError(R.errMustFollowSuit);
 				return null;
 			}
 		}
 		
 		roundState.getCards().remove(playedCard);
 		_cardsPlayed.add(playedCard);
-		forward(arg, self);
+		forward(sender, self);
 		
 		if (_cardsPlayed.size() < _players.size()) {
 			requestNextLead();
@@ -660,18 +667,18 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	@Override
-	public Void visit(ConfirmTrick self, GameClient arg) throws IOException {
+	public Void visit(ConfirmTrick self, GameClient sender) throws IOException {
 		boolean lastConfirmer;
 		synchronized (this) {
-			GameClient client = _barrier.remove(arg.getId());
+			GameClient client = _barrier.remove(sender.getId());
 			if (client == null) {
-				arg.sendError(R.errAlreadyConfirmed);
+				sender.sendError(R.errAlreadyConfirmed);
 				return null;
 			}
 			lastConfirmer = _barrier.isEmpty();
 		}
 		
-		forward(arg, self);
+		forward(sender, self);
 		
 		if (lastConfirmer) {
 			_startPlayerOffset = _trickWinnerOffset;
@@ -747,18 +754,18 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	@Override
-	public Void visit(ConfirmRound self, GameClient arg) throws IOException {
+	public Void visit(ConfirmRound self, GameClient sender) throws IOException {
 		boolean lastConfirmer;
 		synchronized (this) {
-			GameClient client = _barrier.remove(arg.getId());
+			GameClient client = _barrier.remove(sender.getId());
 			if (client == null) {
-				arg.sendError(R.errAlreadyConfirmed);
+				sender.sendError(R.errAlreadyConfirmed);
 				return null;
 			}
 			lastConfirmer = _barrier.isEmpty();
 		}
 		
-		forward(arg, self);
+		forward(sender, self);
 		
 		if (lastConfirmer) {
 			nextRound();
@@ -787,6 +794,13 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		broadCast(finishGame);
 		
 		gameFinished();
+	}
+
+	/**
+	 * Sends the given {@link Msg} to all idle players (not currently participating in an active game).
+	 */
+	private void broadCastAll(Msg msg) {
+		_broadCastAll.accept(msg);
 	}
 
 	private void gameFinished() {
