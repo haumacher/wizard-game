@@ -699,6 +699,7 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
     turnWinner = self.winner;
     initConfirmations();
     setState(WizardPhase.trickConfirmation);
+    activityState.setStartPlayer(turnWinner!.id);
   }
 
   @override
@@ -784,6 +785,11 @@ class ActivityState extends ChangeNotifier {
     _players = players;
     players.forEach(_initInfo);
     _infos.values.forEach(_clearTricks);
+    notifyListeners();
+  }
+
+  void setStartPlayer(String? startPlayer) {
+    _startPlayer = startPlayer;
     notifyListeners();
   }
 
