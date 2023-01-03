@@ -6,7 +6,7 @@ package de.haumacher.wizard.logic;
 import de.haumacher.wizard.msg.Player;
 
 /**
- * Abstraction of a player of a {@link WizardGame}.
+ * Abstraction of a single player.
  */
 public interface GameClient extends ClientConnection {
 

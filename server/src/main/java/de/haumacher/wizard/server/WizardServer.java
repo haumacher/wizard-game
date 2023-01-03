@@ -24,9 +24,12 @@ public class WizardServer {
 	
 	final ConcurrentMap<String, WizardGame> _games = new ConcurrentHashMap<>();
 
+	/**
+	 * Sends the given message to all currently logged-in clients.
+	 */
 	public void broadCast(Msg msg) {
-		for (ClientConnection other : _clients.values()) {
-			other.sendMessage(msg);
+		for (ClientConnection client : _clients.values()) {
+			client.sendMessage(msg);
 		}
 	}
 

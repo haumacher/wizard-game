@@ -12,7 +12,7 @@ import de.haumacher.wizard.resources.StaticResources.Resource;
 public interface ClientConnection {
 
 	/**
-	 * Sends a message to the UI.
+	 * Sends the given message to the client UI.
 	 */
 	void sendMessage(Msg msg);
 

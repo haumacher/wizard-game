@@ -49,13 +49,24 @@ import de.haumacher.wizard.msg.Suit;
 import de.haumacher.wizard.msg.Value;
 
 /**
- * Game logic controlled by {@link GameCmd} messages and sending {@link GameMsg} messages to corresponding clients.
+ * Central server-side game logic.
+ * 
+ * <p>
+ * A {@link WizardGame} receives {@link GameCmd} messages from clients playing the game and sends
+ * back {@link GameMsg} messages.
+ * </p>
  */
 public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException> {
 	
+	/**
+	 * The version of the wire-protocol a client must understand to participate in a game.
+	 */
 	public static final int PROTOCOL_VERSION = 6;
 	
-	static final List<Card> CARDS;
+	/**
+	 * All {@link Card}s available in the Wizard game.
+	 */
+	static final List<Card> ALL_CARDS;
 
 	static {
 		List<Card> cards = new ArrayList<>();
@@ -71,70 +82,198 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			}
 		}
 		
-		CARDS = Collections.unmodifiableList(cards);
+		ALL_CARDS = Collections.unmodifiableList(cards);
 	}
 	
-	enum State {
-		CREATED, STARTED, FINISHED;
+	/**
+	 * The life-cycle state of a {@link WizardGame}
+	 */
+	enum LifeCycleState {
+		/**
+		 * The game has been created and is waiting for players to join.
+		 */
+		CREATED, 
+		
+		/**
+		 * The game is active, no more players can join the game.
+		 */
+		ACTIVE, 
+		
+		/**
+		 * The last move of the game has been played. The winner of the game is certain.
+		 */
+		FINISHED;
 	}
 
-	enum GameState {
-		TRUMP_SELECTION, BIDDING, LEADING, FINISHING_TURN, FINISHING_ROUND;
+	/**
+	 * The state of an active {@link WizardGame}.
+	 */
+	enum PlayingState {
+		/**
+		 * A wizard was chosen as trump card. The player that dealt out the cards must select the
+		 * trump color.
+		 */
+		TRUMP_SELECTION, 
+		
+		/**
+		 * Players are announcing the number of tricks they will make.
+		 */
+		BIDDING, 
+		
+		/**
+		 * An active round where each player puts a card on the table.
+		 */
+		LEADING, 
+		
+		/**
+		 * All players have put a card on the table. The winner of the trick has been selected.
+		 */
+		FINISHING_TURN, 
+		
+		/**
+		 * All players have played all their cards. The number points each player has won or lost
+		 * during this round is certain.
+		 */
+		FINISHING_ROUND;
 	}
 	
+	/**
+	 * @see #getGameId()
+	 */
 	private String _id = UUID.randomUUID().toString();
 	
-	private Map<String, GameClient> _clients = new LinkedHashMap<>();
-
-	private State _state = State.CREATED;
+	private LifeCycleState _lifeCycle = LifeCycleState.CREATED;
 	
-	private GameState _gameState;
+	/**
+	 * The state of an {@link LifeCycleState#ACTIVE} game.
+	 */
+	private PlayingState _gameState;
+	
+	private Map<String, GameClient> _clientByPlayerId = new LinkedHashMap<>();
 
+	/**
+	 * The ID of the current round starting with 1.
+	 * 
+	 * <p>
+	 * The round ID is equal to the number of cards each player gets dealt at the start of the round.
+	 * </p>
+	 * 
+	 * @see #_turnsLeft
+	 */
 	private int _round;
+	
+	/**
+	 * The list of players participating in this game.
+	 * 
+	 * <p>
+	 * The order of this list decides about the order of moves played. 
+	 * </p>
+	 */
 	private List<PlayerState> _players;
 	
+	/**
+	 * The {@link Card} that chooses the {@link #_trumpSuit}, if it is not a {@link Value#Z} card.
+	 */
 	private Card _trumpCard;
+	
+	/**
+	 * The {@link Suit} that is trump during the current round.
+	 * 
+	 * <p>
+	 * It is either chosen by the drawn {@link #_trumpCard}, or by the player that has dealt the
+	 * cards, if the {@link #_trumpCard} is a {@link Value#Z} card.
+	 * </p>
+	 * 
+	 * <p>
+	 * If the round has no trump, the value is <code>null</code>.
+	 * </p>
+	 */
 	private Suit _trumpSuit;
 
 	/**
 	 * Index of the player in {@link #_players} that must make the first bid.
+	 * 
+	 * <p>
+	 * The index is chosen randomly when the game starts and is incremented after each round.
+	 * </p>
 	 */
 	private int _bidOffset;
 	
 	/**
-	 * The number of bids already placed in this round.
+	 * The number of players that have already placed their bids.
+	 * 
+	 * @see PlayingState#BIDDING
+	 * @see #_tricksAnnounced
 	 */
 	private int _bidCount;
+
+	/**
+	 * The number of tricks announced so far.
+	 * 
+	 * @see PlayingState#BIDDING
+	 */
+	private int _tricksAnnounced;
 	
 	/**
-	 * Index of the player in {@link #_players} that must make the first put.
+	 * Index of the player in {@link #_players} that plays the first card.
+	 * 
+	 * <p>
+	 * The player that is expected to play the next card is {@link #_startPlayerOffset} plus the size of
+	 * {@link #_cardsPlayed}.
+	 * </p>
 	 */
-	private int _turnOffset;
-	private List<Card> _turn;
+	private int _startPlayerOffset;
+	
+	/**
+	 * All {@link Card} currently on the table.
+	 */
+	private List<Card> _cardsPlayed;
 
+	/**
+	 * Index of the player in {@link #_players} that won the last trick.
+	 * 
+	 * <p>
+	 * The player that won the last trick plays the first card during the next turn.
+	 * </p>
+	 * 
+	 * @see #_startPlayerOffset
+	 */
+	private int _trickWinnerOffset;
+
+	/**
+	 * The number of rounds played in this game. 
+	 * 
+	 * <p>
+	 * Depends on the number of players participating in this game.
+	 * </p>
+	 */
 	private int _maxRound;
 
-	private int _turns;
-
-	private int _totalBids;
+	/**
+	 * The number of cards a player currently holds in his hand.
+	 */
+	private int _turnsLeft;
 
 	private Map<String, GameClient> _barrier = new HashMap<>();
 
+	/**
+	 * The {@link Player#getId()} of the player that is allowed to select the trump color during
+	 * {@link PlayingState#TRUMP_SELECTION} phase.
+	 */
 	private String _trumpSelectorId;
 
-	private Consumer<String> _onFinish;
-
+	/**
+	 * Function transmitting the given {@link Msg} to all players of the game.
+	 */
 	private Consumer<Msg> _broadCastAll;
+	
+	/**
+	 * Callback invoked after the game has finished.
+	 */
+	private Consumer<String> _onFinish;
 	
 	private Map<String, GameClient> _lostClients = new HashMap<>();
 
-	private int _winnerOffset;
-
-
-	public WizardGame() {
-		this(msg -> {}, g -> {});
-	}
-	
 	/** 
 	 * Creates a {@link WizardGame}.
 	 * 
@@ -157,25 +296,25 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 * Description of this game.
 	 */
 	public Game getData() {
-		return Game.create().setGameId(_id).setPlayers(_clients.values().stream().map(c -> c.getData()).collect(Collectors.toList()));
+		return Game.create().setGameId(_id).setPlayers(_clientByPlayerId.values().stream().map(c -> c.getData()).collect(Collectors.toList()));
 	}
 	
 	/**
 	 * Whether new players can join this game.
 	 */
 	public synchronized boolean isAcceptingPlayers() {
-		return _state == State.CREATED;
+		return _lifeCycle == LifeCycleState.CREATED;
 	}
 
 	/**
 	 * Adds a new player to this game.
 	 */
 	public synchronized boolean addPlayer(GameClient player) {
-		if (_state != State.CREATED) {
+		if (_lifeCycle != LifeCycleState.CREATED) {
 			return false;
 		}
 		
-		_clients.put(player.getId(), player);
+		_clientByPlayerId.put(player.getId(), player);
 		broadCast(JoinAnnounce.create().setGameId(_id).setPlayer(player.getData()));
 		return true;
 	}
@@ -185,17 +324,17 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 */
 	public synchronized void removePlayer(GameClient handle, ClientConnection connection) {
 		if (handle.disconnect(connection)) {
-			if (_state == State.STARTED) {
+			if (_lifeCycle == LifeCycleState.ACTIVE) {
 				// A player lost its connection, prepare for reconnect.
 				_lostClients.put(handle.getId(), handle);
 			} else {
-				GameClient removedPlayer = _clients.remove(handle.getId());
+				GameClient removedPlayer = _clientByPlayerId.remove(handle.getId());
 				if (removedPlayer != null) {
 					broadCast(LeaveAnnounce.create().setGameId(getGameId()).setPlayerId(removedPlayer.getId()));
 				}
 			}
 			
-			if (_clients.size() - _lostClients.size() == 0) {
+			if (_clientByPlayerId.size() - _lostClients.size() == 0) {
 				gameFinished();
 			}
 		}
@@ -206,7 +345,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 	
 	private void broadCast(GameMsg msg) {
-		for (GameClient player : _clients.values()) {
+		for (GameClient player : _clientByPlayerId.values()) {
 			player.sendMessage(msg);
 		}
 	}
@@ -215,15 +354,15 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 * Starts the game.
 	 */
 	public synchronized void start()  {
-		if (_state != State.CREATED) {
+		if (_lifeCycle != LifeCycleState.CREATED) {
 			return;
 		}
-		_state = State.STARTED;
+		_lifeCycle = LifeCycleState.ACTIVE;
 		
 		_round = 1;
-		_maxRound = CARDS.size() / _clients.size();
+		_maxRound = ALL_CARDS.size() / _clientByPlayerId.size();
 		
-		_players = _clients.values().stream().map(c -> PlayerState.create().setPlayer(c.getData())).collect(Collectors.toList());
+		_players = _clientByPlayerId.values().stream().map(c -> PlayerState.create().setPlayer(c.getData())).collect(Collectors.toList());
 		
 		// Choose starting player.
 		_bidOffset = (int) (Math.random() * _players.size());
@@ -238,7 +377,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		GameClient result = _lostClients.remove(clientId);
 		if (result == null) {
 			// Server connection might not yet have crashed, but the client may try to reconnect early.
-			result = _clients.get(clientId);
+			result = _clientByPlayerId.get(clientId);
 		}
 		if (result != null) {
 			result.reconnectTo(connection);
@@ -275,14 +414,14 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void startRound()  {
-		_turns = _round;
-		_turnOffset = _bidOffset;
+		_turnsLeft = _round;
+		_startPlayerOffset = _bidOffset;
 		
 		_bidCount = 0;
-		_totalBids = 0;
-		_turn = new ArrayList<>();
+		_tricksAnnounced = 0;
+		_cardsPlayed = new ArrayList<>();
 		
-		List<Card> cards = new ArrayList<>(CARDS);
+		List<Card> cards = new ArrayList<>(ALL_CARDS);
 		Collections.shuffle(cards);
 		
 		int trumpIndex = _players.size() * _round;
@@ -303,9 +442,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 		
 		if (isCustomTrumpSelection()) {
-			_gameState = GameState.TRUMP_SELECTION;
+			_gameState = PlayingState.TRUMP_SELECTION;
 			
-			int trumpSelectIndex = _clients.size() - 1 + _bidOffset;
+			int trumpSelectIndex = _clientByPlayerId.size() - 1 + _bidOffset;
 			_trumpSelectorId = getPlayerId(trumpSelectIndex);
 			broadCast(createSelectTrumpMessage());
 		} else {
@@ -327,7 +466,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 				.setStartPlayer(players.get(_bidOffset).getId())
 				.setCards(player.getRoundState().getCards())
 				.setTrumpCard(_trumpCard);
-		getClient(player.getPlayer().getId()).sendMessage(message);
+		client(player.getPlayer().getId()).sendMessage(message);
 	}
 
 	private void requestNextBid()  {
@@ -335,15 +474,11 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private RequestBid createBidRequestMessage() {
-		return RequestBid.create().setPlayerId(getPlayerId(_bidOffset + _bidCount)).setRound(_round).setExpected(_totalBids);
+		return RequestBid.create().setPlayerId(getPlayerId(_bidOffset + _bidCount)).setRound(_round).setExpected(_tricksAnnounced);
 	}
 
-	private GameClient getClient(int index) {
-		return getClient(getPlayerId(index));
-	}
-
-	private GameClient getClient(String playerId) {
-		return _clients.get(playerId);
+	private GameClient client(String playerId) {
+		return _clientByPlayerId.get(playerId);
 	}
 
 	private String getPlayerId(int index) {
@@ -391,7 +526,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void startBids() {
-		_gameState = GameState.BIDDING;
+		_gameState = PlayingState.BIDDING;
 		
 		_trumpSelectorId = null;
 		broadCast(createStartBiddingMessage());
@@ -421,9 +556,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 				return null;
 			}
 			int currentBid = self.getCnt();
-			_totalBids += currentBid;
+			_tricksAnnounced += currentBid;
 			playerState.getRoundState().setBidCnt(currentBid);
-			self.setExpected(_totalBids);
+			self.setExpected(_tricksAnnounced);
 			_bidCount++;
 			lastBid = _bidCount >= _players.size();
 		}
@@ -450,8 +585,8 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 		
 		// Only relevant when reconnecting to a running game.
-		int playerIndex = _turnOffset;
-		for (Card card : _turn) {
+		int playerIndex = _startPlayerOffset;
+		for (Card card : _cardsPlayed) {
 			startLead.getCurrentTrick().add(PlayedCard.create().setCard(card).setPlayerId(getPlayerId(playerIndex)));
 			playerIndex++;
 		}
@@ -467,7 +602,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 				arg.sendError(R.errNotAllBidsPlaced);
 				return null;
 			}
-			playerState = getPlayerState(_turnOffset + _turn.size());
+			playerState = getPlayerState(_startPlayerOffset + _cardsPlayed.size());
 			if (!playerState.getPlayer().getId().equals(arg.getId())) {
 				arg.sendError(R.errNotYourTurn);
 				return null;
@@ -489,7 +624,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 		Card playedCard = searchResult.get();
 		
-		Suit leadSuit = leadSuit(_turn);
+		Suit leadSuit = leadSuit(_cardsPlayed);
 		if (leadSuit != null && playedCard.getSuit() != null && playedCard.getSuit() != leadSuit) {
 			if (deck.stream().filter(c -> c.getSuit() == leadSuit).findFirst().isPresent()) {
 				arg.sendError(R.errMustFollowSuit);
@@ -498,10 +633,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		}
 		
 		roundState.getCards().remove(playedCard);
-		_turn.add(playedCard);
+		_cardsPlayed.add(playedCard);
 		forward(arg, self);
 		
-		if (_turn.size() < _players.size()) {
+		if (_cardsPlayed.size() < _players.size()) {
 			requestNextLead();
 		} else {
 			finishTurn();
@@ -539,23 +674,23 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		forward(arg, self);
 		
 		if (lastConfirmer) {
-			_turnOffset = _winnerOffset;
+			_startPlayerOffset = _trickWinnerOffset;
 			nextTurn();
 		}
 		return null;
 	}
 
 	private void nextTurn() {
-		_turn = new ArrayList<>();
+		_cardsPlayed = new ArrayList<>();
 		
-		_turns--;
-		if (_turns > 0) {
+		_turnsLeft--;
+		if (_turnsLeft > 0) {
 			requestNextLead();
 		} else {
 			// Compute points.
 			
 			FinishRound finishRound = createFinishRoundMessage();
-			initBarrier(GameState.FINISHING_ROUND);
+			initBarrier(PlayingState.FINISHING_ROUND);
 			broadCast(finishRound);
 		}
 	}
@@ -583,26 +718,26 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	
 	private void finishTurn() {
 		int winningCardIndex = computeWinningCardIndex();
-		_winnerOffset = normalizeIndex(_turnOffset + winningCardIndex);
-		RoundState winnerRoundState = _players.get(_winnerOffset).getRoundState();
+		_trickWinnerOffset = normalizeIndex(_startPlayerOffset + winningCardIndex);
+		RoundState winnerRoundState = _players.get(_trickWinnerOffset).getRoundState();
 		winnerRoundState.setWinCnt(winnerRoundState.getWinCnt() + 1);
 		
-		initBarrier(GameState.FINISHING_TURN);
+		initBarrier(PlayingState.FINISHING_TURN);
 		broadCast(createFinishTurnMessage());
 	}
 
 	private FinishTurn createFinishTurnMessage() {
-		return FinishTurn.create().setTrick(_turn).setWinner(_players.get(_winnerOffset).getPlayer());
+		return FinishTurn.create().setTrick(_cardsPlayed).setWinner(_players.get(_trickWinnerOffset).getPlayer());
 	}
 
 	/** 
-	 * Compute the index of the winning card in {@link #_turn}.
+	 * Compute the index of the winning card in {@link #_cardsPlayed}.
 	 */
 	private int computeWinningCardIndex() {
 		int winnerIndex = 0;
-		Card best = _turn.get(winnerIndex);
-		for (int n = 1, cnt = _turn.size(); n < cnt; n++) {
-			Card current = _turn.get(n);
+		Card best = _cardsPlayed.get(winnerIndex);
+		for (int n = 1, cnt = _cardsPlayed.size(); n < cnt; n++) {
+			Card current = _cardsPlayed.get(n);
 			if (hits(best, current)) {
 				winnerIndex = n;
 				best = current;
@@ -655,26 +790,26 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void gameFinished() {
-		if (_state != State.FINISHED) {
-			_state = State.FINISHED;
+		if (_lifeCycle != LifeCycleState.FINISHED) {
+			_lifeCycle = LifeCycleState.FINISHED;
 			
 			_onFinish.accept(getGameId());
 		}
 	}
 
-	private void initBarrier(GameState nextState) {
+	private void initBarrier(PlayingState nextState) {
 		_gameState = nextState;
 		_barrier.clear();
-		_barrier.putAll(_clients);
+		_barrier.putAll(_clientByPlayerId);
 	}
 	
 	private void requestNextLead()  {
-		_gameState = GameState.LEADING;
+		_gameState = PlayingState.LEADING;
 		broadCast(createRequestLeadMessage());
 	}
 
 	private RequestLead createRequestLeadMessage() {
-		return RequestLead.create().setPlayerId(getPlayerId(_turnOffset + _turn.size()));
+		return RequestLead.create().setPlayerId(getPlayerId(_startPlayerOffset + _cardsPlayed.size()));
 	}
 
 	private boolean hits(Card best, Card current) {

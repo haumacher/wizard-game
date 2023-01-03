@@ -63,7 +63,7 @@ public class TestWizardGame extends TestCase {
 	}
 	
 	public void testGame() throws IOException {
-		WizardGame game = new WizardGame();
+		WizardGame game = new WizardGame(msg -> {}, g -> {});
 		
 		TestClient p1 = new TestClient("P1");
 		game.addPlayer(p1);
