@@ -388,6 +388,7 @@ abstract class Cmd extends _JsonObject {
 			case "Lead": result = Lead(); break;
 			case "ConfirmTrick": result = ConfirmTrick(); break;
 			case "ConfirmRound": result = ConfirmRound(); break;
+			case "ConfirmGame": result = ConfirmGame(); break;
 			default: result = null;
 		}
 
@@ -1802,6 +1803,7 @@ abstract class GameCmdVisitor<R, A> {
 	R visitLead(Lead self, A arg);
 	R visitConfirmTrick(ConfirmTrick self, A arg);
 	R visitConfirmRound(ConfirmRound self, A arg);
+	R visitConfirmGame(ConfirmGame self, A arg);
 }
 
 ///  A {@link Cmd} targeting a running game.
@@ -1829,6 +1831,7 @@ abstract class GameCmd extends Cmd {
 			case "Lead": result = Lead(); break;
 			case "ConfirmTrick": result = ConfirmTrick(); break;
 			case "ConfirmRound": result = ConfirmRound(); break;
+			case "ConfirmGame": result = ConfirmGame(); break;
 			default: result = null;
 		}
 
@@ -2916,6 +2919,31 @@ class FinishGame extends GameMsg {
 
 	@override
 	R visitGameMsg<R, A>(GameMsgVisitor<R, A> v, A arg) => v.visitFinishGame(this, arg);
+
+}
+
+///  Command in response to {@link FinishGame} that must be received from all players, before the game is dropped.
+class ConfirmGame extends GameCmd {
+	/// Creates a ConfirmGame.
+	ConfirmGame();
+
+	/// Parses a ConfirmGame from a string source.
+	static ConfirmGame? fromString(String source) {
+		return read(JsonReader.fromString(source));
+	}
+
+	/// Reads a ConfirmGame instance from the given reader.
+	static ConfirmGame read(JsonReader json) {
+		ConfirmGame result = ConfirmGame();
+		result._readContent(json);
+		return result;
+	}
+
+	@override
+	String _jsonType() => "ConfirmGame";
+
+	@override
+	R visitGameCmd<R, A>(GameCmdVisitor<R, A> v, A arg) => v.visitConfirmGame(this, arg);
 
 }
 

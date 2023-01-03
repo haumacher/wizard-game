@@ -25,7 +25,7 @@
   "youMakeTheTrick": "Du machst den Stich!",
   "playerMakesTheTrick": "{player} macht den Stich!",
   "youGetPoints": "Du erhälst {points} Punkte!",
-  "youCanLeaveTheGame": "Du kannst das Spiel jetzt verlassen und ein neues starten.",
+  "leaveGame": "Spiel verlassen.",
   "selectTrump": "Wähle die Trumpffarbe!",
   "itsYourTurn": "Du bist am Zug!",
   "waitingForPlayersCard": "Warte auf {player}s Karte.",
@@ -36,5 +36,8 @@
   "email": "E-Mail",
   "createAccount": "Account anlegen",
   "loginFailed": "Login fehlgeschlagen",
-  "reLogin": "Neu anmelden"
+  "reLogin": "Neu anmelden",
+  "rank": "Rang",
+  "player": "Spieler",
+  "score": "Punkte"
 }

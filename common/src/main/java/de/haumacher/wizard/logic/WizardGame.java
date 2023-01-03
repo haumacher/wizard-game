@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Card;
+import de.haumacher.wizard.msg.ConfirmGame;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.FinishGame;
@@ -139,7 +140,12 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		 * All players have played all their cards. The number points each player has won or lost
 		 * during this round is certain.
 		 */
-		FINISHING_ROUND;
+		FINISHING_ROUND,
+		
+		/**
+		 * The last turn was played, the scores are shown to all players.
+		 */
+		FINISHING_GAME;
 	}
 	
 	/**
@@ -246,7 +252,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	private int _trickWinnerOffset;
 
 	/**
-	 * The number of rounds played in this game. 
+	 * The number of rounds to play in this game. 
 	 * 
 	 * <p>
 	 * Depends on the number of players participating in this game.
@@ -368,6 +374,7 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 */
 	public synchronized void start()  {
 		if (_lifeCycle != LifeCycleState.CREATED) {
+			LOG.error("Tried to start a game that is not in created state: " + _lifeCycle);
 			return;
 		}
 		_lifeCycle = LifeCycleState.ACTIVE;
@@ -378,6 +385,9 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			.map(c -> PlayerState.create().setPlayer(c.getData()))
 			.collect(Collectors.toList());
 		_maxRound = ALL_CARDS.size() / _players.size();
+		
+		// Test only:
+		// _maxRound = 1;
 		
 		// Choose starting player.
 		_bidOffset = (int) (Math.random() * _players.size());
@@ -423,6 +433,13 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 			case FINISHING_ROUND:
 				result.sendMessage(createStartLeadMessage());
 				result.sendMessage(createFinishRoundMessage());
+				break;
+				
+			case FINISHING_GAME: 
+				result.sendMessage(createStartLeadMessage());
+				result.sendMessage(createFinishRoundMessage());
+				result.sendMessage(createFinishGameMessage());
+				break;
 			}
 		}
 		return result;
@@ -792,16 +809,41 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	}
 
 	private void finishGame() {
+		FinishGame finishGame = createFinishGameMessage();
+		
+		broadCast(finishGame);
+		
+		initBarrier(PlayingState.FINISHING_GAME);
+	}
+
+	private FinishGame createFinishGameMessage() {
 		FinishGame finishGame = FinishGame.create();
 		for (PlayerState state : _players) {
 			int points = state.getPoints();
 			finishGame.addScore(PlayerScore.create().setPlayer(state.getPlayer()).setPoints(points));
 		}
 		Collections.sort(finishGame.getScores(), (s1, s2) -> -Integer.compare(s1.getPoints(), s2.getPoints()));
+		return finishGame;
+	}
+	
+	@Override
+	public Void visit(ConfirmGame self, GameClient sender) throws IOException {
+		boolean lastConfirmer;
+		synchronized (this) {
+			GameClient client = _barrier.remove(sender.getId());
+			if (client == null) {
+				sender.sendError(R.errAlreadyConfirmed);
+				return null;
+			}
+			lastConfirmer = _barrier.isEmpty();
+		}
 		
-		broadCast(finishGame);
+		forward(sender, self);
 		
-		gameFinished();
+		if (lastConfirmer) {
+			gameFinished();
+		}
+		return null;
 	}
 
 	/**

@@ -54,6 +54,11 @@ class CmdTest implements CmdVisitor<bool, void> {
   }
 
   @override
+  bool visitConfirmGame(ConfirmGame self, void arg) {
+    return false;
+  }
+
+  @override
   bool visitCreateGame(CreateGame self, void arg) {
     return false;
   }

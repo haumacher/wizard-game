@@ -21,6 +21,7 @@ import de.haumacher.wizard.msg.AddEmail;
 import de.haumacher.wizard.msg.AddEmailSuccess;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Cmd;
+import de.haumacher.wizard.msg.ConfirmGame;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.CreateAccount;
@@ -367,6 +368,11 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	
 	@Override
 	public Void visit(ConfirmRound self, Void arg) throws IOException {
+		return forwardToGame(self);
+	}
+	
+	@Override
+	public Void visit(ConfirmGame self, Void arg) throws IOException {
 		return forwardToGame(self);
 	}
 

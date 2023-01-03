@@ -448,6 +448,10 @@ message FinishGame extends GameMsg {
 	repeated PlayerScore scores;
 }
 
+/** Command in response to {@link FinishGame} that must be received from all players, before the game is dropped. */
+message ConfirmGame extends GameCmd {
+}
+
 /** Score info for a player. */
 message PlayerScore {
 	/** The player. */

@@ -19,6 +19,16 @@ void main() {
     runApp(const WizardApp());
 //  testPage(const TestTrickView());
 //  testPage(const MyBidView(8, 5));
+//  testGameResultView();
+}
+
+void testGameResultView() {
+  testPage(GameResultView([
+    PlayerScore(player: Player(name: "Player A"), points: 130),
+    PlayerScore(player: Player(name: "Player B"), points: 110),
+    PlayerScore(player: Player(name: "Player C"), points: 110),
+    PlayerScore(player: Player(name: "Player D"), points: 50),
+  ]));
 }
 
 void testPage(Widget child) {
@@ -237,8 +247,8 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   /// The message sent by the server if the connection cannot be established.
   String? errorMessage;
 
-  static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
-  // static const String _serverAddress = "ws://homepi:8081/zauberer-test/ws";
+  // static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
+  static const String _serverAddress = "ws://homepi:8081/zauberer-test/ws";
 
   /// The ID of the player in this app.
   String? playerId;
@@ -276,7 +286,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
     sendCommand(Hello(version: protocolVersion, language: PlatformDispatcher.instance.locale.languageCode));
 
-    state.value = ConnectionState.accountCreation;
+    setState(ConnectionState.accountCreation);
     notifyListeners();
   }
 
@@ -315,8 +325,12 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
   void _onConnectionError() {
     close();
-    state.value = ConnectionState.disconnected;
+    setState(ConnectionState.disconnected);
     notifyListeners();
+  }
+
+  void setState(ConnectionState value) {
+    state.value = value;
   }
 
   void _onMessage(data) {
@@ -334,7 +348,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
       var lastGameId = gameId;
       if (lastPlayerId != null && lastGameId != null) {
         sendCommand(Reconnect(playerId: lastPlayerId, gameId: lastGameId));
-        state.value = ConnectionState.connecting;
+        setState(ConnectionState.connecting);
       } else {
         _prefs.then((prefs) {
           var _playerId = prefs.getString(playerIdKey);
@@ -345,14 +359,14 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
 
             // Perform auto-login.
             sendCommand(Login(uid: _playerId, secret: secret));
-            state.value = ConnectionState.connecting;
+            setState(ConnectionState.connecting);
           } else {
-            state.value = ConnectionState.accountCreation;
+            setState(ConnectionState.accountCreation);
           }
         });
       }
     } else {
-      state.value = ConnectionState.updateRequired;
+      setState(ConnectionState.updateRequired);
       errorMessage = self.msg;
     }
   }
@@ -371,7 +385,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
       prefs.setString(playerIdKey, uid);
       prefs.setString(secretKey, secret);
 
-      state.value = ConnectionState.connecting;
+      setState(ConnectionState.connecting);
       sendCommand(Login(uid: uid, secret: secret));
     });
   }
@@ -384,19 +398,19 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   @override
   void visitWelcome(Welcome self, void arg) {
     playerId = self.playerId;
-    state.value = ConnectionState.loggedIn;
+    setState(ConnectionState.loggedIn);
     sendCommand(ListGames());
   }
 
   @override
   void visitLoginFailed(LoginFailed self, void arg) {
-    state.value = ConnectionState.accountCreation;
+    setState(ConnectionState.accountCreation);
   }
 
   @override
   void visitListGamesResult(ListGamesResult self, void arg) {
     gameList.setGames(self.games);
-    state.value = ConnectionState.listingGames;
+    setState(ConnectionState.listingGames);
     notifyListeners();
   }
 
@@ -422,7 +436,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
     gameList.removeGame(self.game!.gameId);
     if (gameId == self.game?.gameId) {
       wizardModel = WizardModel(playerId!, currentGame!.game);
-      state.value = ConnectionState.playing;
+      setState(ConnectionState.playing);
       notifyListeners();
     }
   }
@@ -436,7 +450,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   }
 
   void enterGame(ObservableGame game) {
-    state.value = ConnectionState.waitingForStart;
+    setState(ConnectionState.waitingForStart);
     currentGame = game;
     
     notifyListeners();
@@ -461,7 +475,7 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   }
 
   void onLeaveGame() {
-    state.value = ConnectionState.listingGames;
+    setState(ConnectionState.listingGames);
     currentGame = null;
     
     sendCommand(ListGames());
@@ -555,7 +569,7 @@ enum WizardPhase {
   roundConfirmation,
 
   /// The game has ended and the final result is displayed.
-  resultConfirmation
+  gameConfirmation
 }
 
 /// Client-side game state of a wizard game.
@@ -710,7 +724,13 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   @override
   void visitFinishGame(FinishGame self, void arg) {
     result = self.scores;
-    setState(WizardPhase.resultConfirmation);
+    setState(WizardPhase.gameConfirmation);
+  }
+
+  @override
+  void visitConfirmGame(ConfirmGame self, String arg) {
+    activityState.removeActivePlayer(playerId);
+    notifyListeners();
   }
 
   void setActivePlayer(String activePlayerId) {
@@ -1156,7 +1176,8 @@ class WizardWidget extends StatelessWidget {
         print("Building WizardWidget: " + phase.name);
       }
 
-      var roundInfo = connection.wizardModel!.roundInfo;
+      var wizardModel = connection.wizardModel!;
+      var roundInfo = wizardModel.roundInfo;
       return Scaffold(
           appBar: AppBar(
             title: roundInfo == null ?
@@ -1171,10 +1192,10 @@ class WizardWidget extends StatelessWidget {
                 Row(children: [
                   Expanded(child:
                     Padding(padding: const EdgeInsets.all(16),
-                      child: PlayerStateView(connection.wizardModel!.activityState)
+                      child: PlayerStateView(wizardModel.activityState)
                     )),
                   ValueListenableBuilder<msg.Card?>(
-                    valueListenable: connection.wizardModel!.trumpCard,
+                    valueListenable: wizardModel.trumpCard,
                     builder: (context, trumpCard, child) {
                       return trumpCard == null ?
                         const SizedBox.shrink() :
@@ -1186,7 +1207,7 @@ class WizardWidget extends StatelessWidget {
                     child: createBody(context, phase)
                 )),
                 Padding(padding: const EdgeInsets.all(16),
-                    child: CardListView(connection.wizardModel!.myCards,
+                    child: CardListView(wizardModel.myCards,
                       onTap: (card) {
                         connection.sendCommand(msg.Lead(card: card));
                       },
@@ -1197,6 +1218,7 @@ class WizardWidget extends StatelessWidget {
   }
 
   Widget createBody(BuildContext context, WizardPhase phase) {
+    var wizardModel = connection.wizardModel!;
     switch (phase) {
       case WizardPhase.idle:
       case WizardPhase.created:
@@ -1206,7 +1228,7 @@ class WizardWidget extends StatelessWidget {
 
       case WizardPhase.trumpSelection:
         return ValueListenableBuilder<bool>(
-          valueListenable: connection.wizardModel!.activityState.imActive,
+          valueListenable: wizardModel.activityState.imActive,
           builder: (context, imActive, child) {
             return imActive ?
               const TrumpSelectionView() :
@@ -1215,10 +1237,10 @@ class WizardWidget extends StatelessWidget {
 
       case WizardPhase.bidding:
         return ValueListenableBuilder<bool>(
-          valueListenable: connection.wizardModel!.activityState.imActive,
+          valueListenable: wizardModel.activityState.imActive,
           builder: (context, imActive, child) {
             return imActive ?
-              MyBidView(connection.wizardModel!.roundInfo!.round, connection.wizardModel!.expectedBids) :
+              MyBidView(wizardModel.roundInfo!.round, wizardModel.expectedBids) :
               WaitingForView((player) => AppLocalizations.of(context)!.waitingForBid(player));
           });
 
@@ -1230,16 +1252,16 @@ class WizardWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TrickView(connection.wizardModel!.currentTrick,
+              TrickView(wizardModel.currentTrick,
                 child: ValueListenableBuilder<bool>(
-                  valueListenable: connection.wizardModel!.activityState.imActive,
+                  valueListenable: wizardModel.activityState.imActive,
                   builder: (context, amActive, child) {
                     return amActive ?
                       trickText(context,
-                        text: amI(connection.wizardModel!.turnWinner!.id) ?
+                        text: amI(wizardModel.turnWinner!.id) ?
                           AppLocalizations.of(context)!.youMakeTheTrick :
                           AppLocalizations.of(context)!.playerMakesTheTrick(
-                            connection.wizardModel!.turnWinner!.displayName(context)),
+                            wizardModel.turnWinner!.displayName(context)),
                         onPressed: () {
                           connection.sendCommand(msg.ConfirmTrick());
                         }) :
@@ -1252,13 +1274,13 @@ class WizardWidget extends StatelessWidget {
       case WizardPhase.roundConfirmation:
         return Center(
           child: ValueListenableBuilder<bool>(
-            valueListenable: connection.wizardModel!.activityState.imActive,
+            valueListenable: wizardModel.activityState.imActive,
             builder: (context, amActive, child) {
               return amActive ?
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(AppLocalizations.of(context)!.youGetPoints(connection.wizardModel!.pointsEarned),
+                    Text(AppLocalizations.of(context)!.youGetPoints(wizardModel.pointsEarned),
                       style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
@@ -1273,28 +1295,77 @@ class WizardWidget extends StatelessWidget {
                   style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
             }));
 
-      case WizardPhase.resultConfirmation:
-        var result = connection.wizardModel!.result;
-        int rank = 1;
-        int lastScore = result[0].points;
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-          children: [
-            Table(children: [
-              for (var score in result)
-                TableRow(children: [
-                  Text((score.points == lastScore ? rank : ++rank).toString()),
-                  Text(score.player!.displayName(context)),
-                  Text((lastScore = score.points).toString()),
-                ])
-            ]),
-            Text(AppLocalizations.of(context)!.youCanLeaveTheGame)
-          ]));
+      case WizardPhase.gameConfirmation:
+        return GameResultView(wizardModel.result);
 
       default:
         return centerText("ERROR: " + phase.name);
     }
+  }
+}
+
+class GameResultView extends StatelessWidget {
+  final List<PlayerScore> result;
+
+  const GameResultView(this.result, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    int rank = 1;
+    int lastScore = result[0].points;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child:
+      Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Table(
+              columnWidths: const {
+                0: FixedColumnWidth(75),
+                1: FlexColumnWidth(1),
+                2: FixedColumnWidth(75),
+              },
+
+              children: [
+                TableRow(
+                  decoration: const BoxDecoration(
+                    color: Colors.grey,
+                    border: Border(
+                      bottom: BorderSide(width: 2))),
+                  children: [
+                    cell(AppLocalizations.of(context)!.rank),
+                    cell(AppLocalizations.of(context)!.player),
+                    cell(AppLocalizations.of(context)!.score),
+                  ]
+                ),
+                for (var score in result)
+                  TableRow(
+                    decoration: const BoxDecoration(color: Colors.white),
+                    children: [
+                      cell((score.points == lastScore ? rank : ++rank).toString()),
+                      cell(score.player!.displayName(context)),
+                      cell((lastScore = score.points).toString()),
+                    ])
+              ]),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+              child: ElevatedButton(
+                onPressed: () {
+                  connection.sendCommand(msg.ConfirmGame());
+                  Navigator.pop(context);
+                },
+                child: Text(AppLocalizations.of(context)!.leaveGame)))
+          ]))
+    );
+  }
+
+  TableCell cell(final String content) {
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.top,
+      child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Text(content)));
   }
 }
 

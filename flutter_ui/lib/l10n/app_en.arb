@@ -51,7 +51,7 @@
       "points": {}
     }
   },
-  "youCanLeaveTheGame": "You can now leave the game and start a new one.",
+  "leaveGame": "Leave game",
   "selectTrump": "Select the trump color!",
   "itsYourTurn": "It's your turn!",
   "waitingForPlayersCard": "Waiting for {player}'s card.",
@@ -67,5 +67,9 @@
   "email": "E-mail",
   "createAccount": "Create account",
   "loginFailed": "Login failed",
-  "reLogin": "Retry login"
+  "reLogin": "Retry login",
+
+  "rank": "Rank",
+  "player": "Player",
+  "score": "Score"
 }

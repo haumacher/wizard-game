@@ -50,6 +50,7 @@ public interface Cmd extends de.haumacher.msgbuf.data.DataObject {
 			case Lead.LEAD__TYPE: result = de.haumacher.wizard.msg.Lead.readLead(in); break;
 			case ConfirmTrick.CONFIRM_TRICK__TYPE: result = de.haumacher.wizard.msg.ConfirmTrick.readConfirmTrick(in); break;
 			case ConfirmRound.CONFIRM_ROUND__TYPE: result = de.haumacher.wizard.msg.ConfirmRound.readConfirmRound(in); break;
+			case ConfirmGame.CONFIRM_GAME__TYPE: result = de.haumacher.wizard.msg.ConfirmGame.readConfirmGame(in); break;
 			default: in.skipValue(); result = null; break;
 		}
 		in.endArray();

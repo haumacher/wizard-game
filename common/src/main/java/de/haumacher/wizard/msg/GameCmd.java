@@ -23,6 +23,9 @@ public interface GameCmd extends Cmd {
 		/** Visit case for {@link de.haumacher.wizard.msg.ConfirmRound}.*/
 		R visit(de.haumacher.wizard.msg.ConfirmRound self, A arg) throws E;
 
+		/** Visit case for {@link de.haumacher.wizard.msg.ConfirmGame}.*/
+		R visit(de.haumacher.wizard.msg.ConfirmGame self, A arg) throws E;
+
 	}
 
 	/** Reads a new instance from the given reader. */
@@ -36,6 +39,7 @@ public interface GameCmd extends Cmd {
 			case Lead.LEAD__TYPE: result = de.haumacher.wizard.msg.Lead.readLead(in); break;
 			case ConfirmTrick.CONFIRM_TRICK__TYPE: result = de.haumacher.wizard.msg.ConfirmTrick.readConfirmTrick(in); break;
 			case ConfirmRound.CONFIRM_ROUND__TYPE: result = de.haumacher.wizard.msg.ConfirmRound.readConfirmRound(in); break;
+			case ConfirmGame.CONFIRM_GAME__TYPE: result = de.haumacher.wizard.msg.ConfirmGame.readConfirmGame(in); break;
 			default: in.skipValue(); result = null; break;
 		}
 		in.endArray();

@@ -11,6 +11,7 @@ import de.haumacher.wizard.io.WizardConnection;
 import de.haumacher.wizard.msg.AddEmailSuccess;
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
+import de.haumacher.wizard.msg.ConfirmGame;
 import de.haumacher.wizard.msg.ConfirmRound;
 import de.haumacher.wizard.msg.ConfirmTrick;
 import de.haumacher.wizard.msg.CreateAccountResult;
@@ -292,11 +293,17 @@ public class WizardController implements Consumer<Msg>, Msg.Visitor<Void, Void, 
 		_gameView.confirmRound(playerId);
 		return null;
 	}
+	
+	@Override
+	public Void visit(ConfirmGame self, String arg) throws IOException {
+		return null;
+	}
 
 	@Override
 	public Void visit(FinishGame self, Void arg) throws IOException {
 		RankingView ranking = _ui.showView(RankingView.class);
 		ranking.show(_server, self, e -> {
+			_server.sendCommand(ConfirmGame.create());
 			_server.sendCommand(LeaveGame.create().setGameId(_game.getGameId()));
 			_server.sendCommand(ListGames.create());
 		});
