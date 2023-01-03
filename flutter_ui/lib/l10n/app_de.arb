@@ -34,5 +34,7 @@
   "nickname": "Spielername",
   "nicknameMustNotBeEmpty": "Der Spielername darf nicht leer sein.",
   "email": "E-Mail",
-  "createAccount": "Account anlegen"
+  "createAccount": "Account anlegen",
+  "loginFailed": "Login fehlgeschlagen",
+  "reLogin": "Neu anmelden"
 }

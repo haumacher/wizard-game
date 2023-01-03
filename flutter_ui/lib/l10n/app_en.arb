@@ -65,5 +65,7 @@
   "nickname": "Nick name",
   "nicknameMustNotBeEmpty": "Nick name must not be empty.",
   "email": "E-mail",
-  "createAccount": "Create account"
+  "createAccount": "Create account",
+  "loginFailed": "Login failed",
+  "reLogin": "Retry login"
 }

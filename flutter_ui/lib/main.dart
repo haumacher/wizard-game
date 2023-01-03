@@ -1065,6 +1065,20 @@ class PlayingView extends StatelessWidget {
                 ),
               )
             );
+          case ConnectionState.accountCreation:
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text(AppLocalizations.of(context)!.loginFailed),
+                ),
+                body:  Center(
+                  child: ElevatedButton(
+                    child: Text(AppLocalizations.of(context)!.reLogin),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                )
+            );
           case ConnectionState.connecting:
             return Scaffold(
               appBar: AppBar(
