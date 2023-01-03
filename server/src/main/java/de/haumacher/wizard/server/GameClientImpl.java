@@ -3,8 +3,6 @@
  */
 package de.haumacher.wizard.server;
 
-import java.util.UUID;
-
 import de.haumacher.wizard.logic.ClientConnection;
 import de.haumacher.wizard.logic.GameClient;
 import de.haumacher.wizard.msg.Msg;
@@ -30,7 +28,7 @@ public class GameClientImpl implements GameClient {
 		}
 	};
 
-	private final Player _data = Player.create().setId(UUID.randomUUID().toString()).setName("Anonymous");
+	private Player _data;
 	
 	private ClientConnection _connection;
 	
@@ -56,15 +54,26 @@ public class GameClientImpl implements GameClient {
 	}
 	
 	@Override
-	public Player getData() {
-		return _data;
-	}
-
-	@Override
-	public String getId() {
-		return _data.getId();
+	public boolean isLoggedIn() {
+		return _data != null;
 	}
 	
+	@Override
+	public Player getData() {
+		if (_data == null) {
+			throw new IllegalStateException("Not logged in.");
+		}
+		return _data;
+	}
+	
+	@Override
+	public void setData(Player data) {
+		if (_data != null) {
+			throw new IllegalStateException("Must not override login information.");
+		}
+		_data = data;
+	}
+
 	@Override
 	public void sendError(Resource message) {
 		_connection.sendError(message);

@@ -39,6 +39,7 @@ import de.haumacher.wizard.msg.ListGamesResult;
 import de.haumacher.wizard.msg.Login;
 import de.haumacher.wizard.msg.LoginFailed;
 import de.haumacher.wizard.msg.Msg;
+import de.haumacher.wizard.msg.Player;
 import de.haumacher.wizard.msg.Reconnect;
 import de.haumacher.wizard.msg.SelectTrump;
 import de.haumacher.wizard.msg.StartGame;
@@ -62,8 +63,6 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	
 	private WizardGame _game;
 	
-	private boolean _loggedIn = false;
-
 	private Consumer<Msg> _msgSink;
 
 	private GameClient _handle;
@@ -215,8 +214,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 			return null;
 		}
 		
-		_loggedIn = true;
-		_handle.getData().setName(nickName);
+		_handle.setData(Player.create().setId(self.getUid()).setName(nickName));
 		sendMessage(Welcome.create().setPlayerId(getId()));
 		return null;
 	}
@@ -240,9 +238,10 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 			return null;
 		}
 		
-		_loggedIn = true;
 		_game = game;
 		_handle = handle;
+		
+		LOG.info("Reconnecting old player to existing " + handle.getData());
 		
 		return null;
 	}
@@ -253,11 +252,21 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 			sendErrorHasGame();
 			return null;
 		}
+		if (!_handle.isLoggedIn()) {
+			sendErrorNotLoggedIn();
+			return null;
+		}
 		
 		_game = _server.createGame(_handle);
 		_game.addPlayer(_handle);
-		
+
+		LOG.info("Added player " + _handle.getData() + " to game " + _game.getGameId());
+
 		return null;
+	}
+
+	private void sendErrorNotLoggedIn() {
+		sendError(R.errNotLoggedIn);
 	}
 
 	private void sendErrorHasGame() {
@@ -301,6 +310,10 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	public Void visit(JoinGame self, Void arg) throws IOException {
 		if (_game != null) {
 			sendErrorHasGame();
+			return null;
+		}
+		if (!_handle.isLoggedIn()) {
+			sendErrorNotLoggedIn();
 			return null;
 		}
 		_game = _server.getGame(self.getGameId());
@@ -358,7 +371,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 	}
 
 	private Void forwardToGame(GameCmd self) throws IOException {
-		if (!_loggedIn) {
+		if (!_handle.isLoggedIn()) {
 			sendError(R.errNotLoggedIn);
 			return null;
 		}

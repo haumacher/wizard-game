@@ -21,28 +21,33 @@ public class TestWizardGame extends TestCase {
 	
 	static class TestClient implements GameClient {
 
-		private final String _id;
+		private Player _data;
 		
 		/** 
 		 * Creates a {@link TestWizardGame.TestClient}.
 		 */
 		public TestClient(String id) {
-			_id = id;
-		}
-
-		@Override
-		public String getId() {
-			return _id;
+			_data = Player.create().setId(id).setName(id);
 		}
 
 		@Override
 		public void sendMessage(Msg msg) {
-			System.out.println(_id + ": " + msg);
+			System.out.println(getId() + ": " + msg);
+		}
+		
+		@Override
+		public boolean isLoggedIn() {
+			return true;
 		}
 
 		@Override
 		public Player getData() {
-			return Player.create().setId(getId()).setName(getId());
+			return _data;
+		}
+		
+		@Override
+		public void setData(Player data) {
+			throw new UnsupportedOperationException();
 		}
 		
 		@Override

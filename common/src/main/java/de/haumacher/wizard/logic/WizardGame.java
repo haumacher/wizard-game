@@ -15,6 +15,9 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.haumacher.wizard.msg.Announce;
 import de.haumacher.wizard.msg.Bid;
 import de.haumacher.wizard.msg.Card;
@@ -57,6 +60,8 @@ import de.haumacher.wizard.msg.Value;
  * </p>
  */
 public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(WizardGame.class);
 	
 	/**
 	 * The version of the wire-protocol a client must understand to participate in a game.
@@ -303,9 +308,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 	 * Description of this game.
 	 */
 	public Game getData() {
+		// Note at the time, this method is called, the game is not yet started and _players is not yet initialized.
 		return Game.create()
 			.setGameId(_id)
-			.setPlayers(_players.stream().map(PlayerState::getPlayer).collect(Collectors.toList()));
+			.setPlayers(_clientByPlayerId.values().stream().map(GameClient::getData).collect(Collectors.toList()));
 	}
 	
 	/**
@@ -325,6 +331,8 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		
 		_clientByPlayerId.put(player.getId(), player);
 		broadCastAll(JoinAnnounce.create().setGameId(_id).setPlayer(player.getData()));
+		
+		LOG.info("Added '" + player + "' to game '" + getGameId() + "'.");
 		return true;
 	}
 	

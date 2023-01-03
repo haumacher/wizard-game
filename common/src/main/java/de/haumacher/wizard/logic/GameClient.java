@@ -10,23 +10,33 @@ import de.haumacher.wizard.msg.Player;
  */
 public interface GameClient extends ClientConnection {
 
+	/** 
+	 * Whether this client is ready to play.
+	 */
+	boolean isLoggedIn();
+
 	/**
 	 * The player data.
 	 */
 	Player getData();
+	
+	/**
+	 * @see #getData()
+	 */
+	void setData(Player data);
 
 	/**
 	 * The player ID.
 	 */
 	default String getId() {
-		return getData().getId();
+		return isLoggedIn() ? getData().getId() : null;
 	}
 
 	/**
 	 * The player name.
 	 */
 	default String getName() {
-		return getData().getName();
+		return isLoggedIn() ? getData().getName() : "Anonymous";
 	}
 
 	/**
