@@ -69,47 +69,48 @@ class TestTrickView extends StatelessWidget {
 }
 
 Padding testMyCards() {
-  return Padding(padding: const EdgeInsets.all(16),
-          child: CardListView(
-            ObservableList<msg.Card>()
-              ..add(msg.Card(value: Value.z, suit: null))
-              ..add(msg.Card(value: Value.c13, suit: Suit.club))
-              ..add(msg.Card(value: Value.c11, suit: Suit.spade))
-              ..add(msg.Card(value: Value.c12, suit: Suit.heart))
-              ..add(msg.Card(value: Value.c9, suit: Suit.heart))
-              ..add(msg.Card(value: Value.c10, suit: Suit.diamond))
-              ..add(msg.Card(value: Value.n, suit: null))
-            ));
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: CardListView(
+      ObservableList<msg.Card>()
+        ..add(msg.Card(value: Value.z, suit: null))
+        ..add(msg.Card(value: Value.c13, suit: Suit.club))
+        ..add(msg.Card(value: Value.c11, suit: Suit.spade))
+        ..add(msg.Card(value: Value.c12, suit: Suit.heart))
+        ..add(msg.Card(value: Value.c9, suit: Suit.heart))
+        ..add(msg.Card(value: Value.c10, suit: Suit.diamond))
+        ..add(msg.Card(value: Value.n, suit: null))
+      ));
 }
 
 Padding testPlayerStatus() {
-  return Padding(padding: const EdgeInsets.all(16),
-          child:
-          PlayerStateView(
-            ActivityState("1")
-            ..startRound([
-              Player(id: "1", name: "Player A"),
-              Player(id: "2", name: "Player B"),
-              Player(id: "3", name: "Player C"),
-              Player(id: "4", name: "You"),
-            ], "1")
-            ..setActivePlayers(const {"4"})
-            ..finishRound({
-              "1": RoundInfo(total: 50),
-              "2": RoundInfo(total: 90),
-              "3": RoundInfo(total: 70),
-              "4": RoundInfo(total: 120),
-            })
-            ..bid("1", 1)
-            ..bid("2", 2)
-            ..bid("3", 0)
-            ..bid("4", 3)
-            ..setTricks("1", 2)
-            ..setTricks("2", 1)
-            ..setTricks("3", 0)
-            ..setTricks("4", 2)
-          )
-        );
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: PlayerStateView(
+      ActivityState("1")
+      ..startRound([
+        Player(id: "1", name: "Player A"),
+        Player(id: "2", name: "Player B"),
+        Player(id: "3", name: "Player C"),
+        Player(id: "4", name: "You"),
+      ], "1")
+      ..setActivePlayers(const {"4"})
+      ..finishRound({
+        "1": RoundInfo(total: 50),
+        "2": RoundInfo(total: 90),
+        "3": RoundInfo(total: 70),
+        "4": RoundInfo(total: 120),
+      })
+      ..bid("1", 1)
+      ..bid("2", 2)
+      ..bid("3", 0)
+      ..bid("4", 3)
+      ..setTricks("1", 2)
+      ..setTricks("2", 1)
+      ..setTricks("3", 0)
+      ..setTricks("4", 2)
+    )
+  );
 }
 
 extension CardEquality on msg.Card {
