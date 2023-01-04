@@ -1245,7 +1245,7 @@ class WizardWidget extends StatelessWidget {
           builder: (context, imActive, child) {
             return imActive ?
               const TrumpSelectionView() :
-              WaitingForView(i18n.selectsTrump);
+              WaitingForView(i18n.selectsTrump, key: const Key("selectsTrump"));
           });
       case WizardPhase.bidding:
         return ValueListenableBuilder<bool>(
@@ -1253,7 +1253,7 @@ class WizardWidget extends StatelessWidget {
           builder: (context, imActive, child) {
             return imActive ?
               BidView(wizardModel.roundInfo!.round, wizardModel.expectedBids) :
-              WaitingForView(i18n.waitingForBid);
+              WaitingForView(i18n.waitingForBid, key: const Key("waitingForBid"));
           });
       case WizardPhase.leading:
         return const LeadingView();
@@ -1485,10 +1485,6 @@ class WaitingForView extends StatelessWidget {
       builder: (context, activityState) {
         var activePlayer = activityState.activePlayer;
         var message = activePlayer == null ? "" : messageForPlayer(activePlayer.displayName(context));
-
-        if (kDebugMode) {
-          print("Building WaitingForView: " + message);
-        }
 
         return Text(message,
             style: const TextStyle(
