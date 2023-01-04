@@ -3,7 +3,7 @@
 
 	<groupId>de.haumacher.games</groupId>
 	<artifactId>wizard-parent</artifactId>
-	<version>1.0.7-SNAPSHOT</version>
+	<version>1.0.9-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
@@ -17,7 +17,8 @@
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		<project.scm.id>github-haumacher</project.scm.id>
 
-		<msgbuf.version>1.1.2-SNAPSHOT</msgbuf.version>
+		<wizard.version>${project.version}</wizard.version>
+		<msgbuf.version>1.1.2</msgbuf.version>
 	</properties>
 
 	<dependencies>
@@ -29,6 +30,16 @@
 		</dependency>
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>de.haumacher.games</groupId>
+				<artifactId>wizard-common</artifactId>
+				<version>${wizard.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<scm>
 		<tag>v1.0.2</tag>
 		<url>https://github.com/haumacher/wizard-game</url>
