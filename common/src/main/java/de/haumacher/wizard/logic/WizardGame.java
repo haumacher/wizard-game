@@ -458,6 +458,10 @@ public class WizardGame implements GameCmd.Visitor<Void, GameClient, IOException
 		
 		int trumpIndex = _players.size() * _round;
 		_trumpCard = trumpIndex < cards.size() ? cards.get(trumpIndex) : null;
+		
+		// Test only.
+		// _trumpCard = Card.create().setValue(Value.Z);
+		
 		_trumpSuit = _trumpCard != null ? _trumpCard.getSuit() : null;
 		
 		LOG.info("Starting round with trump card: " + _trumpCard);
