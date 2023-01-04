@@ -574,7 +574,7 @@ enum WizardPhase {
 }
 
 /// Client-side game state of a wizard game.
-class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, GameCmdVisitor<void, String> {
+class WizardModel implements GameMsgVisitor<void, void>, GameCmdVisitor<void, String> {
   /// The ID of the player playing in this app.
   String playerId;
 
@@ -649,7 +649,6 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   void visitRequestBid(RequestBid self, void arg) {
     expectedBids = self.expected;
     setActivePlayer(self.playerId);
-    notifyListeners();
   }
 
   @override
@@ -674,9 +673,8 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
       startLead = false;
     }
 
-    setState(WizardPhase.leading);
     setActivePlayer(self.playerId);
-    notifyListeners();
+    setState(WizardPhase.leading);
   }
 
   @override
@@ -687,7 +685,6 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
       myCards.removeFirst((card) => card.eq(playedCard));
     }
     currentTrick.add(TrickCard(playedCard, activityState.getPlayer(playerId)));
-    notifyListeners();
   }
 
   @override
@@ -698,14 +695,13 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
     activityState.incTrick(self.winner!.id);
     turnWinner = self.winner;
     initConfirmations();
-    setState(WizardPhase.trickConfirmation);
     activityState.setStartPlayer(turnWinner!.id);
+    setState(WizardPhase.trickConfirmation);
   }
 
   @override
   void visitConfirmTrick(ConfirmTrick self, String playerId) {
     activityState.removeActivePlayer(playerId);
-    notifyListeners();
   }
 
   @override
@@ -720,7 +716,6 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   @override
   void visitConfirmRound(ConfirmRound self, String playerId) {
     activityState.removeActivePlayer(playerId);
-    notifyListeners();
   }
 
   @override
@@ -732,7 +727,6 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   @override
   void visitConfirmGame(ConfirmGame self, String arg) {
     activityState.removeActivePlayer(playerId);
-    notifyListeners();
   }
 
   void setActivePlayer(String activePlayerId) {
@@ -752,13 +746,21 @@ class WizardModel extends ChangeNotifier implements GameMsgVisitor<void, void>, 
   }
 }
 
+/// The player statistics including the total amount of players, their bids, tricks, points and whether an action is required by a certain player.
 class ActivityState extends ChangeNotifier {
+  /// The ID of the player running the app.
   final String playerId;
 
+  /// All players participating in the order they should be displayed.
   List<Player> _players = [];
+  
+  /// IDs of players that are required to act.
   Set<String> _activePlayerIds = {};
-  final Map<String, PlayerInfo> _infos = {};
+  
+  /// The bid, trick and points info for players.
+  final Map<String, PlayerInfo> _playerInfoById = {};
 
+  /// The ID of the current start player (that places the first bid, or plays the first card).
   String? _startPlayer;
 
   ActivityState(this.playerId);
@@ -777,14 +779,14 @@ class ActivityState extends ChangeNotifier {
   Player? get activePlayer => _activePlayerIds.isEmpty ? null : getPlayer(_activePlayerIds.first);
 
   PlayerInfo getInfo(String playerId) {
-    return _infos[playerId]!;
+    return _playerInfoById[playerId]!;
   }
 
   void startRound(List<Player> players, String startPlayer) {
     _startPlayer = startPlayer;
     _players = players;
     players.forEach(_initInfo);
-    _infos.values.forEach(_clearTricks);
+    _playerInfoById.values.forEach(_clearTricks);
     notifyListeners();
   }
 
@@ -794,7 +796,7 @@ class ActivityState extends ChangeNotifier {
   }
 
   void _initInfo(Player player) {
-    _infos.putIfAbsent(player.id, () => PlayerInfo());
+    _playerInfoById.putIfAbsent(player.id, () => PlayerInfo());
   }
   
   void _clearTricks(PlayerInfo info) {
@@ -935,7 +937,7 @@ class HomePage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: centerText(AppLocalizations.of(context)!.connecting));
+              body: CenteredText(AppLocalizations.of(context)!.connecting));
           case ConnectionState.accountCreation:
             return const CreateAccountView();
           case ConnectionState.disconnected:
@@ -957,7 +959,7 @@ class HomePage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: centerText(AppLocalizations.of(context)!.loggingIn));
+              body: CenteredText(AppLocalizations.of(context)!.loggingIn));
           case ConnectionState.listingGames:
             return ChangeObserver<GameList>(
               state: connection.gameList,
@@ -966,7 +968,7 @@ class HomePage extends StatelessWidget {
                 return Scaffold(
                   appBar: AppBar(title: Text(AppLocalizations.of(context)!.joinGame)),
                   body: openGames.isEmpty ?
-                    centerText(AppLocalizations.of(context)!.noOpenGames) :
+                    CenteredText(AppLocalizations.of(context)!.noOpenGames) :
                     ListView(
                       children: openGames.values.map((g) =>
                         Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -987,14 +989,14 @@ class HomePage extends StatelessWidget {
                   title: Text(AppLocalizations.of(context)!.zaubererOnline),
                 ),
                 backgroundColor: Colors.deepOrange,
-                body: centerText(connection.errorMessage ?? state.name),
+                body: CenteredText(connection.errorMessage ?? state.name),
             );
           default:
             return Scaffold(
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: centerText("ERROR: " + state.name));
+              body: CenteredText("ERROR: " + state.name));
         }
       }
     );
@@ -1111,7 +1113,7 @@ class PlayingView extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: centerText(AppLocalizations.of(context)!.reconnecting));
+              body: CenteredText(AppLocalizations.of(context)!.reconnecting));
           case ConnectionState.waitingForStart:
             ObservableGame? game = connection.currentGame;
             if (game == null) return showWaitingForStart(context);
@@ -1127,7 +1129,7 @@ class PlayingView extends StatelessWidget {
                       title: Text(AppLocalizations.of(context)!.waitingForPlayers),
                     ),
                     body: players.isEmpty ?
-                    centerText(AppLocalizations.of(context)!.noPlayers) :
+                    CenteredText(AppLocalizations.of(context)!.noPlayers) :
                     ListView(
                       children: [
                         for (var n = 0; n < players.length; n++)
@@ -1167,7 +1169,7 @@ Scaffold showWaitingForStart(BuildContext context) {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.waitingForPlayers),
       ),
-      body: centerText(AppLocalizations.of(context)!.joiningGame));
+      body: CenteredText(AppLocalizations.of(context)!.joiningGame));
 }
 
 class WizardWidget extends StatelessWidget {
@@ -1175,85 +1177,86 @@ class WizardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<WizardPhase>(
-      valueListenable: connection.wizardModel!.phase,
-      builder: (context, phase, child)
-    {
-      if (kDebugMode) {
-        print("Building WizardWidget: " + phase.name);
-      }
+    var wizardModel = connection.wizardModel!;
 
-      var wizardModel = connection.wizardModel!;
-      var roundInfo = wizardModel.roundInfo;
-      return Scaffold(
-          appBar: AppBar(
-            title: roundInfo == null ?
-            Text(AppLocalizations.of(context)!.waitingForStart) :
-            Text(AppLocalizations.of(context)!.round(
-              roundInfo.round.toString(),
-              roundInfo.maxRound.toString())),
-          ),
-          backgroundColor: const Color(0xff158215),
-          body: ExpandDisplay(
-              children: [
-                Row(children: [
-                  Expanded(child:
-                    Padding(padding: const EdgeInsets.all(16),
-                      child: PlayerStateView(wizardModel.activityState)
-                    )),
-                  ValueListenableBuilder<msg.Card?>(
-                    valueListenable: wizardModel.trumpCard,
-                    builder: (context, trumpCard, child) {
-                      return trumpCard == null ?
-                        const SizedBox.shrink() :
-                        Padding(padding: const EdgeInsets.fromLTRB(0, 16, 16, 16),
-                          child: CardView(trumpCard, size: 30));
-                      })
-                ]),
-                Expanded(child: Center(
-                    child: createBody(context, phase)
-                )),
-                Padding(padding: const EdgeInsets.all(16),
-                    child: CardListView(wizardModel.myCards,
-                      onTap: (card) {
-                        connection.sendCommand(msg.Lead(card: card));
-                      },
-                    )),
-              ]));
-    });
+    return ValueListenableBuilder<WizardPhase>(
+      valueListenable: wizardModel.phase,
+      builder: (context, phase, child) {
+        if (kDebugMode) {
+          print("Building WizardWidget: " + phase.name);
+        }
+
+        var roundInfo = wizardModel.roundInfo;
+        return Scaffold(
+            appBar: AppBar(
+              title: roundInfo == null ?
+              Text(AppLocalizations.of(context)!.waitingForStart) :
+              Text(AppLocalizations.of(context)!.round(
+                roundInfo.round.toString(),
+                roundInfo.maxRound.toString())),
+            ),
+            backgroundColor: const Color(0xff158215),
+            body: ExpandDisplay(
+                children: [
+                  Row(children: [
+                    Expanded(child:
+                      Padding(padding: const EdgeInsets.all(16),
+                        child: PlayerStateView(wizardModel.activityState)
+                      )),
+                    ValueListenableBuilder<msg.Card?>(
+                      valueListenable: wizardModel.trumpCard,
+                      builder: (context, trumpCard, child) {
+                        return trumpCard == null ?
+                          const SizedBox.shrink() :
+                          Padding(padding: const EdgeInsets.fromLTRB(0, 16, 16, 16),
+                            child: CardView(trumpCard, size: 30));
+                        })
+                  ]),
+                  Expanded(child: Center(
+                      child: createBody(context, phase)
+                  )),
+                  Padding(padding: const EdgeInsets.all(16),
+                      child: CardListView(wizardModel.myCards,
+                        onTap: (card) {
+                          connection.sendCommand(msg.Lead(card: card));
+                        },
+                      )),
+                ]));
+      });
 // createBody(context, phase));
   }
 
   Widget createBody(BuildContext context, WizardPhase phase) {
+    if (kDebugMode) {
+      print("Building WizardWidget body: " + phase.name);
+    }
+
+    var i18n = AppLocalizations.of(context)!;
     var wizardModel = connection.wizardModel!;
     switch (phase) {
       case WizardPhase.idle:
       case WizardPhase.created:
-        return centerText(AppLocalizations.of(context)!.waitingForCards);
+        return CenteredText(i18n.waitingForCards);
       case WizardPhase.cardsGiven:
-        return centerText(AppLocalizations.of(context)!.waitingForBidRequest);
-
+        return CenteredText(i18n.waitingForBidRequest);
       case WizardPhase.trumpSelection:
         return ValueListenableBuilder<bool>(
           valueListenable: wizardModel.activityState.imActive,
           builder: (context, imActive, child) {
             return imActive ?
               const TrumpSelectionView() :
-              WaitingForView((player) => AppLocalizations.of(context)!.selectsTrump(player));
+              WaitingForView(i18n.selectsTrump);
           });
-
       case WizardPhase.bidding:
         return ValueListenableBuilder<bool>(
           valueListenable: wizardModel.activityState.imActive,
           builder: (context, imActive, child) {
             return imActive ?
-              MyBidView(wizardModel.roundInfo!.round, wizardModel.expectedBids) :
-              WaitingForView((player) => AppLocalizations.of(context)!.waitingForBid(player));
+              BidView(wizardModel.roundInfo!.round, wizardModel.expectedBids) :
+              WaitingForView(i18n.waitingForBid);
           });
-
       case WizardPhase.leading:
         return const LeadingView();
-        
       case WizardPhase.trickConfirmation:
         return Center(
           child: Column(
@@ -1266,18 +1269,17 @@ class WizardWidget extends StatelessWidget {
                     return amActive ?
                       trickText(context,
                         text: amI(wizardModel.turnWinner!.id) ?
-                          AppLocalizations.of(context)!.youMakeTheTrick :
-                          AppLocalizations.of(context)!.playerMakesTheTrick(
+                          i18n.youMakeTheTrick :
+                          i18n.playerMakesTheTrick(
                             wizardModel.turnWinner!.displayName(context)),
                         onPressed: () {
                           connection.sendCommand(msg.ConfirmTrick());
                         }) :
-                      trickText(context, text: AppLocalizations.of(context)!.waitingForOtherPlayers);
+                      trickText(context, text: i18n.waitingForOtherPlayers);
                   },
                 ) 
               ),
             ]));
-
       case WizardPhase.roundConfirmation:
         return Center(
           child: ValueListenableBuilder<bool>(
@@ -1287,7 +1289,7 @@ class WizardWidget extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(AppLocalizations.of(context)!.youGetPoints(wizardModel.pointsEarned),
+                    Text(i18n.youGetPoints(wizardModel.pointsEarned),
                       style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
@@ -1295,18 +1297,16 @@ class WizardWidget extends StatelessWidget {
                         onPressed: () {
                           connection.sendCommand(msg.ConfirmRound());
                         },
-                        child: Text(AppLocalizations.of(context)!.ok)))
+                        child: Text(i18n.ok)))
                   ],
                 ) :
-                Text(AppLocalizations.of(context)!.waitingForOtherPlayers,
+                Text(i18n.waitingForOtherPlayers,
                   style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
             }));
-
       case WizardPhase.gameConfirmation:
         return GameResultView(wizardModel.result);
-
       default:
-        return centerText("ERROR: " + phase.name);
+        return CenteredText("ERROR: " + phase.name);
     }
   }
 }
@@ -1377,19 +1377,26 @@ class GameResultView extends StatelessWidget {
 }
 
 /// Message text centered on the game area.
-Widget centerText(String text) {
-  return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Center(
-          child: Text(text,
-            textAlign: TextAlign.justify,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
-          )
-      )
-  );
+class CenteredText extends StatelessWidget {
+  final String text;
+
+  const CenteredText(this.text, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Center(
+            child: Text(text,
+              textAlign: TextAlign.justify,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
+            )
+        )
+    );
+  }
 }
 
 Widget trickText(BuildContext context, {String? text, void Function()? onPressed}) {
@@ -1450,13 +1457,15 @@ class LeadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var i18n = AppLocalizations.of(context)!;
+
     return TrickView(connection.wizardModel!.currentTrick,
       child: ValueListenableBuilder<bool>(
         valueListenable: connection.wizardModel!.activityState.imActive,
         builder: (context, imActive, child) {
           return imActive ?
             trickText(context, text: AppLocalizations.of(context)!.itsYourTurn) :
-            trickTitle(context, child: WaitingForView((player) => AppLocalizations.of(context)!.waitingForPlayersCard(player)));
+            trickTitle(context, child: WaitingForView(i18n.waitingForPlayersCard));
         })
     );
   }
@@ -1469,25 +1478,36 @@ class WaitingForView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var wizardModel = connection.wizardModel;
+    var wizardModel = connection.wizardModel!;
     
     return ChangeObserver<ActivityState>(
-      state: wizardModel!.activityState,
+      state: wizardModel.activityState,
       builder: (context, activityState) {
         var activePlayer = activityState.activePlayer;
-        return activePlayer == null ? 
-          const Text("", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)) : 
-          Text(messageForPlayer(activePlayer.displayName(context)),
-            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold));
+        var message = activePlayer == null ? "" : messageForPlayer(activePlayer.displayName(context));
+
+        if (kDebugMode) {
+          print("Building WaitingForView: " + message);
+        }
+
+        return Text(message,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold));
       });
   }
 }
 
-class MyBidView extends StatelessWidget {
-  final int round;
-  final int expectedBids;
+/// [Widget] to place a bid.
+class BidView extends StatelessWidget {
+  // The number of cards given in this round (equal to the round ID).
+  final int maxBids;
 
-  const MyBidView(this.round, this.expectedBids, {Key? key}) : super(key: key);
+  /// The number of bids already placed by other players.
+  final int bidsSoFar;
+
+  const BidView(this.maxBids, this.bidsSoFar, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1505,8 +1525,8 @@ class MyBidView extends StatelessWidget {
 
   List<Widget> options() {
     List<Widget> result = [];
-    var freeTricks = round - expectedBids;
-    for (var x = 0; x <= round ; x++) {
+    var freeTricks = maxBids - bidsSoFar;
+    for (var x = 0; x <= maxBids ; x++) {
       result.add(
         Padding(
           padding: const EdgeInsets.all(5),
