@@ -800,7 +800,9 @@ class ActivityState extends ChangeNotifier {
   }
   
   void _clearTricks(PlayerInfo info) {
-    info.bid = 0;
+    // Used as marker for "no bids placed yet".
+    info.bid = -1;
+
     info.tricks = 0;
   }
 
@@ -1627,8 +1629,7 @@ class PlayerStateView extends StatelessWidget {
         alignment: WrapAlignment.center,
         spacing: 5,
         runSpacing: 10,
-        children:
-        state.players.map((player) => playerStateView(context, player)).toList(),
+        children: state.players.map((player) => playerStateView(context, player)).toList(),
       );
     });
   }
@@ -1658,6 +1659,9 @@ class PlayerStateView extends StatelessWidget {
   }
 
   Widget trickView(PlayerInfo info) {
+    if (info.bid < 0) {
+      return const Text("");
+    }
     var markers = max(info.bid, info.tricks);
     if (markers == 0) {
       return const Text("--");
