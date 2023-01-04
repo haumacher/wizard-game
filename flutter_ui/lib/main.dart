@@ -117,6 +117,44 @@ extension CardEquality on msg.Card {
   bool eq(msg.Card other) {
     return value == other.value && suit == other.suit;
   }
+
+  bool beatenBy(msg.Suit? trumpColor, msg.Card other) {
+    // First wizard wins.
+    if (value == Value.z) {
+      return false;
+    }
+    if (other.value == Value.z) {
+      return true;
+    }
+
+    // Jester is beaten by all cards except another jester.
+    if (other.value == Value.n) {
+      return false;
+    }
+    if (value == Value.n) {
+      return true;
+    }
+
+    // Trump color wins.
+    if (suit == trumpColor && other.suit != trumpColor) {
+      return false;
+    }
+    if (other.suit == trumpColor && suit != trumpColor) {
+      return true;
+    }
+
+    // Card only beats card of same suit.
+    if (other.suit != suit) {
+      return false;
+    }
+
+    // Card with highest index wins.
+    return value.index < other.value.index;
+  }
+}
+
+bool eitherOr(bool a, bool b) {
+  return a && !b || b && !a;
 }
 
 class ExpandDisplay extends StatelessWidget {
@@ -602,6 +640,9 @@ class WizardModel implements GameMsgVisitor<void, void>, GameCmdVisitor<void, St
 
   ObservableList<TrickCard> currentTrick = ObservableList();
 
+  /// The index of the card in [currentTrick] that will win the trick.
+  int highestCardIndex = -1;
+
   FinishRound? roundResult;
 
   bool startLead = false;
@@ -683,6 +724,13 @@ class WizardModel implements GameMsgVisitor<void, void>, GameCmdVisitor<void, St
 
     if (playerId == this.playerId) {
       myCards.removeFirst((card) => card.eq(playedCard));
+    }
+    if (currentTrick.elements.isEmpty) {
+      highestCardIndex = 0;
+    } else {
+      if (currentTrick.elements[highestCardIndex].card.beatenBy(trump, playedCard)) {
+        highestCardIndex = currentTrick.elements.length;
+      }
     }
     currentTrick.add(TrickCard(playedCard, activityState.getPlayer(playerId)));
   }
@@ -1460,10 +1508,11 @@ class LeadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var i18n = AppLocalizations.of(context)!;
+    var wizardModel = connection.wizardModel!;
 
-    return TrickView(connection.wizardModel!.currentTrick,
+    return TrickView(wizardModel.currentTrick,
       child: ValueListenableBuilder<bool>(
-        valueListenable: connection.wizardModel!.activityState.imActive,
+        valueListenable: wizardModel.activityState.imActive,
         builder: (context, imActive, child) {
           return imActive ?
             trickText(context, text: AppLocalizations.of(context)!.itsYourTurn) :
@@ -1579,19 +1628,29 @@ class TrickView extends StatelessWidget {
 
   Widget buildTrick(BuildContext context) {
     return ChangeObserver<ObservableList<TrickCard>>(state: trick, builder: (context, trick) {
+      List<Widget> cards = [];
+      var cnt = trick.elements.length;
+      for (var n = 0; n < cnt; n++) {
+        var card = trick.elements[n];
+        var highest = cnt > 1 && n == connection.wizardModel!.highestCardIndex;
+
+        cards.add(Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CardView(card.card, highest: highest),
+              Padding(padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                child: Text(card.player.displayName(context),
+                  style: highest ?
+                    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold) :
+                    const TextStyle(color: Colors.white)),
+              )
+            ]));
+      }
+
       return Wrap(
         spacing: 5,
         runSpacing: 10,
-        children:
-        trick.elements.map((card) =>
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardView(card.card),
-              Padding(padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                child: Text(card.player.displayName(context), style: const TextStyle(color: Colors.white)),
-              )
-            ])).toList()
+        children: cards
       );
     });
   }
@@ -1691,10 +1750,11 @@ class PlayerStateView extends StatelessWidget {
 
 class CardView extends StatelessWidget {
   final msg.Card card;
+  final bool highest;
   final double size;
   final void Function(msg.Card)? onTap;
 
-  const CardView(this.card, {this.size = 50, Key? key, this.onTap}) : super(key: key);
+  const CardView(this.card, {this.highest = false, this.size = 50, Key? key, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1713,7 +1773,7 @@ class CardView extends StatelessWidget {
     return Container(
         decoration: BoxDecoration(
             border: Border.all(
-              color: Colors.black,
+              color: highest ? Colors.purple : Colors.black,
               width: 2,
             ),
             borderRadius: const BorderRadius.all(Radius.circular(8)),
