@@ -987,7 +987,7 @@ class HomePage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: CenteredText(AppLocalizations.of(context)!.connecting));
+              body: CenteredText(AppLocalizations.of(context)!.connecting, color: Colors.black));
           case ConnectionState.accountCreation:
             return const CreateAccountView();
           case ConnectionState.disconnected:
@@ -1009,7 +1009,7 @@ class HomePage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: CenteredText(AppLocalizations.of(context)!.loggingIn));
+              body: CenteredText(AppLocalizations.of(context)!.loggingIn, color: Colors.black));
           case ConnectionState.listingGames:
             return ChangeObserver<GameList>(
               state: connection.gameList,
@@ -1039,14 +1039,14 @@ class HomePage extends StatelessWidget {
                   title: Text(AppLocalizations.of(context)!.zaubererOnline),
                 ),
                 backgroundColor: Colors.deepOrange,
-                body: CenteredText(connection.errorMessage ?? state.name),
+                body: CenteredText(connection.errorMessage ?? state.name, color: Colors.black),
             );
           default:
             return Scaffold(
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.zaubererOnline),
               ),
-              body: CenteredText("ERROR: " + state.name));
+              body: CenteredText("ERROR: " + state.name, color: Colors.black));
         }
       }
     );
@@ -1235,16 +1235,16 @@ class WizardWidget extends StatelessWidget {
           content: Text(i18n.leaveGameQuestion),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false), //<-- SEE HERE
+              onPressed: () => Navigator.of(context).pop(/* result of the showDialog() function */ false),
               child: Text(i18n.no),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true), // <-- SEE HERE
+              onPressed: () => Navigator.of(context).pop(true),
               child: Text(i18n.yes),
             ),
           ],
         ),
-        ) ?? false);
+        ) ?? /* if dialog was dismissed by clicking on the background */ false);
       },
       child: buildContent(context),
     );
