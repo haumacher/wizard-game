@@ -39,5 +39,9 @@
   "reLogin": "Neu anmelden",
   "rank": "Rang",
   "player": "Spieler",
-  "score": "Punkte"
+  "score": "Punkte",
+  "leaveGameTitle": "Spiel verlassen?",
+  "leaveGameQuestion": "Wenn Du das Spiel verlässt, können Deine Mitspieler nicht weiterspielen. Willst Du das Spiel trotzdem verlassen?",
+  "no": "Nein",
+  "yes": "Ja"
 }

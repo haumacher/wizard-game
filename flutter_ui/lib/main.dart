@@ -1018,7 +1018,7 @@ class HomePage extends StatelessWidget {
                 return Scaffold(
                   appBar: AppBar(title: Text(AppLocalizations.of(context)!.joinGame)),
                   body: openGames.isEmpty ?
-                    CenteredText(AppLocalizations.of(context)!.noOpenGames) :
+                    CenteredText(AppLocalizations.of(context)!.noOpenGames, color: Colors.black) :
                     ListView(
                       children: openGames.values.map((g) =>
                         Padding(padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
@@ -1227,6 +1227,30 @@ class WizardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        var i18n = AppLocalizations.of(context)!;
+        return (await showDialog(context: context, builder: (context) => AlertDialog(
+          title: Text(i18n.leaveGameTitle),
+          content: Text(i18n.leaveGameQuestion),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), //<-- SEE HERE
+              child: Text(i18n.no),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // <-- SEE HERE
+              child: Text(i18n.yes),
+            ),
+          ],
+        ),
+        ) ?? false);
+      },
+      child: buildContent(context),
+    );
+  }
+
+  Widget buildContent(BuildContext context) {
     var wizardModel = connection.wizardModel!;
 
     return ValueListenableBuilder<WizardPhase>(
@@ -1429,8 +1453,9 @@ class GameResultView extends StatelessWidget {
 /// Message text centered on the game area.
 class CenteredText extends StatelessWidget {
   final String text;
+  final Color color;
 
-  const CenteredText(this.text, {Key? key}) : super(key: key);
+  const CenteredText(this.text, {Key? key, this.color = Colors.white}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1439,8 +1464,8 @@ class CenteredText extends StatelessWidget {
         child: Center(
             child: Text(text,
               textAlign: TextAlign.justify,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle( 
+                color: color,
                 fontSize: 20,
               ),
             )

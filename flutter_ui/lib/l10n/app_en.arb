@@ -71,5 +71,12 @@
 
   "rank": "Rank",
   "player": "Player",
-  "score": "Score"
+  "score": "Score",
+
+  "leaveGameTitle": "Leave game?",
+  "leaveGameQuestion": "If you now leave the game, you play mates cannot continue playing. Would you like to leave the game anyways?",
+
+  "no": "No",
+  "yes": "Yes"
+
 }
