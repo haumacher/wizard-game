@@ -286,8 +286,8 @@ class ConnectionHandler extends ChangeNotifier implements MsgVisitor<void, void>
   /// The message sent by the server if the connection cannot be established.
   String? errorMessage;
 
-  // static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
-  static const String _serverAddress = "ws://homepi:8081/zauberer-test/ws";
+  static const String _serverAddress = "wss://play.haumacher.de/zauberer/ws";
+  // static const String _serverAddress = "ws://homepi:8081/zauberer-test/ws";
 
   /// The ID of the player in this app.
   String? playerId;
