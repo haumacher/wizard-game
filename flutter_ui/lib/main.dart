@@ -663,6 +663,7 @@ class WizardModel implements GameMsgVisitor<void, void>, GameCmdVisitor<void, St
     roundInfo = self;
     activityState.startRound(self.players, self.startPlayer);
     trumpCard.value = self.trumpCard;
+    trump = self.trumpCard?.suit;
     myCards.set(self.cards);
     
     setState(WizardPhase.cardsGiven);
