@@ -1564,6 +1564,7 @@ class WaitingForView extends StatelessWidget {
         var message = activePlayer == null ? "" : messageForPlayer(activePlayer.displayName(context));
 
         return Text(message,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
