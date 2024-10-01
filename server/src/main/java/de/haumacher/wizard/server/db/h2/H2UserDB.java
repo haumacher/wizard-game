@@ -8,6 +8,7 @@ import static de.haumacher.wizard.server.db.h2.schema.tables.UserSession.*;
 import static de.haumacher.wizard.server.db.h2.schema.tables.Users.*;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -89,6 +90,13 @@ public class H2UserDB  implements UserDB {
 		}
 		
 		return CreateAccountResult.create().setUid(uid).setSecret(secret);
+	}
+	
+	@Override
+	public boolean deleteUser(String eMail) {
+		int cnt = _context.deleteFrom(USERS).where(USERS.EMAIL.eq(eMail.getBytes(StandardCharsets.UTF_8))).execute();
+		
+		return cnt > 0;
 	}
 	
 	@Override

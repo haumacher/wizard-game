@@ -12,6 +12,13 @@ public interface UserDB {
 
 	CreateAccountResult createUser(String nickname) throws DBException;
 
+	/** 
+	 * Deletes the user with the given e-mail address.
+	 * 
+	 * @return Whether deletion succeded. 
+	 */
+	boolean deleteUser(String eMail) throws DBException;
+
 	/**
 	 * Verifies the user login.
 	 *

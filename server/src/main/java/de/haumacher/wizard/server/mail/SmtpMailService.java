@@ -10,6 +10,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.haumacher.msgbuf.json.Base64Utils;
+import de.haumacher.wizard.server.servlet.AccountServlet;
 import jakarta.mail.Address;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
@@ -24,12 +29,6 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMessage.RecipientType;
 import jakarta.mail.internet.MimeMultipart;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.haumacher.msgbuf.json.Base64Utils;
-import de.haumacher.wizard.server.servlet.AccountServlet;
 
 /**
  * Service for sending e-mail messages.
@@ -56,9 +55,9 @@ public class SmtpMailService implements MailService {
 	
 	@Override
 	public void sendActivationMail(String receiver, String uid, String code) throws MessagingException {
+		String link = "https://play.haumacher.de/zauberer" + AccountServlet.PATH + "?" + AccountServlet.UID_PARAM + "=" + uid + "&" + AccountServlet.TOKEN_PARAM + "=" + code;
 		String image = "https://play.haumacher.de/zauberer/images/zauberer.png";
 		
-		String link = "https://play.haumacher.de/zauberer" + AccountServlet.PATH + "?" + AccountServlet.UID_PARAM + "=" + uid + "&" + AccountServlet.TOKEN_PARAM + "=" + code;
 		Message msg = createMessage();
 		msg.setSubject("Zauberer account creation");
 		

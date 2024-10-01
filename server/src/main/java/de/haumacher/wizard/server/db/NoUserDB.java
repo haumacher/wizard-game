@@ -44,6 +44,11 @@ public class NoUserDB implements UserDB {
 		
 		return account;
 	}
+	
+	@Override
+	public boolean deleteUser(String eMail) {
+		return false;
+	}
 
 	@Override
 	public String login(String uid, String secret) throws DBException {
