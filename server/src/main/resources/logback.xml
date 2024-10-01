@@ -1,6 +1,6 @@
 <configuration>
     <property name="logName" value="wizard"/>
-    <property name="logDir" value="/var/log/tomcat9"/>
+    <property name="logDir" value="/var/log/tomcat10"/>
 
 	<insertFromJNDI env-entry-name="java:comp/env/log/dir" as="logDir" />
 	<insertFromJNDI env-entry-name="java:comp/env/log/name" as="logName" />
