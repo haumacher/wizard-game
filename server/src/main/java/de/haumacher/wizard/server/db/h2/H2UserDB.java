@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.util.Arrays;
 
 import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import de.haumacher.wizard.msg.CreateAccountResult;
 import de.haumacher.wizard.server.db.DBException;
 import de.haumacher.wizard.server.db.UserDB;
+import de.haumacher.wizard.server.db.h2.schema.Public;
 
 /**
  * The {@link UserDB} stored in a H2 relational database.
@@ -50,6 +52,10 @@ public class H2UserDB  implements UserDB {
 	
 	@Override
 	public void startup() {
+		// _context.createDatabaseIfNotExists(DefaultCatalog.DEFAULT_CATALOG).execute();
+		// _context.createSchemaIfNotExists(Public.PUBLIC).execute();
+		Public.PUBLIC.tableStream().map(_context::createTableIfNotExists).forEach(Query::execute);
+		
 		int userCnt = _context.fetchCount(USERS);
 		LOG.info("User DB startup, " + userCnt + " users registered.");
 	}
