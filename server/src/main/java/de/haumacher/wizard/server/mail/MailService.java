@@ -3,7 +3,7 @@
  */
 package de.haumacher.wizard.server.mail;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 /**
  * Mail service for user registration.

@@ -9,8 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.NoSuchProviderException;
 
 import junit.framework.TestCase;
 
