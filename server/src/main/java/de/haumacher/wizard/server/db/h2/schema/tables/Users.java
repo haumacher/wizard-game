@@ -4,11 +4,6 @@
 package de.haumacher.wizard.server.db.h2.schema.tables;
 
 
-import de.haumacher.wizard.server.db.h2.schema.Indexes;
-import de.haumacher.wizard.server.db.h2.schema.Keys;
-import de.haumacher.wizard.server.db.h2.schema.Public;
-import de.haumacher.wizard.server.db.h2.schema.tables.records.UsersRecord;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +21,11 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import de.haumacher.wizard.server.db.h2.schema.Indexes;
+import de.haumacher.wizard.server.db.h2.schema.Keys;
+import de.haumacher.wizard.server.db.h2.schema.Public;
+import de.haumacher.wizard.server.db.h2.schema.tables.records.UsersRecord;
 
 
 /**
@@ -62,7 +62,7 @@ public class Users extends TableImpl<UsersRecord> {
     /**
      * The column <code>PUBLIC.USERS.EMAIL</code>.
      */
-    public final TableField<UsersRecord, byte[]> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARBINARY(128).nullable(false), this, "");
+    public final TableField<UsersRecord, byte[]> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARBINARY(128).nullable(true), this, "");
 
     /**
      * The column <code>PUBLIC.USERS.LANGUAGE</code>.
