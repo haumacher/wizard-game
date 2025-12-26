@@ -8,8 +8,6 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import jakarta.mail.MessagingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +50,7 @@ import de.haumacher.wizard.server.db.DBException;
 import de.haumacher.wizard.server.db.UserDB;
 import de.haumacher.wizard.server.db.UserDBService;
 import de.haumacher.wizard.server.mail.MailServiceStarter;
+import jakarta.mail.MessagingException;
 
 /**
  * Server-side logic for a single player.
@@ -163,6 +162,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 		try {
 			userCreated = db.createUser(self.getNickname());
 		} catch (DBException ex) {
+			LOG.error("Failed to create account.", ex);
 			sendError(R.errAccountCreationFailed_msg.fill(ex.getMessage()));
 			return null;
 		}
@@ -179,6 +179,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 		try {
 			token = db.addEmail(self.getUid(), self.getSecret(), self.getEmail());
 		} catch (DBException ex) {
+			LOG.error("Failed to add e-mail.", ex);
 			sendError(R.errCannotAddEmail_msg.fill(ex.getMessage()));
 			return null;
 		}
@@ -186,6 +187,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 		try {
 			MailServiceStarter.getInstance().sendActivationMail(self.getEmail(), self.getUid(), token);
 		} catch (MessagingException ex) {
+			LOG.error("Failed to send activation mail.", ex);
 			sendError(R.sendingVerificationMailFailed_msg.fill(ex.getMessage()));
 			return null;
 		}
@@ -201,6 +203,7 @@ public class ClientHandler implements Cmd.Visitor<Void, Void, IOException>, Clie
 		try {
 			db.verifyEmail(self.getUid(), self.getToken());
 		} catch (DBException ex) {
+			LOG.error("Account verification failed.", ex);
 			sendError(R.errVerificationFailed_msg.fill(ex.getMessage()));
 			return null;
 		}
