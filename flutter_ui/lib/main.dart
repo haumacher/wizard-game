@@ -2,8 +2,6 @@ import 'dart:math';
 import 'dart:core';
 import 'dart:ui';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ui/msg.dart';
 import 'package:flutter_ui/msg.dart' as msg;
 import 'package:flutter_ui/svg.dart';
+
+import 'l10n/app_localizations.dart';
 
 /// The protocol version supported by this client app.
 const int protocolVersion = 6;
