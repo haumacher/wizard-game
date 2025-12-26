@@ -141,13 +141,17 @@ public class SmtpMailService implements MailService {
 		StringBuilder result = new StringBuilder();
 		char[] buffer = new char[4096];
 		try (InputStream in = getClass().getResourceAsStream(resource)) {
-			try (Reader r = new InputStreamReader(in, "utf-8")) {
-				while (true) {
-					int direct = r.read(buffer);
-					if (direct < 0) {
-						break;
+			if (in == null) {
+				LOG.error("Mail template does not exist: " + resource);
+			} else {
+				try (Reader r = new InputStreamReader(in, "utf-8")) {
+					while (true) {
+						int direct = r.read(buffer);
+						if (direct < 0) {
+							break;
+						}
+						result.append(buffer, 0, direct);
 					}
-					result.append(buffer, 0, direct);
 				}
 			}
 		} catch (IOException ex) {
