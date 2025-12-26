@@ -15,10 +15,13 @@ import java.security.SecureRandom;
 import java.sql.Connection;
 import java.util.Arrays;
 
+import org.jooq.CreateTableColumnStep;
 import org.jooq.DSLContext;
-import org.jooq.Query;
+import org.jooq.Field;
+import org.jooq.Index;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
+import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -55,7 +58,18 @@ public class H2UserDB  implements UserDB {
 	public void startup() {
 		// _context.createDatabaseIfNotExists(DefaultCatalog.DEFAULT_CATALOG).execute();
 		// _context.createSchemaIfNotExists(Public.PUBLIC).execute();
-		Public.PUBLIC.tableStream().map(_context::createTableIfNotExists).forEach(Query::execute);
+		for (Table<?> t : Public.PUBLIC.getTables()) {
+			CreateTableColumnStep step = _context.createTableIfNotExists(t);
+			for (Field<?> c : t.fields()) {
+				step = step.column(c);
+			}
+			
+			step.execute();
+			
+			for (Index i : t.getIndexes()) {
+				_context.createIndex(i);
+			}
+		}
 		
 		int userCnt = _context.fetchCount(USERS);
 		LOG.info("User DB startup, " + userCnt + " users registered.");
